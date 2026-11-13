@@ -82,7 +82,16 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--acc)}
 .pbar i{display:block;height:100%;width:0;background:var(--acc);transition:width .15s}
 mark{background:transparent;color:var(--acc);font-weight:800;border-bottom:2px solid var(--acc)}
 .verse{font-size:19px;line-height:1.9;margin:4px 0 10px}
-.verse .hit{background:var(--acc);color:#111;border-radius:4px;padding:0 2px;font-weight:800}
+.verse .hit{background:var(--acc);color:#111;border-radius:4px;padding:0 2px;font-weight:800;animation:pop .45s both}
+@keyframes pop{0%{background:transparent;color:inherit;transform:scale(1)}60%{transform:scale(1.35)}100%{transform:scale(1)}}
+.explain{font-size:16px;line-height:1.6;margin:4px 0 10px}
+.chain{display:flex;flex-wrap:wrap;align-items:center;gap:4px;margin:6px 0;font-size:22px}
+.chain b{display:inline-flex;align-items:center;justify-content:center;width:38px;height:42px;border-radius:10px;background:var(--acc);color:#111;animation:pop .45s both}
+.chain .jmp{display:inline-flex;flex-direction:column;align-items:center;color:var(--acc);font-size:16px;line-height:1;animation:fadein .3s both}
+.chain .jmp small{font-size:11px;color:var(--mut)}
+@keyframes fadein{from{opacity:0}to{opacity:1}}
+.help{border-color:var(--acc)}.help .hb{font-size:15px;line-height:1.65}.help .hb b{color:var(--acc)}
+@media (prefers-reduced-motion:reduce){.verse .hit,.chain b,.chain .jmp{animation:none}}
 .seq{font-size:20px;line-height:2;word-break:break-all;letter-spacing:1px;background:var(--card2);border:1px solid var(--line);border-radius:12px;padding:10px;max-height:46vh;overflow:auto}
 .seq mark{cursor:pointer}
 .wl{display:flex;flex-wrap:wrap;gap:6px}
@@ -142,6 +151,7 @@ mark{background:transparent;color:var(--acc);font-weight:800;border-bottom:2px s
 <header id="hdr">
   <button class="ib" id="backBtn" style="display:none"></button>
   <div class="ttl" id="hdrTitle"></div>
+  <button class="ib" id="helpBtn" aria-label="help" style="display:none">?</button>
   <button class="ib" id="aiDotBtn" aria-label="AI"><i class="dot" id="aiDot"></i><span style="font-size:13px">AI</span></button>
   <button class="ib" id="themeBtn" aria-label="theme">🎨</button>
   <button class="ib" id="aboutBtn" aria-label="about">ℹ️</button>
@@ -157,7 +167,14 @@ mark{background:transparent;color:var(--acc);font-weight:800;border-bottom:2px s
   <button class="big" data-go="search"><span class="ic">🔍</span><div><b data-t="mSearch"></b><span data-t="mSearchD"></span></div></button>
   <button class="big" data-go="reader"><span class="ic">🔢</span><div><b data-t="mReader"></b><span data-t="mReaderD"></span></div></button>
   <button class="big" data-go="matrix"><span class="ic">▦</span><div><b data-t="mMatrix"></b><span data-t="mMatrixD"></span></div></button>
+  <button class="big" data-go="ciphers"><span class="ic">🔤</span><div><b data-t="mCiphers"></b><span data-t="mCiphersD"></span></div></button>
+  <button class="big" data-go="pair"><span class="ic">🔗</span><div><b data-t="mPair"></b><span data-t="mPairD"></span></div></button>
   <button class="big" data-go="saved"><span class="ic">★</span><div><b data-t="mSaved"></b><span id="savedCount"></span></div></button>
+  <div class="card">
+    <h3>👤 <span data-t="nameT"></span></h3>
+    <div class="mut" data-t="nameD"></div>
+    <div class="row" style="margin-top:10px"><input type="text" id="nmIn" class="heb" dir="rtl" style="flex:3" data-tp="namePh"><button class="btn pri" id="nmGo" style="flex:1" data-t="nameGo"></button></div>
+  </div>
   <div class="card">
     <h3 data-t="demoT"></h3>
     <div class="mut" data-t="demoD"></div>
@@ -172,6 +189,7 @@ mark{background:transparent;color:var(--acc);font-weight:800;border-bottom:2px s
 
 <!-- SEARCH (ELS) -->
 <section class="sc" id="sc-search">
+  <div class="helpbox" data-help="search"></div>
   <div class="card">
     <div class="fld"><label data-t="wordLbl"></label>
       <input type="text" id="sWord" class="word-in heb" autocomplete="off" dir="rtl" data-tp="wordPh">
@@ -182,6 +200,7 @@ mark{background:transparent;color:var(--acc);font-weight:800;border-bottom:2px s
       <div class="fld"><label data-t="skipMin"></label><input type="number" id="sMin" min="1" value="1" inputmode="numeric"></div>
       <div class="fld"><label data-t="skipMax"></label><input type="number" id="sMax" min="1" value="1000" inputmode="numeric"></div>
     </div>
+    <button class="btn sm" id="sGemSkip" style="margin-bottom:6px" data-t="gemSkipQuick"></button>
     <label class="chk"><input type="checkbox" id="sBoth" checked><span data-t="bothDir"></span></label>
     <label class="chk"><input type="checkbox" id="sCtrl" checked><span data-t="ctrlRun"></span></label>
     <button class="btn pri wide" id="sGo" data-t="searchBtn"></button>
@@ -191,6 +210,7 @@ mark{background:transparent;color:var(--acc);font-weight:800;border-bottom:2px s
 
 <!-- READER (every N) -->
 <section class="sc" id="sc-reader">
+  <div class="helpbox" data-help="reader"></div>
   <div class="card">
     <div class="mut" data-t="readerIntro" style="margin-bottom:8px"></div>
     <div class="scope" id="rScope" data-ch="1"></div>
@@ -207,6 +227,7 @@ mark{background:transparent;color:var(--acc);font-weight:800;border-bottom:2px s
 
 <!-- MATRIX -->
 <section class="sc" id="sc-matrix">
+  <div class="helpbox" data-help="matrix"></div>
   <div class="card" id="mSetup">
     <div class="mut" data-t="matrixIntro" style="margin-bottom:8px"></div>
     <div class="scope" id="mScope" data-ch="1"></div>
@@ -217,6 +238,31 @@ mark{background:transparent;color:var(--acc);font-weight:800;border-bottom:2px s
     <button class="btn pri wide" id="mGo" data-t="buildMatrix"></button>
   </div>
   <div id="mOut"></div>
+</section>
+
+<!-- CIPHERS -->
+<section class="sc" id="sc-ciphers">
+  <div class="helpbox" data-help="ciphers"></div>
+  <div class="chips" id="cTabs" style="margin-bottom:10px"></div>
+  <div id="cBody"></div>
+  <div id="cOut"></div>
+</section>
+
+<!-- PAIR -->
+<section class="sc" id="sc-pair">
+  <div class="helpbox" data-help="pair"></div>
+  <div class="card">
+    <div class="row">
+      <div class="fld"><label data-t="pA"></label><input type="text" id="pA" class="word-in heb" dir="rtl" placeholder="משה"></div>
+      <div class="fld"><label data-t="pB"></label><input type="text" id="pB" class="word-in heb" dir="rtl" placeholder="מצרים"></div>
+    </div>
+    <div class="scope" id="pScope"></div>
+    <div class="fld"><label data-t="pMaxL"></label><input type="number" id="pMax" min="2" inputmode="numeric"></div>
+    <div class="fld"><label data-t="pModeL"></label><div class="chips" id="pMode"></div></div>
+    <label class="chk"><input type="checkbox" id="pCtrl" checked><span data-t="ctrlRun"></span></label>
+    <button class="btn pri wide" id="pGo" data-t="pGo"></button>
+  </div>
+  <div id="pOut"></div>
 </section>
 
 <!-- SAVED -->
@@ -702,11 +748,238 @@ LANG.ar = {
   skip: 'تخطٍّ', next: 'التالي', start: 'لنبدأ'
 };
 
+/* ---- v1.1 strings ---- */
+Object.assign(LANG.he, {
+  wordShortGr: 'בטקסט היווני כותבים באותיות יווניות, למשל ιησους', g_grc: 'הברית החדשה ביוונית (מקור)',
+  resSentence: 'האותיות {l} נמצאות במרחק {d} אותיות זו מזו, מ{a} עד {b}. כדי לקרוא אותן, מתחילים מהאות הראשונה וסופרים {d} אותיות קדימה — שוב ושוב.',
+  resSentenceBack: 'האותיות {l} נמצאות במרחק {d} אותיות זו מזו, אבל קוראים אותן אחורה: מ{a} חזרה עד {b}.',
+  replay: 'הצג שוב את הקפיצות',
+  sumSentence: '"{w}" נמצאה {n} פעמים כשמחפשים בקפיצות של {a} עד {b} אותיות. כל שורה למטה היא מקום אחד כזה.',
+  sumNone: '"{w}" לא נמצאה בטווח הזה.',
+  resHow: 'המספר במסגרת = כמה אותיות מדלגים (מינוס = קוראים אחורה). לחיצה על שורה — הפסוקים, עם האותיות צבועות. ▦ — הטבלה שבה המילה עומדת בעמודה.',
+  helpT: 'איך זה עובד?', gotIt: 'הבנתי',
+  help_search: 'כותבים מילה או שם. האפליקציה מורידה מהטקסט רווחים וניקוד, כך שנשארת שורה ארוכה של אותיות. אחר כך היא מחפשת את אותיות המילה <b>במרחק שווה זו מזו</b> — למשל כל 50 אותיות. המרחק הזה נקרא <b>דילוג</b>.<br>בתוצאות: כל שורה היא מקום אחד שבו המילה נמצאה, עם מספר הדילוג ומאיזה פסוק עד איזה פסוק. שלושת המספרים למעלה משווים לטקסט עם אותן אותיות בסדר אקראי — כדי לדעת אם הממצא באמת מיוחד.',
+  help_reader: 'בוחרים טקסט ומספר. אם בוחרים 3 — לוקחים את האות הראשונה, ואז כל אות שלישית: 1, 4, 7, 10… כל האותיות שנבחרו נכתבות ברצף אחד, ומילים שנוצרות בתוכו <b>מסומנות</b>. לחיצה על מילה מראה מאילו פסוקים באו האותיות שלה. אפשר גם לחפש מילה מסוימת בתוך הרצף.',
+  help_matrix: 'הטקסט נכתב בשורות באורך קבוע — כמו טבלה. כשרוחב השורה שווה לדילוג, מילה שנמצאה בדילוג <b>עומדת בעמודה</b>, מלמעלה למטה. אפשר לשנות את הרוחב (− / +), לחפש מילים נוספות בכל הכיוונים, וללחוץ על אות כדי לראות מאיזה פסוק היא ולקרוא ממנה למטה.',
+  help_ciphers: 'צפנים שמופיעים במסורת היהודית: <b>גימטריה</b> — ערך מספרי לכל אות; <b>אתב״ש ואלב״ם</b> — החלפת אותיות (א↔ת, ב↔ש…), כמו "ששך" שהוא "בבל" בירמיהו; <b>ראשי תיבות</b> — האות הראשונה של כל מילה או פסוק; <b>מילה נסתרת</b> — מילה שמסתתרת בין שתי מילים רצופות.',
+  help_pair: 'מחפשים שתי מילים — למשל שם ומקום, או שם ושנה — ובודקים <b>כמה קרוב</b> הן מופיעות זו לזו בטבלה. זו השיטה של המחקרים המפורסמים. המרחק נמדד בתאים: 1 = צמודות. בדיקת הביקורת מריצה את אותו חיפוש על טקסט מעורבב, כדי לראות אם קרבה כזו יוצאת גם במקרה.',
+  mCiphers: 'גימטריה וצפנים מהמסורת', mCiphersD: 'גימטריה, אתב״ש, ראשי תיבות, מילה נסתרת',
+  mPair: 'זוג מילים קרובות', mPairD: 'שם ועוד מילה — כמה קרוב הן בטבלה',
+  nameT: 'השם שלי בתורה', nameD: 'כתבו שם, והאפליקציה תמצא אותו בדילוגים בתורה ותראה את הטבלה של הממצא עם הדילוג הקטן ביותר.', namePh: 'השם בעברית', nameGo: 'מצא', nameNone: 'לא נמצא בדילוגים בטווח. נסו טווח גדול יותר בהגדרות.',
+  gemSkipQuick: '🔢 דילוג = הגימטריה של המילה', gemSet: 'הדילוג נקבע ל-{v} (הגימטריה של המילה)',
+  tabGem: 'גימטריה', tabAtb: 'אתב״ש ואלב״ם', tabRt: 'ראשי תיבות', tabHid: 'מילה נסתרת',
+  gemIntro: 'לכל אות יש ערך: א=1, ב=2 … י=10, כ=20 … ק=100 … ת=400. מחברים את הערכים ומקבלים את הגימטריה של המילה. כאן רואים את הערך, מילים בתנ״ך עם אותו ערך, ופסוקים שסכומם שווה לו.',
+  gemPh: 'מילה, שם או משפט', gemBig: 'אותיות סופיות בערך גדול (ך=500 … ץ=900)', gemCalc: 'חשב גימטריה', gemValue: 'גימטריה',
+  gemExplain: 'אפשר גם לחפש את המילה בדילוג של {v} אותיות — נוהג מקובל אצל מחפשי צפנים.', gemSkipBtn: 'חפש את המילה בתורה בדילוג {v}',
+  gemWords: 'מילים בתנ״ך עם אותו ערך ({n})', gemWordsD: 'המספר ליד כל מילה = כמה פעמים היא מופיעה. לחיצה — איפה.',
+  gemVerses: 'פסוקים שסכום האותיות שלהם שווה', gemVersesN: '{n} פסוקים (מוצגים עד 40)', gemVersesNone: 'אין פסוק עם סכום כזה בטקסט הזה.',
+  gemWhere: 'איפה מופיעה', first40: 'מוצגים 40 הראשונים.',
+  atbIntro: 'אתב״ש: האות הראשונה מתחלפת באחרונה (א↔ת, ב↔ש, ג↔ר…). אלב״ם: חצי האלף-בית הראשון מתחלף בשני (א↔ל, ב↔מ…). בירמיהו כה:כו "ששך" הוא "בבל" באתב״ש.',
+  sm_atbash: 'אתב״ש', sm_albam: 'אלב״ם', atbConvert: 'המר',
+  atbScanT: 'סריקה בתנ״ך', atbScanD: 'מוצאת מילים בטקסט שהגרסה המוצפנת שלהן היא גם מילה בתנ״ך.', atbScanBtn: 'סרוק',
+  atbLegend: '✓ = המילה קיימת בתנ״ך', atbSearch: 'חפש "{w}" בתנ״ך', heOnly: 'אפשרי רק בתנ״ך העברי',
+  atbScanRes: '{n} מילים ב{l}', atbScanNote: 'רוב ההתאמות מקריות; הדוגמאות המפורסמות (ששך = בבל) הן מעטות.', atbPairNote: '"{a}" ב{m} הוא "{b}".',
+  rtIntro: 'לוקחים מכל מילה (או מכל פסוק) רק את האות הראשונה או האחרונה, וכותבים אותן ברצף. מילים שנוצרות ברצף מסומנות.',
+  acro_wf: 'ראשי תיבות', acro_wl: 'סופי תיבות', acro_vf: 'ראשי פסוקים', acro_vl: 'סופי פסוקים', rtGo: 'הוצא רצף',
+  hidIntro: 'מוצאים מילה שכתובה ברצף בטקסט, אבל מתחילה במילה אחת ונגמרת במילה שאחריה — כך שבקריאה רגילה לא רואים אותה.',
+  hidPh: 'מילה לחיפוש', hidGo: 'חפש מילה נסתרת', hidCross: 'נסתרת בין מילים', hidWhole: 'כמילה רגילה', hidInside: 'בתוך מילה אחרת',
+  hidExplain: '"{w}" מסתתרת {n} פעמים על פני יותר ממילה אחת. האותיות שלה צבועות בפסוקים.', first60: 'מוצגים 60 מתוך {n}.',
+  pA: 'מילה ראשונה (בדילוג)', pB: 'מילה שנייה', pMaxL: 'דילוג מקסימלי', pModeL: 'המילה השנייה',
+  pm_any: 'בכל דילוג', pm_plain: 'רק כתובה בטקסט (דילוג 1)', pGo: '🔗 חפש זוג', pairNeed: 'צריך שתי מילים, לפחות 2 אותיות כל אחת',
+  pBestReal: 'הכי קרוב — אמיתי', pBestShuf: 'הכי קרוב — מעורבב', pCounts: 'מופעים (1 / 2)',
+  pExplain: 'המרחק נמדד בתאים בטבלה שרוחבה כדילוג של המילה הראשונה: 1 = צמודות. מספר קטן = קרובות יותר.',
+  pNone: 'לא נמצא זוג קרוב.', pNoCtrl: 'בלי בדיקת ביקורת אי אפשר לדעת אם הקרבה מיוחדת.', pCloser: 'בטקסט האמיתי המילים קרובות יותר מבטקסט המעורבב. מעניין — אבל זו עדיין לא הוכחה.', pSame: 'קרבה דומה יוצאת גם בטקסט מעורבב — כנראה מקרית.',
+  mxImgBtn: 'תמונה לשיתוף', imgCtrl: 'בדיקת ביקורת: {r} בטקסט · {s} במעורבב · {e} צפוי',
+  seqFindPh: 'חיפוש מילה בתוך הרצף', seqFound: '"{w}" נמצאה {n} פעמים ברצף',
+  srcGrcT: 'הברית החדשה — המקור היווני (Textus Receptus)', srcGrcD: 'Textus Receptus מ-eBible.org, נחלת הכלל. הוסרו סימני ההטעמה והניקוד, הכול באותיות קטנות, ς נחשבת σ. כ-690,600 אותיות. כאן הדילוגים רצים על השפה שבה הטקסט נכתב.',
+  g7t: 'גימטריה וצפנים', g7d: 'גימטריה, אתב״ש, ראשי תיבות ומילים נסתרות — צפנים מהמסורת, וגם זוג מילים קרובות ו"השם שלי בתורה".'
+});
+Object.assign(LANG.en, {
+  wordShortGr: 'In the Greek text type Greek letters, e.g. ιησους', g_grc: 'New Testament in Greek (original)',
+  resSentence: 'The letters {l} are {d} letters apart, from {a} to {b}. To read them, start at the first letter and count {d} letters forward — again and again.',
+  resSentenceBack: 'The letters {l} are {d} letters apart, read backward: from {a} back to {b}.',
+  replay: 'Replay the jumps',
+  sumSentence: '"{w}" was found {n} times when jumping {a} to {b} letters. Each row below is one such place.',
+  sumNone: '"{w}" was not found in this range.',
+  resHow: 'The boxed number = how many letters are skipped (minus = read backward). Tap a row for the verses with the letters colored. ▦ = the grid where the word stands in a column.',
+  helpT: 'How does it work?', gotIt: 'Got it',
+  help_search: 'Type a word or name. The app removes spaces and vowels so the text becomes one long line of letters, then looks for the word\'s letters <b>at an equal distance from each other</b> — e.g. every 50 letters. That distance is the <b>skip</b>.<br>Results: each row is one place where the word was found, with its skip and the verses it spans. The three numbers on top compare with the same letters in random order — so you know if a finding is really special.',
+  help_reader: 'Pick a text and a number. With 3 you take the first letter, then every third: 1, 4, 7, 10… The chosen letters are written as one sequence, and words formed in it are <b>marked</b>. Tap a word to see which verses its letters came from. You can also search a word inside the sequence.',
+  help_matrix: 'The text is written in rows of fixed length, like a grid. When the row width equals the skip, a word found at that skip <b>stands in a column</b>, top to bottom. Change the width (− / +), look for more words in all directions, and tap a letter to see its verse and read down from it.',
+  help_ciphers: 'Ciphers from Jewish tradition: <b>gematria</b> — a number for every letter; <b>atbash and albam</b> — letter swaps (א↔ת, ב↔ש…), like "ששך" = "בבל" in Jeremiah; <b>acronyms</b> — the first letter of each word or verse; <b>hidden words</b> — a word hiding across two neighbouring words.',
+  help_pair: 'Search two words — e.g. a name and a place, or a name and a year — and check <b>how close</b> they appear to each other in the grid. This is the method of the famous studies. Distance is in cells: 1 = touching. The control runs the same search on shuffled text to see whether such closeness also happens by chance.',
+  mCiphers: 'Gematria & traditional ciphers', mCiphersD: 'Gematria, atbash, acronyms, hidden words',
+  mPair: 'Close word pairs', mPairD: 'A name and another word — how close in the grid',
+  nameT: 'My name in the Torah', nameD: 'Type a name; the app finds it at letter skips in the Torah and opens the grid of the smallest-skip finding.', namePh: 'Name in Hebrew', nameGo: 'Find', nameNone: 'Not found at a skip in range. Try a larger range in Settings.',
+  gemSkipQuick: '🔢 Skip = the word\'s gematria', gemSet: 'Skip set to {v} (the word\'s gematria)',
+  tabGem: 'Gematria', tabAtb: 'Atbash & albam', tabRt: 'Acronyms', tabHid: 'Hidden word',
+  gemIntro: 'Every letter has a value: א=1, ב=2 … י=10, כ=20 … ק=100 … ת=400. Add them up for the word\'s gematria. See the value, Bible words with the same value, and verses whose letters add up to it.',
+  gemPh: 'Word, name or phrase', gemBig: 'Final letters with large values (ך=500 … ץ=900)', gemCalc: 'Calculate gematria', gemValue: 'Gematria',
+  gemExplain: 'You can also search the word at a skip of {v} letters — a common practice among code seekers.', gemSkipBtn: 'Search the word in the Torah at skip {v}',
+  gemWords: 'Bible words with the same value ({n})', gemWordsD: 'The number by each word = how often it appears. Tap to see where.',
+  gemVerses: 'Verses whose letters add up to it', gemVersesN: '{n} verses (up to 40 shown)', gemVersesNone: 'No verse with this sum in this text.',
+  gemWhere: 'where it appears', first40: 'First 40 shown.',
+  atbIntro: 'Atbash: the first letter swaps with the last (א↔ת, ב↔ש, ג↔ר…). Albam: the first half of the alphabet swaps with the second (א↔ל, ב↔מ…). In Jeremiah 25:26 "ששך" is "בבל" in atbash.',
+  sm_atbash: 'Atbash', sm_albam: 'Albam', atbConvert: 'Convert',
+  atbScanT: 'Scan the Bible', atbScanD: 'Finds words in the text whose encoded form is also a Bible word.', atbScanBtn: 'Scan',
+  atbLegend: '✓ = the word exists in the Bible', atbSearch: 'Search "{w}" in the Bible', heOnly: 'Only possible in the Hebrew Bible',
+  atbScanRes: '{n} words in {l}', atbScanNote: 'Most matches are chance; the famous examples (ששך = בבל) are few.', atbPairNote: '"{a}" in {m} is "{b}".',
+  rtIntro: 'Take only the first or last letter of every word (or verse) and write them in a row. Words formed in the sequence are marked.',
+  acro_wf: 'Word initials', acro_wl: 'Word finals', acro_vf: 'Verse initials', acro_vl: 'Verse finals', rtGo: 'Extract sequence',
+  hidIntro: 'Find a word written continuously in the text but "hiding" across two or more words.',
+  hidPh: 'Word to search', hidGo: 'Search hidden word', hidCross: 'Hidden across words', hidWhole: 'As a normal word', hidInside: 'Inside another word',
+  hidExplain: '"{w}" hides {n} times across more than one word. Its letters are colored in the verses.', first60: '60 of {n} shown.',
+  pA: 'First word (at a skip)', pB: 'Second word', pMaxL: 'Maximum skip', pModeL: 'The second word',
+  pm_any: 'At any skip', pm_plain: 'Only written in the text (skip 1)', pGo: '🔗 Search pair', pairNeed: 'Two words needed, at least 2 letters each',
+  pBestReal: 'Closest — real', pBestShuf: 'Closest — shuffled', pCounts: 'Hits (1 / 2)',
+  pExplain: 'Distance is measured in cells of a grid as wide as the first word\'s skip: 1 = touching. Smaller = closer.',
+  pNone: 'No close pair found.', pNoCtrl: 'Without a control test you cannot tell whether the closeness is special.', pCloser: 'In the real text the words are closer than in the shuffled one. Interesting — but still not proof.', pSame: 'Similar closeness appears in shuffled text too — probably chance.',
+  mxImgBtn: 'Share image', imgCtrl: 'Control: {r} in text · {s} shuffled · {e} expected',
+  seqFindPh: 'Search a word in the sequence', seqFound: '"{w}" found {n} times in the sequence',
+  srcGrcT: 'New Testament — Greek original (Textus Receptus)', srcGrcD: 'Textus Receptus from eBible.org, public domain. Accents and breathings removed, lowercase, ς counted as σ. About 690,600 letters. Here the skips run over the language the text was written in.',
+  g7t: 'Gematria & ciphers', g7d: 'Gematria, atbash, acronyms and hidden words — ciphers from tradition — plus close word pairs and "my name in the Torah".'
+});
+Object.assign(LANG.ru, {
+  wordShortGr: 'Для греческого текста пишите греческими буквами, например ιησους', g_grc: 'Новый Завет по-гречески (оригинал)',
+  resSentence: 'Буквы {l} стоят через {d} букв друг от друга, от {a} до {b}. Начните с первой буквы и отсчитывайте {d} букв вперёд — снова и снова.',
+  resSentenceBack: 'Буквы {l} стоят через {d} букв, читаются назад: от {a} до {b}.',
+  replay: 'Показать прыжки снова',
+  sumSentence: '«{w}» найдено {n} раз с шагом от {a} до {b} букв. Каждая строка ниже — одно такое место.',
+  sumNone: '«{w}» не найдено в этом диапазоне.',
+  resHow: 'Число в рамке — сколько букв пропускается (минус — назад). Нажмите строку, чтобы увидеть стихи. ▦ — таблица, где слово стоит в столбце.',
+  helpT: 'Как это работает?', gotIt: 'Понятно',
+  help_search: 'Введите слово или имя. Приложение убирает пробелы и огласовки, и текст становится одной длинной строкой букв. Затем оно ищет буквы слова <b>на равном расстоянии</b> друг от друга — например, каждые 50 букв. Это расстояние — <b>шаг</b>.<br>Каждая строка результатов — одно место. Три числа сверху сравнивают с теми же буквами в случайном порядке.',
+  help_reader: 'Выберите текст и число. При 3 берётся первая буква, затем каждая третья: 1, 4, 7, 10… Буквы пишутся подряд, найденные слова <b>отмечены</b>. Нажмите на слово, чтобы увидеть стихи.',
+  help_matrix: 'Текст записан строками одинаковой длины. Когда ширина строки равна шагу, найденное слово <b>стоит в столбце</b>. Меняйте ширину, ищите слова во всех направлениях, нажимайте на буквы.',
+  help_ciphers: 'Шифры еврейской традиции: <b>гематрия</b> — число каждой буквы; <b>атбаш и албам</b> — замена букв, как «ששך» = «בבל» у Иеремии; <b>акронимы</b> — первые буквы слов или стихов; <b>скрытое слово</b> — слово между двумя соседними словами.',
+  help_pair: 'Ищите два слова — например, имя и место — и смотрите, <b>насколько близко</b> они в таблице. Так работали известные исследования. Расстояние в клетках: 1 = рядом. Контроль повторяет поиск на перемешанном тексте.',
+  mCiphers: 'Гематрия и традиционные шифры', mCiphersD: 'Гематрия, атбаш, акронимы, скрытые слова',
+  mPair: 'Близкие пары слов', mPairD: 'Имя и ещё слово — насколько близко',
+  nameT: 'Моё имя в Торе', nameD: 'Введите имя: приложение найдёт его с пропусками в Торе и откроет таблицу находки с наименьшим шагом.', namePh: 'Имя на иврите', nameGo: 'Найти', nameNone: 'Не найдено в диапазоне. Увеличьте диапазон в настройках.',
+  gemSkipQuick: '🔢 Шаг = гематрия слова', gemSet: 'Шаг установлен: {v} (гематрия слова)',
+  tabGem: 'Гематрия', tabAtb: 'Атбаш и албам', tabRt: 'Акронимы', tabHid: 'Скрытое слово',
+  gemIntro: 'У каждой буквы есть значение: א=1 … י=10, כ=20 … ק=100 … ת=400. Сумма — гематрия слова. Здесь видно значение, слова Танаха с тем же значением и стихи с такой суммой.',
+  gemPh: 'Слово, имя или фраза', gemBig: 'Конечные буквы с большим значением (ך=500 … ץ=900)', gemCalc: 'Вычислить', gemValue: 'Гематрия',
+  gemExplain: 'Можно искать слово с шагом {v} букв — частая практика искателей кодов.', gemSkipBtn: 'Искать слово в Торе с шагом {v}',
+  gemWords: 'Слова Танаха с тем же значением ({n})', gemWordsD: 'Число рядом — сколько раз встречается. Нажмите, чтобы увидеть где.',
+  gemVerses: 'Стихи с такой суммой букв', gemVersesN: '{n} стихов (до 40)', gemVersesNone: 'Нет стиха с такой суммой.',
+  gemWhere: 'где встречается', first40: 'Показаны первые 40.',
+  atbIntro: 'Атбаш: первая буква меняется с последней (א↔ת, ב↔ש…). Албам: первая половина алфавита меняется со второй (א↔ל, ב↔מ…). У Иеремии 25:26 «ששך» — это «בבל».',
+  sm_atbash: 'Атбаш', sm_albam: 'Албам', atbConvert: 'Преобразовать',
+  atbScanT: 'Сканирование', atbScanD: 'Находит слова, зашифрованная форма которых тоже слово Танаха.', atbScanBtn: 'Сканировать',
+  atbLegend: '✓ = слово есть в Танахе', atbSearch: 'Искать «{w}» в Танахе', heOnly: 'Только для еврейского Танаха',
+  atbScanRes: '{n} слов в {l}', atbScanNote: 'Большинство совпадений случайны.', atbPairNote: '«{a}» в {m} — это «{b}».',
+  rtIntro: 'Берём только первую или последнюю букву каждого слова (или стиха) и пишем подряд. Найденные слова отмечены.',
+  acro_wf: 'Первые буквы слов', acro_wl: 'Последние буквы слов', acro_vf: 'Первые буквы стихов', acro_vl: 'Последние буквы стихов', rtGo: 'Получить',
+  hidIntro: 'Найдите слово, написанное подряд, но «спрятанное» между двумя и более словами.',
+  hidPh: 'Слово для поиска', hidGo: 'Искать скрытое слово', hidCross: 'Скрыто между словами', hidWhole: 'Как обычное слово', hidInside: 'Внутри другого слова',
+  hidExplain: '«{w}» скрыто {n} раз между словами. Буквы выделены в стихах.', first60: 'Показано 60 из {n}.',
+  pA: 'Первое слово (с шагом)', pB: 'Второе слово', pMaxL: 'Макс. шаг', pModeL: 'Второе слово',
+  pm_any: 'С любым шагом', pm_plain: 'Только в тексте (шаг 1)', pGo: '🔗 Искать пару', pairNeed: 'Нужны два слова, минимум 2 буквы',
+  pBestReal: 'Ближе всего — настоящий', pBestShuf: 'Ближе всего — перемешанный', pCounts: 'Найдено (1 / 2)',
+  pExplain: 'Расстояние в клетках таблицы шириной в шаг первого слова: 1 = рядом.',
+  pNone: 'Близкая пара не найдена.', pNoCtrl: 'Без контроля нельзя понять, особая ли близость.', pCloser: 'В настоящем тексте слова ближе, чем в перемешанном. Интересно, но не доказательство.', pSame: 'Похожая близость и в перемешанном тексте — вероятно, случайность.',
+  mxImgBtn: 'Картинка', imgCtrl: 'Контроль: {r} в тексте · {s} перемешано · {e} ожидается',
+  seqFindPh: 'Найти слово в последовательности', seqFound: '«{w}» найдено {n} раз',
+  srcGrcT: 'Новый Завет — греческий оригинал (Textus Receptus)', srcGrcD: 'Textus Receptus с eBible.org, общественное достояние. Ударения убраны, строчные буквы, ς = σ. Около 690 600 букв.',
+  g7t: 'Гематрия и шифры', g7d: 'Гематрия, атбаш, акронимы и скрытые слова, а также близкие пары и «моё имя в Торе».'
+});
+Object.assign(LANG.es, {
+  wordShortGr: 'En el texto griego escribe con letras griegas, p. ej. ιησους', g_grc: 'Nuevo Testamento en griego (original)',
+  resSentence: 'Las letras {l} están a {d} letras unas de otras, de {a} a {b}. Empieza en la primera letra y cuenta {d} letras hacia adelante, una y otra vez.',
+  resSentenceBack: 'Las letras {l} están a {d} letras, leídas hacia atrás: de {a} a {b}.',
+  replay: 'Repetir los saltos',
+  sumSentence: '«{w}» se encontró {n} veces saltando de {a} a {b} letras. Cada fila es un lugar.',
+  sumNone: '«{w}» no se encontró en este rango.',
+  resHow: 'El número en el recuadro = cuántas letras se saltan (menos = hacia atrás). Toca una fila para ver los versículos. ▦ = la tabla donde la palabra está en columna.',
+  helpT: '¿Cómo funciona?', gotIt: 'Entendido',
+  help_search: 'Escribe una palabra o nombre. La app quita espacios y vocales: el texto queda como una larga línea de letras. Luego busca las letras <b>a igual distancia</b> — p. ej. cada 50 letras. Esa distancia es el <b>salto</b>.<br>Cada fila es un lugar. Los tres números comparan con las mismas letras en orden aleatorio.',
+  help_reader: 'Elige un texto y un número. Con 3 se toma la primera letra y luego cada tercera: 1, 4, 7, 10… Las palabras que se forman se <b>marcan</b>. Toca una para ver sus versículos.',
+  help_matrix: 'El texto se escribe en filas de igual largo. Si el ancho es igual al salto, la palabra <b>queda en columna</b>. Cambia el ancho, busca palabras en todas las direcciones y toca letras.',
+  help_ciphers: 'Cifrados de la tradición judía: <b>guematría</b> — un número por letra; <b>atbash y albam</b> — cambio de letras, como «ששך» = «בבל» en Jeremías; <b>acrónimos</b> — primeras letras de palabras o versículos; <b>palabra oculta</b> — entre dos palabras vecinas.',
+  help_pair: 'Busca dos palabras — p. ej. un nombre y un lugar — y mira <b>qué tan cerca</b> están en la tabla. Es el método de los estudios famosos. Distancia en celdas: 1 = juntas. El control repite la búsqueda en texto mezclado.',
+  mCiphers: 'Guematría y cifrados tradicionales', mCiphersD: 'Guematría, atbash, acrónimos, palabras ocultas',
+  mPair: 'Pares de palabras cercanas', mPairD: 'Un nombre y otra palabra: qué tan cerca',
+  nameT: 'Mi nombre en la Torá', nameD: 'Escribe un nombre: la app lo busca en saltos en la Torá y abre la tabla del hallazgo con el salto menor.', namePh: 'Nombre en hebreo', nameGo: 'Buscar', nameNone: 'No encontrado en el rango. Prueba un rango mayor en Ajustes.',
+  gemSkipQuick: '🔢 Salto = guematría de la palabra', gemSet: 'Salto fijado en {v} (guematría)',
+  tabGem: 'Guematría', tabAtb: 'Atbash y albam', tabRt: 'Acrónimos', tabHid: 'Palabra oculta',
+  gemIntro: 'Cada letra tiene un valor: א=1 … י=10, כ=20 … ק=100 … ת=400. La suma es la guematría. Ves el valor, palabras del Tanaj con el mismo valor y versículos con esa suma.',
+  gemPh: 'Palabra, nombre o frase', gemBig: 'Letras finales con valor grande (ך=500 … ץ=900)', gemCalc: 'Calcular', gemValue: 'Guematría',
+  gemExplain: 'También puedes buscar la palabra con un salto de {v} letras.', gemSkipBtn: 'Buscar la palabra en la Torá con salto {v}',
+  gemWords: 'Palabras con el mismo valor ({n})', gemWordsD: 'El número = cuántas veces aparece. Toca para ver dónde.',
+  gemVerses: 'Versículos con esa suma', gemVersesN: '{n} versículos (hasta 40)', gemVersesNone: 'Ningún versículo con esa suma.',
+  gemWhere: 'dónde aparece', first40: 'Se muestran los primeros 40.',
+  atbIntro: 'Atbash: la primera letra se cambia por la última (א↔ת, ב↔ש…). Albam: la primera mitad del alfabeto por la segunda (א↔ל, ב↔מ…). En Jeremías 25:26 «ששך» es «בבל».',
+  sm_atbash: 'Atbash', sm_albam: 'Albam', atbConvert: 'Convertir',
+  atbScanT: 'Escanear', atbScanD: 'Encuentra palabras cuya forma cifrada también es palabra del Tanaj.', atbScanBtn: 'Escanear',
+  atbLegend: '✓ = la palabra existe en el Tanaj', atbSearch: 'Buscar «{w}» en el Tanaj', heOnly: 'Solo en el Tanaj hebreo',
+  atbScanRes: '{n} palabras en {l}', atbScanNote: 'La mayoría de las coincidencias son azar.', atbPairNote: '«{a}» en {m} es «{b}».',
+  rtIntro: 'Se toma solo la primera o última letra de cada palabra (o versículo) y se escriben seguidas. Las palabras formadas se marcan.',
+  acro_wf: 'Iniciales de palabras', acro_wl: 'Finales de palabras', acro_vf: 'Iniciales de versículos', acro_vl: 'Finales de versículos', rtGo: 'Extraer',
+  hidIntro: 'Encuentra una palabra escrita seguida pero «escondida» entre dos o más palabras.',
+  hidPh: 'Palabra a buscar', hidGo: 'Buscar palabra oculta', hidCross: 'Oculta entre palabras', hidWhole: 'Como palabra normal', hidInside: 'Dentro de otra palabra',
+  hidExplain: '«{w}» se esconde {n} veces entre palabras. Sus letras se colorean.', first60: '60 de {n} mostradas.',
+  pA: 'Primera palabra (con salto)', pB: 'Segunda palabra', pMaxL: 'Salto máximo', pModeL: 'La segunda palabra',
+  pm_any: 'Con cualquier salto', pm_plain: 'Solo en el texto (salto 1)', pGo: '🔗 Buscar par', pairNeed: 'Se necesitan dos palabras de 2 letras o más',
+  pBestReal: 'Más cercano — real', pBestShuf: 'Más cercano — mezclado', pCounts: 'Apariciones (1 / 2)',
+  pExplain: 'La distancia se mide en celdas de una tabla del ancho del salto de la primera palabra: 1 = juntas.',
+  pNone: 'No se encontró un par cercano.', pNoCtrl: 'Sin prueba de control no se sabe si la cercanía es especial.', pCloser: 'En el texto real están más cerca que en el mezclado. Interesante, pero no es prueba.', pSame: 'Una cercanía similar aparece en texto mezclado: probablemente azar.',
+  mxImgBtn: 'Imagen', imgCtrl: 'Control: {r} en texto · {s} mezclado · {e} esperado',
+  seqFindPh: 'Buscar una palabra en la secuencia', seqFound: '«{w}» aparece {n} veces',
+  srcGrcT: 'Nuevo Testamento — original griego (Textus Receptus)', srcGrcD: 'Textus Receptus de eBible.org, dominio público. Sin acentos, en minúsculas, ς = σ. Unas 690.600 letras.',
+  g7t: 'Guematría y cifrados', g7d: 'Guematría, atbash, acrónimos y palabras ocultas, además de pares cercanos y «mi nombre en la Torá».'
+});
+Object.assign(LANG.ar, {
+  wordShortGr: 'في النص اليوناني اكتب بحروف يونانية، مثل ιησους', g_grc: 'العهد الجديد باليونانية (الأصل)',
+  resSentence: 'الحروف {l} تفصل بينها {d} حرفًا، من {a} إلى {b}. ابدأ من الحرف الأول وعدّ {d} حرفًا للأمام مرة بعد مرة.',
+  resSentenceBack: 'الحروف {l} تفصل بينها {d} حرفًا، تُقرأ للخلف: من {a} إلى {b}.',
+  replay: 'إعادة عرض القفزات',
+  sumSentence: 'وُجدت «{w}» {n} مرة عند القفز من {a} إلى {b} حرفًا. كل سطر بالأسفل موضع واحد.',
+  sumNone: 'لم تُوجد «{w}» في هذا النطاق.',
+  resHow: 'الرقم في الإطار = كم حرفًا نتخطى (السالب = للخلف). اضغط على سطر لرؤية الآيات. ▦ = الجدول حيث تقف الكلمة في عمود.',
+  helpT: 'كيف يعمل؟', gotIt: 'فهمت',
+  help_search: 'اكتب كلمة أو اسمًا. يزيل التطبيق المسافات والحركات فيصبح النص سطرًا طويلًا من الحروف، ثم يبحث عن حروف الكلمة <b>على مسافات متساوية</b> — مثلًا كل 50 حرفًا. هذه المسافة هي <b>التخطي</b>.<br>كل سطر في النتائج موضع واحد. الأرقام الثلاثة تقارن مع الحروف نفسها بترتيب عشوائي.',
+  help_reader: 'اختر نصًا ورقمًا. مع 3 يؤخذ الحرف الأول ثم كل حرف ثالث: 1، 4، 7، 10… تُعلَّم الكلمات المتكونة. اضغط على كلمة لترى آياتها.',
+  help_matrix: 'يُكتب النص في صفوف متساوية الطول. عندما يساوي العرض التخطي <b>تقف الكلمة في عمود</b>. غيّر العرض وابحث عن كلمات في كل الاتجاهات واضغط على الحروف.',
+  help_ciphers: 'شيفرات من التقليد اليهودي: <b>الجماتريا</b> — قيمة عددية لكل حرف؛ <b>أتباش وألبام</b> — تبديل الحروف، مثل «ששך» = «בבל» في إرميا؛ <b>الحروف الأولى</b> للكلمات أو الآيات؛ <b>الكلمة المخفية</b> بين كلمتين متجاورتين.',
+  help_pair: 'ابحث عن كلمتين — مثلًا اسم ومكان — وانظر <b>مدى قربهما</b> في الجدول. هذه طريقة الدراسات المشهورة. المسافة بالخانات: 1 = متجاورتان. اختبار المقارنة يعيد البحث على نص مخلوط.',
+  mCiphers: 'الجماتريا والشيفرات التقليدية', mCiphersD: 'جماتريا، أتباش، حروف أولى، كلمات مخفية',
+  mPair: 'أزواج كلمات متقاربة', mPairD: 'اسم وكلمة أخرى — مدى القرب',
+  nameT: 'اسمي في التوراة', nameD: 'اكتب اسمًا؛ يجده التطبيق بالتخطي في التوراة ويفتح جدول النتيجة ذات أصغر تخطٍّ.', namePh: 'الاسم بالعبرية', nameGo: 'ابحث', nameNone: 'لم يُوجد في النطاق. جرّب نطاقًا أكبر في الإعدادات.',
+  gemSkipQuick: '🔢 التخطي = جماتريا الكلمة', gemSet: 'تم ضبط التخطي على {v} (الجماتريا)',
+  tabGem: 'جماتريا', tabAtb: 'أتباش وألبام', tabRt: 'الحروف الأولى', tabHid: 'كلمة مخفية',
+  gemIntro: 'لكل حرف قيمة: א=1 … י=10، כ=20 … ק=100 … ת=400. المجموع هو الجماتريا. ترى القيمة وكلمات التناخ بالقيمة نفسها وآيات بهذا المجموع.',
+  gemPh: 'كلمة أو اسم أو عبارة', gemBig: 'الحروف النهائية بقيمة كبيرة (ך=500 … ץ=900)', gemCalc: 'احسب', gemValue: 'الجماتريا',
+  gemExplain: 'يمكنك أيضًا البحث عن الكلمة بتخطي {v} حرفًا.', gemSkipBtn: 'ابحث عن الكلمة في التوراة بتخطي {v}',
+  gemWords: 'كلمات بالقيمة نفسها ({n})', gemWordsD: 'الرقم = عدد مرات الظهور. اضغط لترى أين.',
+  gemVerses: 'آيات بهذا المجموع', gemVersesN: '{n} آية (حتى 40)', gemVersesNone: 'لا توجد آية بهذا المجموع.',
+  gemWhere: 'أين تظهر', first40: 'تُعرض أول 40.',
+  atbIntro: 'أتباش: يُبدَّل الحرف الأول بالأخير (א↔ת، ב↔ש…). ألبام: النصف الأول من الأبجدية بالثاني (א↔ל، ב↔מ…). في إرميا 25:26 «ששך» هي «בבל».',
+  sm_atbash: 'أتباش', sm_albam: 'ألبام', atbConvert: 'تحويل',
+  atbScanT: 'مسح', atbScanD: 'يجد كلمات شكلها المشفّر كلمة في التناخ أيضًا.', atbScanBtn: 'مسح',
+  atbLegend: '✓ = الكلمة موجودة في التناخ', atbSearch: 'ابحث عن «{w}» في التناخ', heOnly: 'متاح في التناخ العبري فقط',
+  atbScanRes: '{n} كلمة في {l}', atbScanNote: 'معظم التطابقات بالصدفة.', atbPairNote: '«{a}» في {m} هي «{b}».',
+  rtIntro: 'نأخذ الحرف الأول أو الأخير من كل كلمة (أو آية) ونكتبها متتالية. تُعلَّم الكلمات المتكونة.',
+  acro_wf: 'أوائل الكلمات', acro_wl: 'أواخر الكلمات', acro_vf: 'أوائل الآيات', acro_vl: 'أواخر الآيات', rtGo: 'استخراج',
+  hidIntro: 'جد كلمة مكتوبة متصلة لكنها «مخفية» بين كلمتين أو أكثر.',
+  hidPh: 'كلمة للبحث', hidGo: 'ابحث عن كلمة مخفية', hidCross: 'مخفية بين الكلمات', hidWhole: 'ككلمة عادية', hidInside: 'داخل كلمة أخرى',
+  hidExplain: '«{w}» مخفية {n} مرة بين أكثر من كلمة. حروفها ملوّنة في الآيات.', first60: 'تُعرض 60 من {n}.',
+  pA: 'الكلمة الأولى (بالتخطي)', pB: 'الكلمة الثانية', pMaxL: 'أكبر تخطٍّ', pModeL: 'الكلمة الثانية',
+  pm_any: 'بأي تخطٍّ', pm_plain: 'مكتوبة في النص فقط (تخطي 1)', pGo: '🔗 ابحث عن زوج', pairNeed: 'يلزم كلمتان من حرفين على الأقل',
+  pBestReal: 'الأقرب — حقيقي', pBestShuf: 'الأقرب — مخلوط', pCounts: 'الظهور (1 / 2)',
+  pExplain: 'المسافة بخانات جدول بعرض تخطي الكلمة الأولى: 1 = متجاورتان.',
+  pNone: 'لم يُوجد زوج قريب.', pNoCtrl: 'بدون اختبار مقارنة لا يمكن معرفة إن كان القرب مميزًا.', pCloser: 'في النص الحقيقي الكلمتان أقرب من المخلوط. مثير — لكنه ليس دليلًا.', pSame: 'قرب مشابه يظهر في النص المخلوط أيضًا — غالبًا صدفة.',
+  mxImgBtn: 'صورة', imgCtrl: 'المقارنة: {r} في النص · {s} مخلوط · {e} متوقع',
+  seqFindPh: 'ابحث عن كلمة في التسلسل', seqFound: '«{w}» وُجدت {n} مرة',
+  srcGrcT: 'العهد الجديد — الأصل اليوناني (Textus Receptus)', srcGrcD: 'Textus Receptus من eBible.org، ملكية عامة. أُزيلت النبرات، بحروف صغيرة، ς = σ. نحو 690,600 حرف.',
+  g7t: 'الجماتريا والشيفرات', g7d: 'جماتريا وأتباش وحروف أولى وكلمات مخفية، وأزواج كلمات متقاربة و«اسمي في التوراة».'
+});
+
 </script>
 <script>
 /* הצופן התנכי · CodeNest — AppNest © 2026 Barak Aflalo */
 'use strict';
-var VERSION = '1.0.0', DATA_V = '1';
+var VERSION = '1.1.0', DATA_V = '1';
 var STORE_URL = 'https://appnest-store.pages.dev/';
 var FEEDBACK = 'appnest55@gmail.com';
 function $(id) { return document.getElementById(id); }
@@ -746,7 +1019,7 @@ function applyLang() {
   document.querySelectorAll('[data-t]').forEach(function (el) { el.textContent = T(el.getAttribute('data-t')); });
   document.querySelectorAll('[data-tp]').forEach(function (el) { el.placeholder = T(el.getAttribute('data-tp')); });
   $('verLbl').textContent = T('version') + ' ' + VERSION;
-  updHeader(); updSavedCount(); renderScopes(); hello();
+  updHeader(); updSavedCount(); renderScopes(); hello(); renderHelp();
 }
 function hello() { $('homeHello').textContent = S.name ? T('hello', { n: S.name }) : ''; }
 
@@ -775,14 +1048,26 @@ var BOOKS = {
   tanach: [["GEN", "בראשית", 50, "Genesis"], ["EXO", "שמות", 40, "Exodus"], ["LEV", "ויקרא", 27, "Leviticus"], ["NUM", "במדבר", 36, "Numbers"], ["DEU", "דברים", 34, "Deuteronomy"], ["JOS", "יהושע", 24, "Joshua"], ["JDG", "שופטים", 21, "Judges"], ["1SA", "שמואל א", 31, "1 Samuel"], ["2SA", "שמואל ב", 24, "2 Samuel"], ["1KI", "מלכים א", 22, "1 Kings"], ["2KI", "מלכים ב", 25, "2 Kings"], ["ISA", "ישעיהו", 66, "Isaiah"], ["JER", "ירמיהו", 52, "Jeremiah"], ["EZK", "יחזקאל", 48, "Ezekiel"], ["HOS", "הושע", 14, "Hosea"], ["JOL", "יואל", 4, "Joel"], ["AMO", "עמוס", 9, "Amos"], ["OBA", "עובדיה", 1, "Obadiah"], ["JON", "יונה", 4, "Jonah"], ["MIC", "מיכה", 7, "Micah"], ["NAM", "נחום", 3, "Nahum"], ["HAB", "חבקוק", 3, "Habakkuk"], ["ZEP", "צפניה", 3, "Zephaniah"], ["HAG", "חגי", 2, "Haggai"], ["ZEC", "זכריה", 14, "Zechariah"], ["MAL", "מלאכי", 3, "Malachi"], ["PSA", "תהילים", 150, "Psalms"], ["PRO", "משלי", 31, "Proverbs"], ["JOB", "איוב", 42, "Job"], ["SNG", "שיר השירים", 8, "Song of Songs"], ["RUT", "רות", 4, "Ruth"], ["LAM", "איכה", 5, "Lamentations"], ["ECC", "קהלת", 12, "Ecclesiastes"], ["EST", "אסתר", 10, "Esther"], ["DAN", "דניאל", 12, "Daniel"], ["EZR", "עזרא", 10, "Ezra"], ["NEH", "נחמיה", 13, "Nehemiah"], ["1CH", "דברי הימים א", 29, "1 Chronicles"], ["2CH", "דברי הימים ב", 36, "2 Chronicles"]],
   nt: [["MAT", "מתי", 28, "Matthew"], ["MRK", "מרקוס", 16, "Mark"], ["LUK", "לוקס", 24, "Luke"], ["JHN", "יוחנן", 21, "John"], ["ACT", "מעשי השליחים", 28, "Acts"], ["ROM", "אל הרומים", 16, "Romans"], ["1CO", "הראשונה אל הקורינתים", 16, "1 Corinthians"], ["2CO", "השנייה אל הקורינתים", 13, "2 Corinthians"], ["GAL", "אל הגלטים", 6, "Galatians"], ["EPH", "אל האפסים", 6, "Ephesians"], ["PHP", "אל הפיליפים", 4, "Philippians"], ["COL", "אל הקולוסים", 4, "Colossians"], ["1TH", "הראשונה אל התסלוניקים", 5, "1 Thessalonians"], ["2TH", "השנייה אל התסלוניקים", 3, "2 Thessalonians"], ["1TI", "הראשונה אל טימותיוס", 6, "1 Timothy"], ["2TI", "השנייה אל טימותיוס", 4, "2 Timothy"], ["TIT", "אל טיטוס", 3, "Titus"], ["PHM", "אל פילימון", 1, "Philemon"], ["HEB", "אל העברים", 13, "Hebrews"], ["JAS", "יעקב", 5, "James"], ["1PE", "הראשונה לפטרוס", 5, "1 Peter"], ["2PE", "השנייה לפטרוס", 3, "2 Peter"], ["1JN", "הראשונה ליוחנן", 5, "1 John"], ["2JN", "השנייה ליוחנן", 1, "2 John"], ["3JN", "השלישית ליוחנן", 1, "3 John"], ["JUD", "יהודה", 1, "Jude"], ["REV", "ההתגלות", 22, "Revelation"]]
 };
-var GROUPS = { torah: ['tanach', 0, 5], neviim: ['tanach', 5, 26], ketuvim: ['tanach', 26, 39], tanach: ['tanach', 0, 39], nt: ['nt', 0, 27] };
+BOOKS.grc = BOOKS.nt;
+var GROUPS = { torah: ['tanach', 0, 5], neviim: ['tanach', 5, 26], ketuvim: ['tanach', 26, 39], tanach: ['tanach', 0, 39], nt: ['nt', 0, 27], grc: ['grc', 0, 27] };
+var GROUP_IDS = ['torah', 'neviim', 'ketuvim', 'tanach', 'nt', 'grc'];
 function bookName(src, bi) { var b = BOOKS[src][bi]; return (S.lang === 'he' || S.lang === 'ar') ? b[1] : b[3]; }
 function chv(n) { return S.lang === 'he' ? heNum(n) : String(n); }
 
 /* ---------- corpus ---------- */
-var AB = 'אבגדהוזחטיכלמנסעפצקרשתךםןףץ';
-var CODE = {}; for (var _i = 0; _i < AB.length; _i++) CODE[AB[_i]] = _i;
-var NORMMAP = new Uint8Array(27); for (_i = 0; _i < 22; _i++) NORMMAP[_i] = _i; NORMMAP[22] = 10; NORMMAP[23] = 12; NORMMAP[24] = 13; NORMMAP[25] = 16; NORMMAP[26] = 17;
+function mkAlph(id, ab, finals, rtl) {
+  var A = { id: id, AB: ab, CODE: {}, NORM: new Uint8Array(ab.length), rtl: rtl }, i;
+  for (i = 0; i < ab.length; i++) { A.CODE[ab[i]] = i; A.NORM[i] = i; }
+  Object.keys(finals).forEach(function (f) { A.NORM[A.CODE[f]] = A.CODE[finals[f]]; });
+  return A;
+}
+var ALPH = {
+  he: mkAlph('he', 'אבגדהוזחטיכלמנסעפצקרשתךםןףץ', { 'ך': 'כ', 'ם': 'מ', 'ן': 'נ', 'ף': 'פ', 'ץ': 'צ' }, true),
+  gr: mkAlph('gr', 'αβγδεζηθικλμνξοπρστυφχψως', { 'ς': 'σ' }, false)
+};
+var SRC_ALPH = { tanach: 'he', nt: 'he', grc: 'gr' };
+var AB = ALPH.he.AB, CODE = ALPH.he.CODE, NORMMAP = ALPH.he.NORM;
+function alphOf(src) { return ALPH[SRC_ALPH[src] || 'he']; }
 var CORP = {}, LOADING = {};
 function loadCorp(src) {
   if (CORP[src]) return Promise.resolve(CORP[src]);
@@ -794,41 +1079,46 @@ function loadCorp(src) {
   return LOADING[src];
 }
 function buildCorp(src, books) {
-  var verses = [], vb = [], vc = [], vn = [], st = [], total = 0, bk = [];
+  var A = alphOf(src), verses = [], vb = [], vc = [], vn = [], st = [], total = 0, bk = [];
   books.forEach(function (b, bi) {
     var info = { l0: total, v0: verses.length, chV: [], chL: [] };
     b.ch.forEach(function (ch, ci) {
       info.chV.push(verses.length); info.chL.push(total);
-      ch.forEach(function (t, vi) { verses.push(t); vb.push(bi); vc.push(ci + 1); vn.push(vi + 1); st.push(total); total += t.length - (t.split(' ').length - 1) - (t ? 0 : 0); });
+      ch.forEach(function (t, vi) { verses.push(t); vb.push(bi); vc.push(ci + 1); vn.push(vi + 1); st.push(total); for (var q = 0; q < t.length; q++) if (A.CODE[t[q]] != null) total++; });
     });
     info.l1 = total; info.v1 = verses.length; bk.push(info);
   });
-  var disp = new Uint8Array(total), p = 0;
-  for (var i = 0; i < verses.length; i++) { var t = verses[i]; for (var j = 0; j < t.length; j++) { var c = CODE[t[j]]; if (c != null) disp[p++] = c; } }
-  var norm = new Uint8Array(total); for (i = 0; i < total; i++) norm[i] = NORMMAP[disp[i]];
-  return { src: src, verses: verses, vb: Int16Array.from(vb), vc: Int16Array.from(vc), vn: Int16Array.from(vn), st: Int32Array.from(st), n: total, disp: disp, norm: norm, books: bk };
+  var disp = new Uint8Array(total), ws = new Uint8Array(total), p = 0;
+  for (var i = 0; i < verses.length; i++) { var t = verses[i], nw = true; for (var j = 0; j < t.length; j++) { var c = A.CODE[t[j]]; if (c != null) { if (nw) ws[p] = 1; nw = false; disp[p++] = c; } else nw = true; } }
+  var norm = new Uint8Array(total); for (i = 0; i < total; i++) norm[i] = A.NORM[disp[i]];
+  return { src: src, A: A, verses: verses, vb: Int16Array.from(vb), vc: Int16Array.from(vc), vn: Int16Array.from(vn), st: Int32Array.from(st), n: total, disp: disp, norm: norm, ws: ws, books: bk };
 }
 function verseOf(C, idx) { var lo = 0, hi = C.st.length - 1; while (lo < hi) { var m = (lo + hi + 1) >> 1; if (C.st[m] <= idx) lo = m; else hi = m - 1; } return lo; }
 function refOf(C, idx) { var v = verseOf(C, idx); return bookName(C.src, C.vb[v]) + ' ' + chv(C.vc[v]) + ':' + chv(C.vn[v]); }
-function letterAt(C, idx) { return AB[C.disp[idx]]; }
+function letterAt(C, idx) { return C.A.AB[C.disp[idx]]; }
 function verseHTML(C, v, hits) {
   var t = C.verses[v], base = C.st[v], o = '', li = 0;
-  for (var i = 0; i < t.length; i++) { var ch = t[i]; if (ch === ' ') { o += ' '; continue; } var g = base + li; li++; o += hits[g] ? '<span class="hit">' + ch + '</span>' : esc(ch); }
+  for (var i = 0; i < t.length; i++) { var ch = t[i]; if (ch === ' ') { o += ' '; continue; } var g = base + li; li++; o += hits[g] ? '<span class="hit" style="animation-delay:' + ((hits[g] - 1) * 0.55).toFixed(2) + 's">' + esc(ch) + '</span>' : esc(ch); }
   return o;
 }
-function wordCodes(str, finals) {
-  var w = [], s = String(str || '').replace(/[֑-ׇ]/g, '');
-  for (var i = 0; i < s.length; i++) { var c = CODE[s[i]]; if (c != null) w.push(finals ? c : NORMMAP[c]); }
+function prepStr(str, A) {
+  var s = String(str || '');
+  if (A && A.id === 'gr') return s.normalize('NFD').toLowerCase();
+  return s;
+}
+function wordCodes(str, finals, A) {
+  A = A || ALPH.he; var w = [], s = prepStr(str, A);
+  for (var i = 0; i < s.length; i++) { var c = A.CODE[s[i]]; if (c != null) w.push(finals ? c : A.NORM[c]); }
   return w;
 }
-function cleanWord(str) { return String(str || '').replace(/[֑-ׇ]/g, '').replace(/[^א-ת]/g, ''); }
+function cleanWord(str, A) { A = A || ALPH.he; var s = prepStr(str, A), o = ''; for (var i = 0; i < s.length; i++) if (A.CODE[s[i]] != null) o += s[i]; return o; }
 
 /* ---------- scope selector ---------- */
-var SCOPES = {};
+var SCOPES = {}, SCOPE_GROUPS = { cScope: ['torah', 'neviim', 'ketuvim', 'tanach', 'nt'], hScope: ['torah', 'neviim', 'ketuvim', 'tanach', 'nt'] };
 function scopeHTML(id, withCh) {
   var sc = SCOPES[id] || (SCOPES[id] = { g: 'torah', b: -1, c1: 1, c2: 0, withCh: withCh });
   var o = '<div class="fld"><label>' + T('textLbl') + '</label><div class="chips">';
-  ['torah', 'neviim', 'ketuvim', 'tanach', 'nt'].forEach(function (g) { o += '<button class="chip' + (sc.g === g ? ' on' : '') + '" data-sg="' + g + '">' + T('g_' + g) + '</button>'; });
+  (SCOPE_GROUPS[id] || GROUP_IDS).forEach(function (g) { o += '<button class="chip' + (sc.g === g ? ' on' : '') + '" data-sg="' + g + '">' + T('g_' + g) + '</button>'; });
   o += '</div></div><div class="row"><div class="fld" style="flex:2"><label>' + T('bookLbl') + '</label><select data-sb>';
   var G = GROUPS[sc.g]; o += '<option value="-1">' + T('allBooks') + '</option>';
   for (var i = G[1]; i < G[2]; i++) o += '<option value="' + i + '"' + (sc.b === i ? ' selected' : '') + '>' + esc(bookName(G[0], i)) + '</option>';
@@ -844,13 +1134,13 @@ function scopeHTML(id, withCh) {
 function renderScope(id) {
   var el = $(id); if (!el) return; var sc = SCOPES[id]; el.innerHTML = scopeHTML(id, sc ? sc.withCh : el.getAttribute('data-ch') === '1');
   sc = SCOPES[id];
-  el.querySelectorAll('[data-sg]').forEach(function (b) { b.onclick = function () { sc.g = b.getAttribute('data-sg'); sc.b = -1; sc.c1 = 1; sc.c2 = 0; renderScope(id); }; });
+  el.querySelectorAll('[data-sg]').forEach(function (b) { b.onclick = function () { sc.g = b.getAttribute('data-sg'); sc.b = -1; sc.c1 = 1; sc.c2 = 0; renderScope(id); if (id === 'sScope') quickChips(); }; });
   var sb = el.querySelector('[data-sb]'); sb.onchange = function () { sc.b = +sb.value; sc.c1 = 1; sc.c2 = 0; renderScope(id); };
   var c1 = el.querySelector('[data-c1]'), c2 = el.querySelector('[data-c2]');
   if (c1) c1.onchange = function () { sc.c1 = +c1.value; if (sc.c2 && sc.c2 < sc.c1) sc.c2 = sc.c1; renderScope(id); };
   if (c2) c2.onchange = function () { sc.c2 = +c2.value; if (sc.c2 < sc.c1) sc.c1 = sc.c2; renderScope(id); };
 }
-function renderScopes() { renderScope('sScope'); renderScope('rScope'); renderScope('mScope'); }
+function renderScopes() { ['sScope', 'rScope', 'mScope', 'pScope', 'cScope', 'hScope'].forEach(renderScope); }
 function scopeLabel(sc) {
   var G = GROUPS[sc.g];
   if (sc.b < 0) return T('g_' + sc.g);
@@ -869,7 +1159,7 @@ function scopeRange(C, sc) {
 
 /* ---------- navigation & back button (AppNest mandatory pattern) ---------- */
 var curSc = 'home', navStack = [], MODALS = [], hist = { guard: false, ignore: 0 }, exitArm = 0;
-var SC_TITLE = { home: 'appName', search: 'mSearch', reader: 'mReader', matrix: 'mMatrix', saved: 'mSaved', sources: 'mSources', settings: 'mSettings', about: 'about' };
+var SC_TITLE = { ciphers: 'mCiphers', pair: 'mPair', home: 'appName', search: 'mSearch', reader: 'mReader', matrix: 'mMatrix', saved: 'mSaved', sources: 'mSources', settings: 'mSettings', about: 'about' };
 function syncHistory() {
   var need = !exitArm;
   if (need && !hist.guard) { history.pushState({ g: 1 }, ''); hist.guard = true; }
@@ -884,7 +1174,7 @@ function showSc(id, opt) {
     curSc = id; window.scrollTo(0, 0);
     if (ON_SHOW[id]) ON_SHOW[id](opt || {});
   }
-  updHeader(); syncHistory();
+  updHeader(); renderHelp(); syncHistory();
 }
 function goBack() { var p = navStack.pop() || 'home'; showSc(p, { back: true }); }
 function updHeader() {
@@ -893,6 +1183,7 @@ function updHeader() {
   $('aiDotBtn').style.display = home ? '' : 'none';
   $('themeBtn').style.display = home ? '' : 'none';
   $('aboutBtn').style.display = home ? '' : 'none';
+  var hb = $('helpBtn'); if (hb) hb.style.display = HELP_IDS.indexOf(curSc) >= 0 ? '' : 'none';
   var prev = navStack.length ? navStack[navStack.length - 1] : 'home';
   $('backBtn').textContent = (isRTL() ? '→ ' : '← ') + T(prev === 'home' ? 'home' : SC_TITLE[prev]);
   $('hdrTitle').innerHTML = home ? esc(T('appName')) + ' <small>CodeNest</small>' : esc(T(SC_TITLE[curSc]));
@@ -979,7 +1270,9 @@ function workerMain() {
   }
   self.onmessage = function (e) {
     var m = e.data, rep = function (ph, f) { self.postMessage({ id: m.id, type: 'prog', phase: ph, frac: f }); };
-    var T = m.T, r = els(T, m.w, m.dmin, m.dmax, m.both, m.maxRes, rep, 1), ctrl = null;
+    var T = m.T;
+    if (m.shuffle) { var R0 = rng(m.seed), Sx = new Uint8Array(T), a, b, t0; for (a = Sx.length - 1; a > 0; a--) { b = Math.floor(R0() * (a + 1)); t0 = Sx[a]; Sx[a] = Sx[b]; Sx[b] = t0; } T = Sx; }
+    var r = els(T, m.w, m.dmin, m.dmax, m.both, m.maxRes, rep, 1), ctrl = null;
     var exp = expected(T, m.w, m.dmin, m.dmax, m.both);
     if (m.control) {
       var R = rng(m.seed), S2 = new Uint8Array(T), i, j, t;
@@ -1005,21 +1298,23 @@ function initSearch() {
   $('sWord').addEventListener('keydown', function (e) { if (e.key === 'Enter') runSearch(); });
 }
 function quickChips() {
-  var q = ['תורה', 'ישראל', 'משיח', 'שלום', 'אמת'];
-  if (S.name && cleanWord(S.name).length >= 2) q.unshift(cleanWord(S.name));
+  var gr = SCOPES.sScope && SCOPES.sScope.g === 'grc';
+  var q = gr ? ['ιησους', 'χριστος', 'θεος', 'αγαπη', 'λογος'] : ['תורה', 'ישראל', 'משיח', 'שלום', 'אמת'];
+  if (!gr && S.name && cleanWord(S.name).length >= 2) q.unshift(cleanWord(S.name));
+  $('sWord').dir = gr ? 'ltr' : 'rtl';
   $('sQuick').innerHTML = q.map(function (w) { return '<button class="chip heb" data-q="' + esc(w) + '">' + esc(w) + '</button>'; }).join('');
   $('sQuick').querySelectorAll('[data-q]').forEach(function (b) { b.onclick = function () { $('sWord').value = b.getAttribute('data-q'); }; });
 }
 function runSearch(opts) {
-  opts = opts || {};
-  var word = cleanWord($('sWord').value);
-  if (word.length < 2) { toast(T('wordShort')); return; }
+  opts = (opts && opts.after !== undefined) ? opts : {};
+  var sc = SCOPES.sScope, src = GROUPS[sc.g][0], AL = alphOf(src);
+  var word = cleanWord($('sWord').value, AL);
+  if (word.length < 2) { toast(T(AL.id === 'gr' ? 'wordShortGr' : 'wordShort')); return; }
   if (word.length > 14) { toast(T('wordLong')); return; }
-  var sc = SCOPES.sScope, src = GROUPS[sc.g][0];
   var dmin = Math.max(1, parseInt($('sMin').value, 10) || 1), dmax = Math.max(dmin, parseInt($('sMax').value, 10) || 1);
   var both = $('sBoth').checked, ctrl = $('sCtrl').checked;
   loadCorp(src).then(function (C) {
-    var R = scopeRange(C, sc), A = S.finals ? C.disp : C.norm, Tt = A.slice(R.from, R.to), w = wordCodes(word, S.finals);
+    var R = scopeRange(C, sc), A = S.finals ? C.disp : C.norm, Tt = A.slice(R.from, R.to), w = wordCodes(word, S.finals, C.A);
     var lim = Math.floor((Tt.length - 1) / (w.length - 1)); if (dmax > lim) dmax = lim;
     if (dmin > dmax) { toast(T('rangeBad')); return; }
     var id = ++wkId, W = getWorker(), t0 = Date.now();
@@ -1032,6 +1327,7 @@ function runSearch(opts) {
       res.sort(function (a, b) { return Math.abs(a.d) - Math.abs(b.d) || a.s - b.s; });
       LAST = { word: word, w: w, src: src, sc: JSON.parse(JSON.stringify(sc)), scLbl: scopeLabel(sc), dmin: dmin, dmax: dmax, both: both, count: m.count, d1: m.d1, ctrl: m.ctrl, exp: m.exp, res: res, ms: Date.now() - t0, shown: 50 };
       renderSearch();
+      if (typeof opts.after === 'function') opts.after(LAST);
     };
     W.onerror = function () { busyOff(); toast(T('errGeneric')); killWorker(); };
     W.postMessage({ id: id, T: Tt, w: w, dmin: dmin, dmax: dmax, both: both, maxRes: 500, control: ctrl, seed: 12345 + word.length * 7 });
@@ -1057,6 +1353,7 @@ function renderSearch() {
   var L = LAST; if (!L) return;
   var C = CORP[L.src];
   var o = '<div class="card"><h3 class="heb" style="font-size:22px">' + esc(L.word) + ' <span class="mut" style="font-size:14px">· ' + esc(L.scLbl) + ' · ' + T('skipsRange', { a: L.dmin, b: L.dmax }) + '</span></h3>';
+  o += '<p class="explain">' + esc(L.count ? T('sumSentence', { w: L.word, n: fmtN(L.count), a: L.dmin, b: L.dmax }) : T('sumNone', { w: L.word })) + '</p>';
   o += '<div class="stat"><div><b>' + fmtN(L.count) + '</b><span>' + T('stReal') + '</span></div>';
   o += '<div><b>' + (L.ctrl == null ? '—' : fmtN(L.ctrl)) + '</b><span>' + T('stShuf') + '</span></div>';
   o += '<div><b>' + fmtN(Math.round(L.exp * 10) / 10) + '</b><span>' + T('stExp') + '</span></div></div>';
@@ -1064,7 +1361,7 @@ function renderSearch() {
   o += '<div class="verdict" style="margin-top:8px">' + esc(verdict(L)) + ' <a href="#" id="whyCtrl" style="color:var(--acc)">' + T('whyCtrl') + '</a></div>';
   o += '</div>';
   if (L.res.length) {
-    o += '<div class="card" style="padding:4px 8px"><div class="mut" style="padding:8px 6px">' + T('resShown', { n: fmtN(Math.min(L.shown, L.res.length)), t: fmtN(L.count) }) + '</div>';
+    o += '<div class="card" style="padding:4px 8px"><div class="mut" style="padding:8px 6px">' + T('resShown', { n: fmtN(Math.min(L.shown, L.res.length)), t: fmtN(L.count) }) + '<br>' + T('resHow') + '</div>';
     for (var i = 0; i < Math.min(L.shown, L.res.length); i++) {
       var r = L.res[i], end = r.s + (L.w.length - 1) * r.d;
       o += '<div class="res" data-i="' + i + '"><div class="sk" dir="ltr">' + (r.d > 0 ? '' : '−') + fmtN(Math.abs(r.d)) + '</div><div class="rf">' + esc(refOf(C, r.s)) + '<small>' + T('until') + ' ' + esc(refOf(C, end)) + '</small></div><button class="btn sm" data-mx="' + i + '">▦</button></div>';
@@ -1078,16 +1375,19 @@ function renderSearch() {
   $('sOut').querySelectorAll('[data-mx]').forEach(function (b) { b.onclick = function () { var r = L.res[+b.getAttribute('data-mx')]; matrixFromResult(L, r); }; });
   var mb = $('moreRes'); if (mb) mb.onclick = function () { L.shown += 50; renderSearch(); };
 }
-function hitsOf(L, r) { var h = {}; for (var j = 0; j < L.w.length; j++) h[r.s + j * r.d] = 1; return h; }
+function hitsOf(L, r) { var h = {}; for (var j = 0; j < L.w.length; j++) h[r.s + j * r.d] = j + 1; return h; }
 function openResult(i) {
   var L = LAST, r = L.res[i], C = CORP[L.src], hits = hitsOf(L, r), seen = {}, o = '';
-  o += '<div class="mut">' + T('skipIs') + ' <b style="color:var(--acc)">' + r.d + '</b> · ' + esc(L.scLbl) + '</div>';
+  var lets = []; for (var q = 0; q < L.w.length; q++) lets.push(letterAt(C, r.s + q * r.d));
+  o += '<p class="explain">' + esc(T(r.d > 0 ? 'resSentence' : 'resSentenceBack', { l: lets.join('-'), d: fmtN(Math.abs(r.d)), a: refOf(C, r.s), b: refOf(C, r.s + (L.w.length - 1) * r.d) })) + '</p>';
+  o += chainHTML(lets, Math.abs(r.d), C.A.rtl) + '<div class="row" style="margin:4px 0 6px"><button class="btn sm" data-a="replay">▶ ' + T('replay') + '</button></div><div data-vv>';
   for (var j = 0; j < L.w.length; j++) {
     var idx = r.s + j * r.d, v = verseOf(C, idx); if (seen[v]) continue; seen[v] = 1;
     o += '<div style="margin-top:8px"><span class="tag">' + esc(refOf(C, idx)) + '</span></div><div class="verse heb">' + verseHTML(C, v, hits) + '</div>';
   }
-  o += '<div class="row"><button class="btn" data-a="mx">▦ ' + T('mMatrix') + '</button><button class="btn" data-a="sv">★ ' + T('save') + '</button><button class="btn" data-a="ai">🤖 ' + T('aiExplain') + '</button></div>';
+  o += '</div><div class="row"><button class="btn" data-a="mx">▦ ' + T('mMatrix') + '</button><button class="btn" data-a="sv">★ ' + T('save') + '</button><button class="btn" data-a="ai">🤖 ' + T('aiExplain') + '</button></div>';
   var m = openModal(L.word + ' · ' + refOf(C, r.s), o);
+  m.querySelector('[data-a=replay]').onclick = function () { replayAnim(m); };
   m.querySelector('[data-a=mx]').onclick = function () { closeModal(m); matrixFromResult(L, r); };
   m.querySelector('[data-a=sv]').onclick = function () { saveFinding(elsFinding(L, r)); };
   m.querySelector('[data-a=ai]').onclick = function () { aiOpen(promptELS(L, r)); };
@@ -1096,17 +1396,39 @@ function elsFinding(L, r) {
   return { id: Date.now(), type: 'els', word: L.word, src: L.src, s: r.s, d: r.d, k: L.w.length, scLbl: L.scLbl, count: L.count, ctrl: L.ctrl, exp: L.exp, dmin: L.dmin, dmax: L.dmax, note: '', date: new Date().toISOString() };
 }
 
+function chainHTML(lets, d, rtl) {
+  var o = '<div class="chain" dir="' + (rtl ? 'rtl' : 'ltr') + '">';
+  lets.forEach(function (l, i) { if (i) o += '<span class="jmp" style="animation-delay:' + (i * 0.55 - 0.3).toFixed(2) + 's">' + (rtl ? '←' : '→') + '<small>' + fmtN(d) + '</small></span>'; o += '<b style="animation-delay:' + (i * 0.55).toFixed(2) + 's">' + esc(l) + '</b>'; });
+  return o + '</div>';
+}
+function replayAnim(root) { root.querySelectorAll('.chain b,.chain .jmp,.verse .hit').forEach(function (el) { el.style.animationName = 'none'; void el.offsetWidth; el.style.animationName = ''; }); }
+/* ---------- help cards ---------- */
+var HELP_IDS = ['search', 'reader', 'matrix', 'ciphers', 'pair'];
+function renderHelp() {
+  S.helpSeen = S.helpSeen || {};
+  document.querySelectorAll('.helpbox').forEach(function (el) {
+    var id = el.getAttribute('data-help');
+    if (S.helpSeen[id]) { el.innerHTML = ''; return; }
+    el.innerHTML = '<div class="card help"><h3>💡 ' + esc(T('helpT')) + '</h3><div class="hb">' + T('help_' + id) + '</div><div class="row" style="margin-top:8px"><button class="btn sm" data-ok>' + esc(T('gotIt')) + '</button></div></div>';
+    el.querySelector('[data-ok]').onclick = function () { S.helpSeen[id] = 1; saveS(); renderHelp(); };
+  });
+  var hb = $('helpBtn'); if (hb) hb.style.display = HELP_IDS.indexOf(curSc) >= 0 ? '' : 'none';
+}
+function showHelpAgain() { S.helpSeen = S.helpSeen || {}; delete S.helpSeen[curSc]; saveS(); renderHelp(); window.scrollTo(0, 0); }
+
 /* ---------- READER (every N-th letter) ---------- */
-var DICT = null;
-function getDict() {
-  if (DICT) return Promise.resolve(DICT);
-  return loadCorp('tanach').then(function (C) {
-    var set = new Set(), fin = /[ךםןףץ]/g, mp = { 'ך': 'כ', 'ם': 'מ', 'ן': 'נ', 'ף': 'פ', 'ץ': 'צ' };
-    C.verses.forEach(function (t) { t.split(' ').forEach(function (w) { if (w.length >= 3 && w.length <= 9) set.add(w.replace(fin, function (c) { return mp[c]; })); }); });
-    DICT = set; return set;
+var DICTS = {}, DICT = null;
+function normWordStr(w, A) { var o = ''; for (var i = 0; i < w.length; i++) { var c = A.CODE[w[i]]; if (c != null) o += A.AB[A.NORM[c]]; } return o; }
+function getDict(src) {
+  var aid = SRC_ALPH[src || 'tanach'] || 'he', dsrc = aid === 'gr' ? 'grc' : 'tanach';
+  if (DICTS[aid]) { DICT = DICTS[aid]; return Promise.resolve(DICT); }
+  return loadCorp(dsrc).then(function (C) {
+    var set = new Set();
+    C.verses.forEach(function (t) { t.split(' ').forEach(function (w) { if (w.length >= 3 && w.length <= 9) set.add(normWordStr(w, C.A)); }); });
+    DICTS[aid] = set; DICT = set; return set;
   });
 }
-function normStr(C, idxs) { var s = ''; for (var i = 0; i < idxs.length; i++) s += AB[C.norm[idxs[i]]]; return s; }
+function normStr(C, idxs) { var s = '', ab = C.A.AB; for (var i = 0; i < idxs.length; i++) s += ab[C.norm[idxs[i]]]; return s; }
 function findWords(str, dict) {
   var marks = new Uint8Array(str.length), found = {}, i, L;
   for (i = 0; i < str.length; i++) {
@@ -1122,7 +1444,7 @@ function initReader() { $('rGo').onclick = runReader; }
 function runReader() {
   var sc = SCOPES.rScope, src = GROUPS[sc.g][0];
   var N = Math.max(1, parseInt($('rN').value, 10) || 1), st = Math.max(1, parseInt($('rStart').value, 10) || 1), mx = Math.min(50000, Math.max(10, parseInt($('rMax').value, 10) || 2000)), back = $('rBack').checked;
-  Promise.all([loadCorp(src), getDict()]).then(function (a) {
+  Promise.all([loadCorp(src), getDict(src)]).then(function (a) {
     var C = a[0], R = scopeRange(C, sc), idxs = [];
     if (!back) { for (var p = R.from + st - 1; p < R.to && idxs.length < mx; p += N) idxs.push(p); }
     else { for (p = R.to - st; p >= R.from && idxs.length < mx; p -= N) idxs.push(p); }
@@ -1130,34 +1452,42 @@ function runReader() {
   });
 }
 function readerFrom(src, start, d, count, label) {
-  loadCorp(src).then(function (C) { return getDict().then(function () { return C; }); }).then(function (C) {
+  loadCorp(src).then(function (C) { return getDict(src).then(function () { return C; }); }).then(function (C) {
     var idxs = []; for (var p = start; p >= 0 && p < C.n && idxs.length < count; p += d) idxs.push(p);
     showSc('reader'); readerShow({ src: src, idxs: idxs, N: d, label: label || refOf(C, start), st: 1 });
   });
 }
-function readerShow(o) {
-  var C = CORP[o.src], str = normStr(C, o.idxs), fw = findWords(str, DICT);
-  RLAST = { src: o.src, idxs: o.idxs, N: o.N, label: o.label, str: str, fw: fw };
+function readerShow(o, target) {
+  target = target || 'rOut'; if (target !== 'rOut') $('rOut').innerHTML = ''; else if ($('cOut')) $('cOut').innerHTML = '';
+  var C = CORP[o.src], str = normStr(C, o.idxs), fw = findWords(str, DICTS[C.A.id] || DICT);
+  RLAST = { src: o.src, idxs: o.idxs, N: o.N, label: o.label, str: str, fw: fw, acro: o.acro, title: o.title };
   var words = Object.keys(fw.found).sort(function (a, b) { return b.length - a.length || fw.found[b].length - fw.found[a].length; });
   var dispMax = Math.min(str.length, 4000), h = '';
   for (var i = 0; i < dispMax; i++) {
-    var ch = AB[C.disp[o.idxs[i]]];
+    var ch = C.A.AB[C.disp[o.idxs[i]]];
     h += fw.marks[i] ? '<mark data-p="' + i + '">' + ch + '</mark>' : ch;
   }
-  var out = '<div class="card"><h3>' + T('readerRes', { n: o.N, l: esc(o.label) }) + '</h3><div class="mut">' + T('lettersN', { n: fmtN(str.length) }) + (str.length > dispMax ? ' · ' + T('dispCut', { n: fmtN(dispMax) }) : '') + '</div>';
-  out += '<div class="seq heb" id="rSeq">' + h + '</div>';
+  var out = '<div class="card"><h3>' + (o.title ? esc(o.title) : T('readerRes', { n: o.N, l: esc(o.label) })) + '</h3><div class="mut">' + T('lettersN', { n: fmtN(str.length) }) + (str.length > dispMax ? ' · ' + T('dispCut', { n: fmtN(dispMax) }) : '') + '</div>';
+  out += '<div class="seq heb" id="rSeq" dir="' + (C.A.rtl ? 'rtl' : 'ltr') + '">' + h + '</div>';
+  out += '<div class="row" style="margin-top:8px"><input type="text" id="rFind" class="heb" style="flex:3" placeholder="' + esc(T('seqFindPh')) + '"><button class="btn sm" id="rFindGo" style="flex:1">' + T('find') + '</button></div><div id="rFindOut"></div>';
   out += '<div class="mut" style="margin-top:6px">' + T('tapMark') + '</div>';
   out += '<h3 style="margin-top:12px">' + T('wordsFound', { n: fmtN(words.length) }) + '</h3><div class="wl heb">';
   words.slice(0, 120).forEach(function (w) { out += '<button class="chip" data-w="' + w + '">' + w + ' <b>' + fw.found[w].length + '</b></button>'; });
   out += '</div><div class="mut" style="margin-top:8px">' + T('dictNote') + '</div>';
   out += '<div class="row" style="margin-top:10px"><button class="btn" id="rSave">★ ' + T('save') + '</button><button class="btn" id="rAi">🤖 ' + T('aiExplain') + '</button><button class="btn" id="rCopy">' + T('copy') + '</button></div></div>';
-  $('rOut').innerHTML = out;
+  $(target).innerHTML = out;
   $('rSeq').onclick = function (e) { var m = e.target.closest('mark'); if (!m) return; seqWordAt(+m.getAttribute('data-p')); };
-  $('rOut').querySelectorAll('[data-w]').forEach(function (b) { b.onclick = function () { var w = b.getAttribute('data-w'); seqWordShow(w, RLAST.fw.found[w][0]); }; });
-  $('rSave').onclick = function () { saveFinding({ id: Date.now(), type: 'reader', src: o.src, label: o.label, N: o.N, start: o.idxs[0], len: o.idxs.length, words: words.slice(0, 30), note: '', date: new Date().toISOString() }); };
+  $(target).querySelectorAll('[data-w]').forEach(function (b) { b.onclick = function () { var w = b.getAttribute('data-w'); seqWordShow(w, RLAST.fw.found[w][0]); }; });
+  $('rSave').onclick = function () { saveFinding(o.acro ? { id: Date.now(), type: 'acro', src: o.src, label: o.label, mode: o.acro, idxs: o.idxs.slice(0, 5000), words: words.slice(0, 30), note: '', date: new Date().toISOString() } : { id: Date.now(), type: 'reader', src: o.src, label: o.label, N: o.N, start: o.idxs[0], len: o.idxs.length, words: words.slice(0, 30), note: '', date: new Date().toISOString() }); };
+  $('rFindGo').onclick = function () {
+    var w = normWordStr(cleanWord($('rFind').value, C.A), C.A); if (w.length < 2) { toast(T('wordShort')); return; }
+    var pos = [], i = -1; while ((i = str.indexOf(w, i + 1)) >= 0 && pos.length < 200) pos.push(i);
+    $('rFindOut').innerHTML = '<div class="mut" style="margin:6px 0">' + esc(T('seqFound', { w: w, n: pos.length })) + '</div><div class="wl">' + pos.slice(0, 60).map(function (p, k) { return '<button class="chip" data-fp="' + p + '">' + esc(refOf(C, o.idxs[p])) + '</button>'; }).join('') + '</div>';
+    $('rFindOut').querySelectorAll('[data-fp]').forEach(function (b) { b.onclick = function () { seqWordShow(w, +b.getAttribute('data-fp')); }; });
+  };
   $('rAi').onclick = function () { aiOpen(promptReader(RLAST, words)); };
   $('rCopy').onclick = function () { copyText(str); };
-  $('rOut').scrollIntoView({ behavior: 'smooth' });
+  $(target).scrollIntoView({ behavior: 'smooth' });
 }
 function seqWordAt(p) {
   var R = RLAST, best = null;
@@ -1166,7 +1496,7 @@ function seqWordAt(p) {
 }
 function seqWordShow(w, i) {
   var R = RLAST, C = CORP[R.src], hits = {}, seen = {}, o = '';
-  for (var j = 0; j < w.length; j++) hits[R.idxs[i + j]] = 1;
+  for (var j = 0; j < w.length; j++) hits[R.idxs[i + j]] = j + 1;
   o += '<div class="mut">' + T('wordFromLetters', { n: w.length }) + '</div>';
   for (j = 0; j < w.length; j++) { var idx = R.idxs[i + j], v = verseOf(C, idx); if (seen[v]) continue; seen[v] = 1; o += '<div style="margin-top:8px"><span class="tag">' + esc(refOf(C, idx)) + '</span></div><div class="verse heb">' + verseHTML(C, v, hits) + '</div>'; }
   o += '<div class="row"><button class="btn" data-a="mx">▦ ' + T('mMatrix') + '</button></div>';
@@ -1190,7 +1520,7 @@ function matrixFromResult(L, r) {
 }
 function matrixOpen(o) {
   loadCorp(o.src).then(function (C) {
-    MX = { src: o.src, W: o.W, rows: o.rows || Math.max(15, Math.min(41, (o.primary.length || 0) + 14)), primary: o.primary || [], extras: [], title: o.title, free: !!o.free, fromEls: o.fromEls, origin: o.origin != null ? o.origin : 0 };
+    MX = { src: o.src, W: o.W, rows: o.rows || Math.max(15, Math.min(41, (o.primary.length || 0) + 14)), primary: o.primary || [], extras: (o.fixedExtras || []).slice(), title: o.title, free: !!o.free, fromEls: o.fromEls, origin: o.origin != null ? o.origin : 0 };
     if (o.free) { MX.base = o.top; MX.C = Math.min(MX.W, 60); }
     else centerMx(o.center);
     if (curSc !== 'matrix') { mxOpening = true; showSc('matrix'); mxOpening = false; }
@@ -1211,12 +1541,12 @@ function renderMatrix() {
   o += '<div class="card"><h3 class="heb">' + esc(MX.title) + '</h3>';
   o += '<div class="fld"><label>' + T('rowWidth') + '</label><div class="stepper"><button class="btn" id="mxWm">−</button><input type="number" id="mxW" value="' + MX.W + '" inputmode="numeric"><button class="btn" id="mxWp">+</button></div></div>';
   o += '<div class="navpad"><button class="btn sm" id="mxUp">▲</button><button class="btn sm" id="mxDn">▼</button>' + (MX.W > MX.C ? '<button class="btn sm" id="mxL">' + (isRTL() ? '▶' : '◀') + '</button><button class="btn sm" id="mxR">' + (isRTL() ? '◀' : '▶') + '</button>' : '') + '</div>';
-  o += '<div class="mxwrap" id="mxWrap"><div class="mx heb" id="mxGrid" style="grid-template-columns:repeat(' + MX.C + ',var(--cs,26px));direction:rtl">';
+  o += '<div class="mxwrap" id="mxWrap"><div class="mx heb" id="mxGrid" style="grid-template-columns:repeat(' + MX.C + ',var(--cs,26px));direction:' + (C.A.rtl ? 'rtl' : 'ltr') + '">';
   for (var r = 0; r < MX.rows; r++) for (var c = 0; c < MX.C; c++) {
     var idx = mxCell(r, c);
     if (idx < 0 || idx >= C.n) { o += '<div class="e"></div>'; continue; }
     var cls = prim[idx] ? 'h1' : (ex[idx] || '');
-    o += '<div data-i="' + idx + '"' + (cls ? ' class="' + cls + '"' : '') + '>' + AB[C.disp[idx]] + '</div>';
+    o += '<div data-i="' + idx + '"' + (cls ? ' class="' + cls + '"' : '') + '>' + C.A.AB[C.disp[idx]] + '</div>';
   }
   o += '</div></div>';
   o += '<div class="lg">' + (MX.primary.length ? '<span><i style="background:var(--hl1)"></i>' + esc(MX.title) + '</span>' : '');
@@ -1225,7 +1555,7 @@ function renderMatrix() {
   o += '<div class="mut">' + T('mxRange', { a: esc(refOf(C, Math.max(0, mxCell(0, 0)))), b: esc(refOf(C, Math.min(C.n - 1, mxCell(MX.rows - 1, MX.C - 1)))) }) + '</div>';
   o += '<div class="fld" style="margin-top:10px"><label>' + T('mxExtra') + '</label><div class="row"><input type="text" id="mxEx" class="heb" dir="rtl" style="flex:3" placeholder="' + esc(T('mxExtraPh')) + '"><button class="btn sm" id="mxExGo" style="flex:1">' + T('find') + '</button></div></div>';
   o += '<div class="mut">' + T('mxTap') + '</div>';
-  o += '<div class="row" style="margin-top:10px"><button class="btn" id="mxSave">★ ' + T('save') + '</button><button class="btn" id="mxAi">🤖 ' + T('aiExplain') + '</button>' + (MX.extras.length ? '<button class="btn" id="mxClr">' + T('clear') + '</button>' : '') + '</div></div>';
+  o += '<div class="row" style="margin-top:10px"><button class="btn" id="mxSave">★ ' + T('save') + '</button><button class="btn" id="mxAi">🤖 ' + T('aiExplain') + '</button><button class="btn" id="mxImg">📷 ' + T('mxImgBtn') + '</button>' + (MX.extras.length ? '<button class="btn" id="mxClr">' + T('clear') + '</button>' : '') + '</div></div>';
   $('mOut').innerHTML = o;
   $('mSetup').style.display = MX.free ? '' : 'none';
   var wrap = $('mxWrap'), avail = wrap.clientWidth - 14, cs = Math.max(18, Math.min(30, Math.floor(avail / MX.C) - 1));
@@ -1239,11 +1569,12 @@ function renderMatrix() {
   $('mxUp').onclick = function () { MX.base -= MX.W * 5; recompExtras(); renderMatrix(); };
   $('mxDn').onclick = function () { MX.base += MX.W * 5; recompExtras(); renderMatrix(); };
   if ($('mxL')) { $('mxL').onclick = function () { MX.base -= 5; recompExtras(); renderMatrix(); }; $('mxR').onclick = function () { MX.base += 5; recompExtras(); renderMatrix(); }; }
-  $('mxExGo').onclick = function () { var w = cleanWord($('mxEx').value); if (w.length < 2) { toast(T('wordShort')); return; } addExtra(w); };
+  $('mxExGo').onclick = function () { var w = cleanWord($('mxEx').value, CORP[MX.src].A); if (w.length < 2) { toast(T('wordShort')); return; } addExtra(w); };
   $('mxEx').addEventListener('keydown', function (e) { if (e.key === 'Enter') $('mxExGo').click(); });
-  $('mxSave').onclick = function () { saveFinding({ id: Date.now(), type: 'matrix', src: MX.src, title: MX.title, W: MX.W, base: MX.base, rows: MX.rows, C: MX.C, primary: MX.primary, extras: MX.extras.map(function (e) { return e.word; }), free: MX.free, note: '', date: new Date().toISOString() }); };
+  $('mxSave').onclick = function () { saveFinding({ id: Date.now(), type: 'matrix', src: MX.src, title: MX.title, W: MX.W, base: MX.base, rows: MX.rows, C: MX.C, primary: MX.primary, extras: MX.extras.map(function (e) { return e.word; }), extrasFull: MX.extras.map(function (e) { return { word: e.word, cells: e.fixed ? e.cells : null, fixed: !!e.fixed }; }), free: MX.free, note: '', date: new Date().toISOString() }); };
   $('mxAi').onclick = function () { aiOpen(promptMatrix()); };
-  if ($('mxClr')) $('mxClr').onclick = function () { MX.extras = []; renderMatrix(); };
+  if ($('mxClr')) $('mxClr').onclick = function () { MX.extras = MX.extras.filter(function (e) { return e.fixed; }); renderMatrix(); };
+  $('mxImg').onclick = mxImage;
 }
 function addExtra(w) {
   if (MX.extras.some(function (e) { return e.word === w; })) return;
@@ -1257,7 +1588,8 @@ function recompExtras() {
   for (var r = 0; r < R; r++) { G.push([]); for (var c = 0; c < Cc; c++) { var i = mxCell(r, c); G[r].push(i >= 0 && i < C.n ? A[i] : 255); } }
   var DIRS = [[0, 1], [0, -1], [1, 0], [-1, 0], [1, 1], [1, -1], [-1, 1], [-1, -1]];
   MX.extras.forEach(function (e) {
-    var w = wordCodes(e.word, S.finals), k = w.length; e.cells = []; e.n = 0;
+    if (e.fixed) return;
+    var w = wordCodes(e.word, S.finals, C.A), k = w.length; e.cells = []; e.n = 0;
     for (var r = 0; r < R; r++) for (var c = 0; c < Cc; c++) {
       if (G[r][c] !== w[0]) continue;
       DIRS.forEach(function (D) {
@@ -1278,18 +1610,324 @@ function mxTapCell(idx) {
   m.querySelector('[data-a=up]').onclick = function () { closeModal(m); readerFrom(MX.src, idx, -MX.W, 300, T('colFrom', { r: refOf(C, idx) })); };
 }
 
+/* ---------- generic worker run ---------- */
+function wkRun(p, txt, sub) {
+  return new Promise(function (res, rej) {
+    var id = ++wkId, W = getWorker(); p.id = id;
+    busy(txt, 0, sub, function () { killWorker(); rej(new Error('stopped')); });
+    W.onmessage = function (e) { var m = e.data; if (m.id !== id) return; if (m.type === 'prog') { busy(txt, m.frac, sub); return; } res(m); };
+    W.onerror = function () { killWorker(); rej(new Error('worker')); };
+    W.postMessage(p);
+  });
+}
+function resList(arr, k) { var o = []; for (var i = 0; i < arr.length; i += 2) o.push({ s: arr[i], d: arr[i + 1], k: k }); return o; }
+
+/* ---------- traditional ciphers ---------- */
+var GEMV = {}; 'אבגדהוזחטיכלמנסעפצקרשת'.split('').forEach(function (c, i) { GEMV[c] = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 200, 300, 400][i]; });
+var GEMF = { 'ך': [20, 500], 'ם': [40, 600], 'ן': [50, 700], 'ף': [80, 800], 'ץ': [90, 900] };
+function gemOf(str, big) { var t = 0; for (var i = 0; i < str.length; i++) { var c = str[i]; if (GEMV[c]) t += GEMV[c]; else if (GEMF[c]) t += GEMF[c][big ? 1 : 0]; } return t; }
+function gemParts(str, big) { var o = []; for (var i = 0; i < str.length; i++) { var c = str[i], v = GEMV[c] || (GEMF[c] ? GEMF[c][big ? 1 : 0] : 0); if (v) o.push(c + '=' + v); } return o.join(' + '); }
+var FINALS = { 'כ': 'ך', 'מ': 'ם', 'נ': 'ן', 'פ': 'ף', 'צ': 'ץ' }, UNFIN = { 'ך': 'כ', 'ם': 'מ', 'ן': 'נ', 'ף': 'פ', 'ץ': 'צ' };
+function finalize(w) { if (!w) return w; var l = w[w.length - 1]; return FINALS[l] ? w.slice(0, -1) + FINALS[l] : w; }
+function unfin(w) { return w.replace(/[ךםןףץ]/g, function (c) { return UNFIN[c]; }); }
+var SUBST = { atbash: 'אבגדהוזחטיכ|תשרקצפעסנמל', albam: 'אבגדהוזחטיכ|למנסעפצקרשת' };
+function substMap(mode) { var p = SUBST[mode].split('|'), m = {}; for (var i = 0; i < p[0].length; i++) { m[p[0][i]] = p[1][i]; m[p[1][i]] = p[0][i]; } return m; }
+function substWord(w, mode) { var m = substMap(mode), o = ''; w = unfin(w); for (var i = 0; i < w.length; i++) o += m[w[i]] || w[i]; return o; }
+var WFREQ = null, GEMIDX = null, VSUM = null;
+function wordFreq() {
+  if (WFREQ) return Promise.resolve(WFREQ);
+  return loadCorp('tanach').then(function (C) { var m = new Map(); C.verses.forEach(function (t) { t.split(' ').forEach(function (w) { if (w) m.set(w, (m.get(w) || 0) + 1); }); }); WFREQ = m; return m; });
+}
+function gemIndex() {
+  if (GEMIDX) return Promise.resolve(GEMIDX);
+  return wordFreq().then(function (m) { var g = new Map(); m.forEach(function (n, w) { var v = gemOf(w, false); if (!g.has(v)) g.set(v, []); g.get(v).push(w); }); GEMIDX = g; return g; });
+}
+function verseSums(C) { if (VSUM) return VSUM; VSUM = new Int32Array(C.verses.length); for (var i = 0; i < C.verses.length; i++) VSUM[i] = gemOf(C.verses[i], false); return VSUM; }
+function verseRangeOf(C, R) { return { v0: verseOf(C, R.from), v1: verseOf(C, Math.max(R.from, R.to - 1)) + 1 }; }
+function wordVerseHTML(C, v, word) {
+  var u = unfin(word);
+  return C.verses[v].split(' ').map(function (x) { return unfin(x) === u ? '<span class="hit" style="animation:none">' + esc(x) + '</span>' : esc(x); }).join(' ');
+}
+function wordWhere(word) {
+  loadCorp('tanach').then(function (C) {
+    var o = '', n = 0, u = unfin(word);
+    for (var v = 0; v < C.verses.length && n < 40; v++) { if (C.verses[v].split(' ').some(function (x) { return unfin(x) === u; })) { n++; o += '<div style="margin-top:8px"><span class="tag">' + esc(refOf(C, C.st[v])) + '</span></div><div class="verse heb">' + wordVerseHTML(C, v, word) + '</div>'; } }
+    openModal(word + ' · ' + T('gemWhere'), (n ? o : '<p class="mut">—</p>') + (n >= 40 ? '<p class="mut">' + T('first40') + '</p>' : ''));
+  });
+}
+var CTAB = 'gem', GEM_SC = 'torah', ACRO_MODE = 'wf', SUB_MODE = 'atbash';
+function renderCiphers() {
+  var tabs = [['gem', '🔢 ' + T('tabGem')], ['atb', '🔁 ' + T('tabAtb')], ['rt', '🔠 ' + T('tabRt')], ['hid', '🫥 ' + T('tabHid')]];
+  $('cTabs').innerHTML = tabs.map(function (t) { return '<button class="chip' + (CTAB === t[0] ? ' on' : '') + '" data-ct="' + t[0] + '">' + esc(t[1]) + '</button>'; }).join('');
+  $('cTabs').querySelectorAll('[data-ct]').forEach(function (b) { b.onclick = function () { CTAB = b.getAttribute('data-ct'); $('cOut').innerHTML = ''; renderCiphers(); }; });
+  ({ gem: tabGem, atb: tabAtb, rt: tabRt, hid: tabHid })[CTAB]();
+}
+function tabGem() {
+  $('cBody').innerHTML = '<div class="card"><p class="mut">' + T('gemIntro') + '</p><div class="fld"><input type="text" id="gIn" class="word-in heb" dir="rtl" placeholder="' + esc(T('gemPh')) + '" value="' + esc(S.name && cleanWord(S.name).length > 1 ? S.name : '') + '"></div><label class="chk"><input type="checkbox" id="gBig"><span>' + T('gemBig') + '</span></label><button class="btn pri wide" id="gGo">' + T('gemCalc') + '</button></div>';
+  $('gGo').onclick = runGem; $('gIn').addEventListener('keydown', function (e) { if (e.key === 'Enter') runGem(); });
+}
+function runGem() {
+  var raw = $('gIn').value.replace(/[֑-ׇ]/g, ''), word = raw.replace(/[^א-ת ]/g, '').trim(), big = $('gBig').checked;
+  if (!word.replace(/ /g, '')) { toast(T('wordShort')); return; }
+  var v = gemOf(word, big);
+  Promise.all([gemIndex(), loadCorp('tanach')]).then(function (a) {
+    var g = a[0], C = a[1], same = (g.get(gemOf(word, false)) || []).slice().sort(function (x, y) { return WFREQ.get(y) - WFREQ.get(x); });
+    var o = '<div class="card"><h3 class="heb" style="font-size:22px">' + esc(word) + '</h3><div class="stat" style="grid-template-columns:1fr"><div><b style="font-size:34px">' + fmtN(v) + '</b><span>' + T('gemValue') + '</span></div></div><div class="mut heb" dir="rtl">' + esc(gemParts(word, big)) + '</div>';
+    o += '<p class="explain" style="margin-top:10px">' + esc(T('gemExplain', { v: v })) + '</p>';
+    o += '<div class="row"><button class="btn" id="gSkip">🔍 ' + esc(T('gemSkipBtn', { v: v })) + '</button></div></div>';
+    o += '<div class="card"><h3>' + T('gemWords', { n: fmtN(same.length) }) + '</h3><div class="mut">' + T('gemWordsD') + '</div><div class="wl heb" style="margin-top:8px">';
+    same.slice(0, 80).forEach(function (w) { o += '<button class="chip" data-gw="' + esc(w) + '">' + esc(w) + ' <b>' + WFREQ.get(w) + '</b></button>'; });
+    o += '</div></div>';
+    o += '<div class="card"><h3>' + T('gemVerses') + '</h3><div class="chips">' + ['torah', 'tanach'].map(function (gg) { return '<button class="chip' + (GEM_SC === gg ? ' on' : '') + '" data-gs="' + gg + '">' + T('g_' + gg) + '</button>'; }).join('') + '</div><div id="gVs"></div></div>';
+    $('cOut').innerHTML = o;
+    $('gSkip').onclick = function () { gotoSearch(cleanWord(word), 'torah', v, v); };
+    $('cOut').querySelectorAll('[data-gw]').forEach(function (b) { b.onclick = function () { wordWhere(b.getAttribute('data-gw')); }; });
+    var showV = function () {
+      var vs = verseSums(C), lim = GEM_SC === 'torah' ? C.books[5].v0 : C.verses.length, o2 = '', n = 0, tv = gemOf(word, false);
+      for (var i = 0; i < lim; i++) if (vs[i] === tv) { n++; if (n <= 40) o2 += '<div style="margin-top:8px"><span class="tag">' + esc(refOf(C, C.st[i])) + '</span></div><div class="verse heb">' + esc(C.verses[i]) + '</div>'; }
+      $('gVs').innerHTML = n ? '<div class="mut">' + T('gemVersesN', { n: fmtN(n) }) + '</div>' + o2 : '<p class="mut">' + T('gemVersesNone') + '</p>';
+    };
+    $('cOut').querySelectorAll('[data-gs]').forEach(function (b) { b.onclick = function () { GEM_SC = b.getAttribute('data-gs'); $('cOut').querySelectorAll('[data-gs]').forEach(function (x) { x.classList.toggle('on', x === b); }); showV(); }; });
+    showV();
+    $('cOut').scrollIntoView({ behavior: 'smooth' });
+  });
+}
+function gotoSearch(word, g, dmin, dmax, after) {
+  showSc('search'); $('sWord').value = word; SCOPES.sScope = SCOPES.sScope || {}; SCOPES.sScope.g = g; SCOPES.sScope.b = -1; renderScope('sScope'); quickChips();
+  $('sMin').value = dmin; $('sMax').value = dmax; runSearch({ after: after });
+}
+function tabAtb() {
+  var o = '<div class="card"><p class="mut">' + T('atbIntro') + '</p><div class="chips">' + ['atbash', 'albam'].map(function (m) { return '<button class="chip' + (SUB_MODE === m ? ' on' : '') + '" data-sm="' + m + '">' + T('sm_' + m) + '</button>'; }).join('') + '</div>';
+  o += '<div class="fld"><input type="text" id="aIn" class="word-in heb" dir="rtl" placeholder="ששך"></div><button class="btn pri wide" id="aGo">' + T('atbConvert') + '</button><div id="aRes"></div></div>';
+  o += '<div class="card"><h3>' + T('atbScanT') + '</h3><p class="mut">' + T('atbScanD') + '</p><div class="scope" id="cScope" data-ch="1"></div><button class="btn wide" id="aScan">🔎 ' + T('atbScanBtn') + '</button></div>';
+  $('cBody').innerHTML = o;
+  if (!SCOPES.cScope) SCOPES.cScope = { g: 'neviim', b: 12, c1: 25, c2: 25, withCh: true };
+  renderScope('cScope');
+  $('cBody').querySelectorAll('[data-sm]').forEach(function (b) { b.onclick = function () { SUB_MODE = b.getAttribute('data-sm'); tabAtb(); }; });
+  $('aGo').onclick = runAtb; $('aIn').addEventListener('keydown', function (e) { if (e.key === 'Enter') runAtb(); });
+  $('aScan').onclick = runAtbScan;
+}
+function runAtb() {
+  var words = $('aIn').value.replace(/[֑-ׇ]/g, '').replace(/[^א-ת ]/g, ' ').split(/\s+/).filter(Boolean);
+  if (!words.length) { toast(T('wordShort')); return; }
+  getDict('tanach').then(function (D) {
+    var outW = words.map(function (w) { return finalize(substWord(w, SUB_MODE)); });
+    var o = '<div class="heb" style="font-size:28px;text-align:center;margin:10px 0;color:var(--acc)">' + esc(outW.join(' ')) + '</div><div class="wl heb" style="justify-content:center">';
+    outW.forEach(function (w) { var ok = D.has(unfin(w)); o += '<span class="chip">' + esc(w) + ' ' + (ok ? '✓' : '·') + '</span>'; });
+    o += '</div><div class="mut" style="margin-top:6px">' + T('atbLegend') + '</div><div class="row" style="margin-top:8px"><button class="btn" id="aSearch">🔍 ' + esc(T('atbSearch', { w: outW[0] })) + '</button></div>';
+    $('aRes').innerHTML = o;
+    $('aSearch').onclick = function () { gotoSearch(unfin(outW[0]), 'tanach', 1, S.maxSkip); };
+  });
+}
+function runAtbScan() {
+  var sc = SCOPES.cScope;
+  if (GROUPS[sc.g][0] !== 'tanach') { toast(T('heOnly')); return; }
+  Promise.all([loadCorp('tanach'), getDict('tanach')]).then(function (a) {
+    var C = a[0], D = a[1], R = scopeRange(C, sc), VR = verseRangeOf(C, R), found = {};
+    for (var v = VR.v0; v < VR.v1; v++) C.verses[v].split(' ').forEach(function (w) {
+      var u = unfin(w); if (u.length < 3) return; var t = substWord(u, SUB_MODE); if (t === u || !D.has(t)) return;
+      var f = found[u] || (found[u] = { w: w, t: finalize(t), n: 0, v: v }); f.n++;
+    });
+    var list = Object.keys(found).map(function (k) { return found[k]; }).sort(function (x, y) { return y.w.length - x.w.length || y.n - x.n; });
+    var o = '<div class="card"><h3>' + T('atbScanRes', { n: fmtN(list.length), l: esc(scopeLabel(sc)) }) + '</h3><div class="mut">' + T('atbScanNote') + '</div>';
+    list.slice(0, 150).forEach(function (f, i) { o += '<div class="res" data-ai="' + i + '"><div class="rf heb"><b>' + esc(f.w) + '</b> → <b style="color:var(--acc)">' + esc(f.t) + '</b><small>' + esc(refOf(C, C.st[f.v])) + ' · ×' + f.n + '</small></div></div>'; });
+    if (!list.length) o += '<p class="mut">—</p>';
+    $('cOut').innerHTML = o + '</div>';
+    $('cOut').querySelectorAll('[data-ai]').forEach(function (el) { el.onclick = function () { var f = list[+el.getAttribute('data-ai')]; openModal(f.w + ' → ' + f.t, '<div><span class="tag">' + esc(refOf(C, C.st[f.v])) + '</span></div><div class="verse heb">' + wordVerseHTML(C, f.v, f.w) + '</div><p class="mut">' + esc(T('atbPairNote', { a: f.w, b: f.t, m: T('sm_' + SUB_MODE) })) + '</p>'); }; });
+    $('cOut').scrollIntoView({ behavior: 'smooth' });
+  });
+}
+function tabRt() {
+  var modes = ['wf', 'wl', 'vf', 'vl'];
+  var o = '<div class="card"><p class="mut">' + T('rtIntro') + '</p><div class="chips">' + modes.map(function (m) { return '<button class="chip' + (ACRO_MODE === m ? ' on' : '') + '" data-am="' + m + '">' + T('acro_' + m) + '</button>'; }).join('') + '</div>';
+  o += '<div class="scope" id="cScope" data-ch="1"></div><div class="fld"><label>' + T('maxLetters') + '</label><input type="number" id="rtMax" value="3000" min="10" inputmode="numeric"></div><button class="btn pri wide" id="rtGo">🔠 ' + T('rtGo') + '</button></div>';
+  $('cBody').innerHTML = o;
+  if (!SCOPES.cScope) SCOPES.cScope = { g: 'torah', b: 0, c1: 1, c2: 0, withCh: true };
+  renderScope('cScope');
+  $('cBody').querySelectorAll('[data-am]').forEach(function (b) { b.onclick = function () { ACRO_MODE = b.getAttribute('data-am'); tabRt(); }; });
+  $('rtGo').onclick = runAcro;
+}
+function acroIdxs(C, R, mode, mx) {
+  var idxs = [], i;
+  if (mode === 'wf') { for (i = R.from; i < R.to && idxs.length < mx; i++) if (C.ws[i]) idxs.push(i); }
+  else if (mode === 'wl') { for (i = R.from; i < R.to && idxs.length < mx; i++) if (i + 1 >= C.n || C.ws[i + 1]) idxs.push(i); }
+  else { var VR = verseRangeOf(C, R); for (var v = VR.v0; v < VR.v1 && idxs.length < mx; v++) { var a = C.st[v], b = v + 1 < C.st.length ? C.st[v + 1] : C.n; if (b > a) idxs.push(mode === 'vf' ? a : b - 1); } }
+  return idxs;
+}
+function runAcro() {
+  var sc = SCOPES.cScope, src = GROUPS[sc.g][0], mx = Math.min(50000, Math.max(10, parseInt($('rtMax').value, 10) || 3000));
+  Promise.all([loadCorp(src), getDict(src)]).then(function (a) {
+    var C = a[0], R = scopeRange(C, sc), idxs = acroIdxs(C, R, ACRO_MODE, mx);
+    $('rOut').innerHTML = '';
+    readerShow({ src: src, idxs: idxs, N: 0, label: scopeLabel(sc), title: T('acro_' + ACRO_MODE) + ' · ' + scopeLabel(sc), acro: ACRO_MODE }, 'cOut');
+  });
+}
+function tabHid() {
+  var o = '<div class="card"><p class="mut">' + T('hidIntro') + '</p><div class="fld"><input type="text" id="hIn" class="word-in heb" dir="rtl" placeholder="' + esc(T('hidPh')) + '"></div><div class="scope" id="hScope" data-ch="1"></div><button class="btn pri wide" id="hGo">🫥 ' + T('hidGo') + '</button></div>';
+  $('cBody').innerHTML = o;
+  if (!SCOPES.hScope) SCOPES.hScope = { g: 'torah', b: -1, c1: 1, c2: 0, withCh: true };
+  renderScope('hScope');
+  $('hGo').onclick = runHid; $('hIn').addEventListener('keydown', function (e) { if (e.key === 'Enter') runHid(); });
+}
+function runHid() {
+  var sc = SCOPES.hScope, src = GROUPS[sc.g][0], word = cleanWord($('hIn').value);
+  if (word.length < 2) { toast(T('wordShort')); return; }
+  loadCorp(src).then(function (C) {
+    var R = scopeRange(C, sc), w = wordCodes(word, false), k = w.length, T0 = C.norm, ws = C.ws, whole = 0, inside = 0, hid = [], i, j;
+    for (i = R.from; i <= R.to - k; i++) {
+      if (T0[i] !== w[0]) continue;
+      for (j = 1; j < k; j++) if (T0[i + j] !== w[j]) break;
+      if (j < k) continue;
+      var cross = false; for (j = 1; j < k; j++) if (ws[i + j]) { cross = true; break; }
+      if (cross) hid.push(i);
+      else if (ws[i] && (i + k >= C.n || ws[i + k])) whole++; else inside++;
+    }
+    var o = '<div class="card"><h3 class="heb" style="font-size:22px">' + esc(word) + ' · ' + esc(scopeLabel(sc)) + '</h3><div class="stat"><div><b>' + fmtN(hid.length) + '</b><span>' + T('hidCross') + '</span></div><div><b>' + fmtN(whole) + '</b><span>' + T('hidWhole') + '</span></div><div><b>' + fmtN(inside) + '</b><span>' + T('hidInside') + '</span></div></div>';
+    o += '<p class="explain">' + esc(T('hidExplain', { w: word, n: fmtN(hid.length) })) + '</p></div>';
+    if (hid.length) {
+      o += '<div class="card">';
+      hid.slice(0, 60).forEach(function (p) {
+        var h = {}; for (var q = 0; q < k; q++) h[p + q] = q + 1;
+        var v1 = verseOf(C, p), v2 = verseOf(C, p + k - 1);
+        o += '<div style="margin-top:8px"><span class="tag">' + esc(refOf(C, p)) + '</span></div><div class="verse heb">' + verseHTML(C, v1, h) + (v2 !== v1 ? ' ' + verseHTML(C, v2, h) : '') + '</div>';
+      });
+      if (hid.length > 60) o += '<p class="mut">' + T('first60', { n: fmtN(hid.length) }) + '</p>';
+      o += '</div>';
+    }
+    $('cOut').innerHTML = o; $('cOut').scrollIntoView({ behavior: 'smooth' });
+  });
+}
+
+/* ---------- word pairs (proximity) ---------- */
+var PLAST = null, P_MODE = 'any';
+function initPair() {
+  $('pMax').value = Math.min(S.maxSkip, 1000);
+  $('pGo').onclick = runPair;
+  renderPairMode();
+}
+function renderPairMode() {
+  $('pMode').innerHTML = ['any', 'plain'].map(function (m) { return '<button class="chip' + (P_MODE === m ? ' on' : '') + '" data-pm="' + m + '">' + T('pm_' + m) + '</button>'; }).join('');
+  $('pMode').querySelectorAll('[data-pm]').forEach(function (b) { b.onclick = function () { P_MODE = b.getAttribute('data-pm'); renderPairMode(); }; });
+}
+function bestPairs(ra, rb, max) {
+  var out = [];
+  ra.forEach(function (a) {
+    var W = Math.abs(a.d), ca = a.s + (a.k - 1) * a.d / 2, best = null;
+    rb.forEach(function (b) {
+      var cb = b.s + (b.k - 1) * b.d / 2; if (Math.abs(ca - cb) > W * 25 + Math.abs(b.d) * b.k) return;
+      var md = 1e9;
+      for (var i = 0; i < a.k; i++) { var x = a.s + i * a.d, xr = Math.floor(x / W), xc = x % W;
+        for (var j = 0; j < b.k; j++) { var y = b.s + j * b.d, yr = Math.floor(y / W), yc = y % W, dc = Math.abs(xc - yc); dc = Math.min(dc, W - dc); var dr = xr - yr, dd = dr * dr + dc * dc; if (dd < md) md = dd; } }
+      if (md === 0) return;
+      if (!best || md < best.dist) best = { a: a, b: b, dist: md };
+    });
+    if (best) out.push(best);
+  });
+  out.sort(function (x, y) { return x.dist - y.dist || Math.abs(x.a.d) - Math.abs(y.a.d); });
+  return out.slice(0, max);
+}
+function runPair() {
+  var sc = SCOPES.pScope, src = GROUPS[sc.g][0], AL = alphOf(src);
+  var A = cleanWord($('pA').value, AL), B = cleanWord($('pB').value, AL);
+  if (A.length < 2 || B.length < 2) { toast(T('pairNeed')); return; }
+  var dmax = Math.max(2, parseInt($('pMax').value, 10) || 1000), ctrl = $('pCtrl').checked, seed = 777;
+  loadCorp(src).then(function (C) {
+    var R = scopeRange(C, sc), Tt = (S.finals ? C.disp : C.norm).slice(R.from, R.to), wA = wordCodes(A, S.finals, C.A), wB = wordCodes(B, S.finals, C.A);
+    var limA = Math.min(dmax, Math.floor((Tt.length - 1) / (wA.length - 1))), limB = P_MODE === 'plain' ? 1 : Math.min(dmax, Math.floor((Tt.length - 1) / (wB.length - 1)));
+    var lbl = scopeLabel(sc), out = {};
+    var run = function (w, lim, k, sh) { return wkRun({ T: Tt, w: w, dmin: k === 'a' ? 2 : 1, dmax: lim, both: true, maxRes: k === 'a' ? 1500 : 4000, control: false, shuffle: sh, seed: seed }, T(sh ? 'ctrlRunning' : 'searching', { w: k === 'a' ? A : B }), lbl); };
+    run(wA, limA, 'a', false).then(function (m) { out.ra = resList(m.res, wA.length); out.na = m.count; return run(wB, limB, 'b', false); })
+      .then(function (m) { out.rb = resList(m.res, wB.length); out.nb = m.count; if (!ctrl) return null; return run(wA, limA, 'a', true); })
+      .then(function (m) { if (!m) return null; out.sa = resList(m.res, wA.length); return run(wB, limB, 'b', true); })
+      .then(function (m) {
+        busyOff();
+        if (m) out.sb = resList(m.res, wB.length);
+        var pairs = bestPairs(out.ra, out.rb, 30); pairs.forEach(function (p) { p.a = { s: p.a.s + R.from, d: p.a.d, k: p.a.k }; p.b = { s: p.b.s + R.from, d: p.b.d, k: p.b.k }; });
+        var sp = out.sa ? bestPairs(out.sa, out.sb, 1) : null;
+        PLAST = { A: A, B: B, src: src, lbl: lbl, na: out.na, nb: out.nb, pairs: pairs, best: pairs.length ? pairs[0].dist : null, sbest: sp ? (sp.length ? sp[0].dist : null) : undefined, mode: P_MODE, dmax: dmax };
+        renderPair();
+      }).catch(function (e) { busyOff(); if (e.message === 'stopped') toast(T('stopped')); else toast(T('errGeneric')); });
+  });
+}
+function dfmt(d2) { return (Math.round(Math.sqrt(d2) * 10) / 10).toString(); }
+function renderPair() {
+  var P = PLAST, C = CORP[P.src], o = '<div class="card"><h3 class="heb" style="font-size:20px">' + esc(P.A) + ' + ' + esc(P.B) + ' <span class="mut" style="font-size:14px">· ' + esc(P.lbl) + '</span></h3>';
+  o += '<div class="stat"><div><b>' + (P.best == null ? '—' : dfmt(P.best)) + '</b><span>' + T('pBestReal') + '</span></div><div><b>' + (P.sbest === undefined ? '—' : P.sbest == null ? '—' : dfmt(P.sbest)) + '</b><span>' + T('pBestShuf') + '</span></div><div><b>' + fmtN(P.na) + ' / ' + fmtN(P.nb) + '</b><span>' + T('pCounts') + '</span></div></div>';
+  var v = '';
+  if (P.best == null) v = T('pNone');
+  else if (P.sbest === undefined) v = T('pNoCtrl');
+  else if (P.sbest == null || P.best < P.sbest * 0.6) v = T('pCloser');
+  else v = T('pSame');
+  o += '<p class="explain">' + esc(T('pExplain')) + '</p><div class="verdict">' + esc(v) + '</div></div>';
+  if (P.pairs.length) {
+    o += '<div class="card" style="padding:4px 8px">';
+    P.pairs.forEach(function (p, i) { o += '<div class="res" data-pi="' + i + '"><div class="sk" dir="ltr">' + dfmt(p.dist) + '</div><div class="rf">' + esc(refOf(C, p.a.s)) + '<small>' + esc(P.A) + ': ' + T('skipIs') + ' ⁦' + p.a.d + '⁩ · ' + esc(P.B) + ': ' + T('skipIs') + ' ⁦' + p.b.d + '⁩</small></div><button class="btn sm">▦</button></div>'; });
+    o += '</div>';
+  }
+  $('pOut').innerHTML = o;
+  $('pOut').querySelectorAll('[data-pi]').forEach(function (el) { el.onclick = function () { pairMatrix(P, P.pairs[+el.getAttribute('data-pi')]); }; });
+  $('pOut').scrollIntoView({ behavior: 'smooth' });
+}
+function pairMatrix(P, p) {
+  var ca = [], cb = [], j; for (j = 0; j < p.a.k; j++) ca.push(p.a.s + j * p.a.d); for (j = 0; j < p.b.k; j++) cb.push(p.b.s + j * p.b.d);
+  matrixOpen({ src: P.src, W: Math.abs(p.a.d), center: ca[Math.floor(ca.length / 2)], primary: ca, title: P.A + ' + ' + P.B, fixedExtras: [{ word: P.B, cells: cb, n: 1, fixed: true }] });
+}
+
+/* ---------- my name ---------- */
+function runName() {
+  var w = cleanWord($('nmIn').value);
+  if (w.length < 2) { toast(T('wordShort')); return; }
+  if (!S.name) { S.name = $('nmIn').value.trim().slice(0, 40); saveS(); hello(); }
+  gotoSearch(w, 'torah', 2, Math.min(S.maxSkip, 3000), function (L) {
+    var r = L.res.filter(function (x) { return Math.abs(x.d) >= 2; })[0];
+    if (r) matrixFromResult(L, r); else toast(T('nameNone'), 3500);
+  });
+}
+
+/* ---------- matrix → shareable image ---------- */
+function mxImage() {
+  var C = CORP[MX.src], cs = 44, pad = 36, head = 130, foot = 96, Wd = MX.C * cs + pad * 2, Hd = head + MX.rows * cs + foot;
+  if (Wd < 520) { pad += (520 - Wd) / 2; Wd = 520; }
+  var cv = document.createElement('canvas'); cv.width = Wd; cv.height = Hd; var g = cv.getContext('2d');
+  g.fillStyle = '#0b0b0c'; g.fillRect(0, 0, Wd, Hd);
+  g.strokeStyle = '#d4af37'; g.lineWidth = 3; g.strokeRect(10, 10, Wd - 20, Hd - 20);
+  g.direction = C.A.rtl ? 'rtl' : 'ltr'; g.textAlign = 'center'; g.textBaseline = 'middle';
+  g.fillStyle = '#d4af37'; g.font = 'bold 40px "Frank Ruehl CLM","David",serif'; g.fillText(MX.title, Wd / 2, 52);
+  g.fillStyle = '#a29f96'; g.font = '20px system-ui,sans-serif';
+  g.fillText(T('mxRange', { a: refOf(C, Math.max(0, mxCell(0, 0))), b: refOf(C, Math.min(C.n - 1, mxCell(MX.rows - 1, MX.C - 1))) }) + ' · ' + T('rowWidth') + ' ' + MX.W, Wd / 2, 96);
+  var prim = {}, ex = {}, cols = ['#4fc3f7', '#ef6f8f', '#7ed37a', '#c18cff'];
+  MX.primary.forEach(function (i) { prim[i] = 1; }); MX.extras.forEach(function (e, k) { e.cells.forEach(function (i) { if (!ex[i]) ex[i] = cols[k % 4]; }); });
+  for (var r = 0; r < MX.rows; r++) for (var c = 0; c < MX.C; c++) {
+    var idx = mxCell(r, c); if (idx < 0 || idx >= C.n) continue;
+    var x = pad + (C.A.rtl ? (MX.C - 1 - c) : c) * cs, y = head + r * cs, hl = prim[idx] ? '#d4af37' : ex[idx];
+    if (hl) { g.fillStyle = hl; g.beginPath(); if (g.roundRect) g.roundRect(x + 3, y + 3, cs - 6, cs - 6, 8); else g.rect(x + 3, y + 3, cs - 6, cs - 6); g.fill(); }
+    g.fillStyle = hl ? '#111' : '#8a8578'; g.font = (hl ? 'bold ' : '') + '28px "Frank Ruehl CLM","David",serif'; g.fillText(C.A.AB[C.disp[idx]], x + cs / 2, y + cs / 2 + 1);
+  }
+  g.fillStyle = '#a29f96'; g.font = '18px system-ui,sans-serif';
+  if (MX.fromEls) { var L = MX.fromEls.L; g.fillText(T('imgCtrl', { r: L.count, s: L.ctrl == null ? '—' : L.ctrl, e: Math.round(L.exp * 10) / 10 }), Wd / 2, Hd - 62); }
+  g.fillStyle = '#d4af37'; g.font = 'bold 20px system-ui,sans-serif'; g.fillText(T('appName') + ' · AppNest' + (S.name ? ' · ' + S.name : ''), Wd / 2, Hd - 32);
+  cv.toBlob(function (blob) {
+    if (!blob) { toast(T('errGeneric')); return; }
+    var name = 'codenest-' + MX.title.replace(/[^\wא-תα-ω]+/g, '_') + '.png', file = new File([blob], name, { type: 'image/png' });
+    if (navigator.canShare && navigator.canShare({ files: [file] })) navigator.share({ files: [file], title: T('appName'), text: MX.title }).catch(function () { });
+    else download(name, blob, 'image/png');
+    window.__LAST_IMG = blob.size;
+  }, 'image/png');
+}
+
 /* ---------- SAVED ---------- */
 function updSavedCount() { var el = $('savedCount'); if (el) el.textContent = SAVED.length ? T('savedN', { n: fmtN(SAVED.length) }) : T('mSavedD'); }
 function saveFinding(f) { SAVED.unshift(f); saveSaved(); toast(T('savedOk')); }
 function fTitle(f) {
   if (f.type === 'els') return f.word + ' · ' + T('skipIs') + ' \u2066' + f.d + '\u2069';
   if (f.type === 'reader') return T('everyNshort', { n: Math.abs(f.N) }) + ' · ' + f.label;
+  if (f.type === 'acro') return T('acro_' + f.mode) + ' · ' + f.label;
   return '▦ ' + f.title + ' · ' + T('rowWidth') + ' ' + f.W;
 }
 function fSub(f) {
   var C = CORP[f.src], d = new Date(f.date).toLocaleDateString(S.lang);
   if (f.type === 'els') return (C ? refOf(C, f.s) + ' · ' : '') + f.scLbl + ' · ' + d;
-  if (f.type === 'reader') return (f.words || []).slice(0, 6).join(' · ') + ' · ' + d;
+  if (f.type === 'reader' || f.type === 'acro') return (f.words || []).slice(0, 6).join(' · ') + ' · ' + d;
   return (f.extras || []).join(' · ') + ' · ' + d;
 }
 function renderSaved() {
@@ -1314,12 +1952,15 @@ function openSaved(i) {
   var f = SAVED[i];
   loadCorp(f.src).then(function (C) {
     if (f.type === 'els') {
-      var w = wordCodes(f.word, S.finals), cells = []; for (var j = 0; j < f.k; j++) cells.push(f.s + j * f.d);
+      var cells = []; for (var j = 0; j < f.k; j++) cells.push(f.s + j * f.d);
       matrixOpen({ src: f.src, W: Math.abs(f.d), center: cells[Math.floor(cells.length / 2)], primary: cells, title: f.word });
     } else if (f.type === 'reader') readerFrom(f.src, f.start, f.N, f.len, f.label);
+    else if (f.type === 'acro') { getDict(f.src).then(function () { showSc('reader'); readerShow({ src: f.src, idxs: f.idxs, N: 0, label: f.label, title: T('acro_' + f.mode) + ' · ' + f.label, acro: f.mode }); }); }
     else {
       MX = { src: f.src, W: f.W, rows: f.rows, C: f.C, base: f.base, primary: f.primary || [], extras: [], title: f.title, free: !!f.free, origin: 0 };
-      (f.extras || []).forEach(function (w) { MX.extras.push({ word: w, cells: [], n: 0 }); }); recompExtras();
+      if (f.extrasFull) f.extrasFull.forEach(function (e) { MX.extras.push({ word: e.word, cells: e.cells || [], n: e.fixed ? 1 : 0, fixed: e.fixed }); });
+      else (f.extras || []).forEach(function (w) { MX.extras.push({ word: w, cells: [], n: 0 }); });
+      recompExtras();
       mxOpening = true; showSc('matrix'); mxOpening = false; renderMatrix();
     }
   });
@@ -1418,7 +2059,7 @@ function promptReader(R, words) {
 }
 function promptMatrix() {
   var C = CORP[MX.src], rows = [];
-  for (var r = 0; r < MX.rows; r++) { var s = ''; for (var c = 0; c < MX.C; c++) { var i = mxCell(r, c); s += i >= 0 && i < C.n ? AB[C.disp[i]] : '·'; } rows.push(s); }
+  for (var r = 0; r < MX.rows; r++) { var s = ''; for (var c = 0; c < MX.C; c++) { var i = mxCell(r, c); s += i >= 0 && i < C.n ? C.A.AB[C.disp[i]] : '·'; } rows.push(s); }
   var o = promptHead() + T('aiMatrix', { t: MX.title, w: MX.W, a: refOf(C, Math.max(0, mxCell(0, 0))), b: refOf(C, Math.min(C.n - 1, mxCell(MX.rows - 1, MX.C - 1))) }) + '\n' + rows.join('\n') + '\n';
   if (MX.extras.length) o += T('aiExtras') + ' ' + MX.extras.map(function (e) { return e.word + ' (' + e.n + ')'; }).join(', ') + '\n';
   if (MX.fromEls) o += ctrlLine(MX.fromEls.L) + '\n';
@@ -1426,7 +2067,7 @@ function promptMatrix() {
 }
 function promptSaved(f) {
   var C = CORP[f.src];
-  if (f.type === 'els') { var L = { word: f.word, w: wordCodes(f.word, false).slice(0, f.k), src: f.src, scLbl: f.scLbl, count: f.count, ctrl: f.ctrl, exp: f.exp, dmin: f.dmin, dmax: f.dmax }; return promptELS(L, { s: f.s, d: f.d }) + (f.note ? '\n' + T('note') + ': ' + f.note : ''); }
+  if (f.type === 'els') { var L = { word: f.word, w: wordCodes(f.word, false, alphOf(f.src)).slice(0, f.k), src: f.src, scLbl: f.scLbl, count: f.count, ctrl: f.ctrl, exp: f.exp, dmin: f.dmin, dmax: f.dmax }; return promptELS(L, { s: f.s, d: f.d }) + (f.note ? '\n' + T('note') + ': ' + f.note : ''); }
   return promptHead() + fTitle(f) + '\n' + fSub(f) + (f.note ? '\n' + T('note') + ': ' + f.note : '') + '\n\n' + T('aiAsk');
 }
 function aiOpen(prompt) {
@@ -1526,6 +2167,7 @@ function initSettings() {
 function renderSources() {
   var o = '<div class="card"><h3>' + T('srcWlcT') + ' <span class="tag ok">verified</span></h3><p class="mut">' + T('srcWlcD') + '</p><div class="mut">' + T('license') + ': Public Domain · <a style="color:var(--acc)" href="https://github.com/openscriptures/morphhb" target="_blank" rel="noopener">Open Scriptures Hebrew Bible</a> · <a style="color:var(--acc)" href="https://ebible.org/" target="_blank" rel="noopener">eBible.org</a></div></div>';
   o += '<div class="card"><h3>' + T('srcNtT') + ' <span class="tag rv">review</span></h3><p class="mut">' + T('srcNtD') + '</p><div class="mut">' + T('license') + ': Public Domain · <a style="color:var(--acc)" href="https://ebible.org/" target="_blank" rel="noopener">eBible.org</a> · <a style="color:var(--acc)" href="https://github.com/BibleNLP/ebible" target="_blank" rel="noopener">BibleNLP/ebible</a></div></div>';
+  o += '<div class="card"><h3>' + T('srcGrcT') + ' <span class="tag ok">verified</span></h3><p class="mut">' + T('srcGrcD') + '</p><div class="mut">' + T('license') + ': Public Domain · <a style="color:var(--acc)" href="https://ebible.org/" target="_blank" rel="noopener">eBible.org</a></div></div>';
   o += '<div class="card"><h3>' + T('srcKorenT') + '</h3><p class="mut">' + T('srcKorenD') + '</p></div>';
   o += '<div class="card"><h3>' + T('srcRulesT') + '</h3><p class="mut">' + T('srcRulesD') + '</p></div>';
   $('srcBody').innerHTML = o;
@@ -1545,7 +2187,7 @@ function renderAbout() {
 }
 
 /* ---------- GUIDE ---------- */
-var GSTEPS = [['📜', 'g1t', 'g1d'], ['🔍', 'g2t', 'g2d'], ['🔢', 'g3t', 'g3d'], ['▦', 'g4t', 'g4d'], ['⚖️', 'g5t', 'g5d'], ['★', 'g6t', 'g6d']], gi = 0;
+var GSTEPS = [['📜', 'g1t', 'g1d'], ['🔍', 'g2t', 'g2d'], ['🔢', 'g3t', 'g3d'], ['▦', 'g4t', 'g4d'], ['🔤', 'g7t', 'g7d'], ['⚖️', 'g5t', 'g5d'], ['★', 'g6t', 'g6d']], gi = 0;
 function guideOpen() { return $('guide').classList.contains('on'); }
 function openGuide() { gi = 0; $('guide').classList.add('on'); renderGuide(); disarmExit(); syncHistory(); }
 function renderGuide() {
@@ -1558,6 +2200,7 @@ function skipGuide() { $('guide').classList.remove('on'); S.guided = true; saveS
 /* ---------- boot ---------- */
 var ON_SHOW = {
   search: function () { quickChips(); },
+  ciphers: function (o) { if (!o.back) $('cOut').innerHTML = ''; renderCiphers(); }, pair: function () { renderScope('pScope'); renderPairMode(); },
   saved: renderSaved, settings: renderSettings, sources: renderSources, about: renderAbout,
   matrix: function (o) { if (!o.back && !mxOpening) { MX = null; $('mSetup').style.display = ''; $('mOut').innerHTML = ''; } }
 };
@@ -1565,6 +2208,7 @@ function boot() {
   applyTheme(); applyLang();
   document.querySelectorAll('[data-go]').forEach(function (b) { b.onclick = function () { showSc(b.getAttribute('data-go')); }; });
   $('backBtn').onclick = goBack;
+  $('helpBtn').onclick = showHelpAgain;
   $('themeBtn').onclick = function () { S.theme = THEMES[(THEMES.indexOf(S.theme) + 1) % THEMES.length]; saveS(); applyTheme(); toast('🎨 ' + T('th_' + S.theme)); };
   $('aboutBtn').onclick = function () { showSc('about'); };
   $('aiDotBtn').onclick = function () { showSc('settings'); setTimeout(function () { $('aiCard').scrollIntoView({ behavior: 'smooth' }); }, 120); };
@@ -1578,7 +2222,9 @@ function boot() {
   };
   $('expCsv').onclick = exportCSV; $('expPdf').onclick = exportPDF;
   $('shareSaved').onclick = function () { if (!SAVED.length) { toast(T('noSaved')); return; } shareText(T('mSaved'), savedText()); };
-  initSearch(); initReader(); initMatrix(); initSettings(); initAI();
+  initSearch(); initReader(); initMatrix(); initSettings(); initAI(); initPair();
+  $('nmIn').value = S.name || ''; $('nmGo').onclick = runName; $('nmIn').addEventListener('keydown', function (e) { if (e.key === 'Enter') runName(); });
+  $('sGemSkip').onclick = function () { var w = cleanWord($('sWord').value); if (w.length < 2) { toast(T('wordShort')); return; } var v = gemOf($('sWord').value.replace(/[^\u05D0-\u05EA]/g, ''), false); $('sMin').value = v; $('sMax').value = v; toast(T('gemSet', { v: v })); };
   updSavedCount(); syncHistory();
   if (!S.guided && !/[?&]noguide/.test(location.search)) openGuide();
   var bf = $('bootfail'); if (bf) bf.remove();
