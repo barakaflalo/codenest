@@ -32,6 +32,7 @@ button,input,select,textarea{font:inherit;color:inherit}
 header#hdr{position:sticky;top:0;z-index:40;background:var(--bg);border-bottom:1px solid var(--line);display:flex;align-items:center;gap:8px;padding:10px 12px;padding-top:calc(10px + env(safe-area-inset-top));min-height:56px}
 #hdr .ttl{flex:1;font-weight:700;font-size:18px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 #hdr .ttl small{color:var(--acc);font-weight:600}
+@media(max-width:430px){#hdr .ttl small{display:none}#hdr .ib{min-width:36px;padding:0 7px}}
 .ib{background:transparent;border:1px solid var(--line);border-radius:10px;min-width:40px;height:40px;padding:0 10px;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:6px}
 .ib:active{transform:scale(.96)}
 #backBtn{border-color:var(--acc);color:var(--acc);font-weight:600;max-width:46%;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
@@ -140,6 +141,9 @@ mark{background:transparent;color:var(--acc);font-weight:800;border-bottom:2px s
 .pv button.on{border-color:var(--txt)}
 .ans{white-space:pre-wrap;background:var(--card2);border:1px solid var(--line);border-radius:12px;padding:12px;font-size:15px;max-height:50vh;overflow:auto}
 .empty{text-align:center;color:var(--mut);padding:30px 10px}
+.tbl{width:100%;border-collapse:collapse;font-size:14px}.tbl th,.tbl td{border-bottom:1px solid var(--line);padding:8px 6px;text-align:center}.tbl th{color:var(--mut);font-weight:600}.tbl td small{display:block;color:var(--mut);font-size:11px}.tbl .hiR{color:var(--acc);font-weight:800}
+.yr{margin:8px 0;border:1px solid var(--line);border-radius:12px;padding:8px 10px}.yr summary{cursor:pointer;color:var(--acc);font-weight:600}
+#appnest-assistant-panel{z-index:75!important}
 #bootfail{display:none;position:fixed;inset:auto 10px 10px;background:#400;color:#fff;padding:12px;border-radius:10px;z-index:99;animation:bf 0s 9s forwards}
 @keyframes bf{to{display:block}}
 #print{display:none}
@@ -152,6 +156,7 @@ mark{background:transparent;color:var(--acc);font-weight:800;border-bottom:2px s
   <button class="ib" id="backBtn" style="display:none"></button>
   <div class="ttl" id="hdrTitle"></div>
   <button class="ib" id="helpBtn" aria-label="help" style="display:none">?</button>
+  <button class="ib" id="asstBtn" aria-label="assistant">🪄</button>
   <button class="ib" id="aiDotBtn" aria-label="AI"><i class="dot" id="aiDot"></i><span style="font-size:13px">AI</span></button>
   <button class="ib" id="themeBtn" aria-label="theme">🎨</button>
   <button class="ib" id="aboutBtn" aria-label="about">ℹ️</button>
@@ -170,6 +175,7 @@ mark{background:transparent;color:var(--acc);font-weight:800;border-bottom:2px s
   <button class="big" data-go="ciphers"><span class="ic">🔤</span><div><b data-t="mCiphers"></b><span data-t="mCiphersD"></span></div></button>
   <button class="big" data-go="pair"><span class="ic">🔗</span><div><b data-t="mPair"></b><span data-t="mPairD"></span></div></button>
   <button class="big" data-go="saved"><span class="ic">★</span><div><b data-t="mSaved"></b><span id="savedCount"></span></div></button>
+  <div class="card" id="parCard"></div>
   <div class="card">
     <h3>👤 <span data-t="nameT"></span></h3>
     <div class="mut" data-t="nameD"></div>
@@ -259,6 +265,7 @@ mark{background:transparent;color:var(--acc);font-weight:800;border-bottom:2px s
     <div class="scope" id="pScope"></div>
     <div class="fld"><label data-t="pMaxL"></label><input type="number" id="pMax" min="2" inputmode="numeric"></div>
     <div class="fld"><label data-t="pModeL"></label><div class="chips" id="pMode"></div></div>
+    <details class="yr"><summary>📅 <span data-t="yrT"></span></summary><div class="mut" data-t="yrD" style="margin:6px 0"></div><input type="text" id="yrIn" placeholder="2026 · 5787 · 2026-11-13" dir="ltr"><div id="yrOut"></div></details>
     <label class="chk"><input type="checkbox" id="pCtrl" checked><span data-t="ctrlRun"></span></label>
     <button class="btn pri wide" id="pGo" data-t="pGo"></button>
   </div>
@@ -293,6 +300,7 @@ mark{background:transparent;color:var(--acc);font-weight:800;border-bottom:2px s
     <label class="chk"><input type="checkbox" id="stFinals"><span data-t="finalsLbl"></span></label>
     <div class="mut" data-t="finalsD"></div>
     <div class="fld" style="margin-top:8px"><label data-t="defMax"></label><input type="number" id="stMax" min="10" max="50000" inputmode="numeric"></div>
+    <div class="fld"><label data-t="nShufL"></label><select id="stShuf"><option value="1">1</option><option value="10">10</option><option value="30">30</option><option value="100">100</option></select><div class="mut" data-t="nShufD"></div></div>
   </div>
   <div class="card" id="aiCard">
     <h3>🤖 <span data-t="aiTitle"></span></h3>
@@ -975,11 +983,104 @@ Object.assign(LANG.ar, {
   g7t: 'الجماتريا والشيفرات', g7d: 'جماتريا وأتباش وحروف أولى وكلمات مخفية، وأزواج كلمات متقاربة و«اسمي في التوراة».'
 });
 
+/* ---- v1.2 strings ---- */
+Object.assign(LANG.he, {
+  ctrlSubN: 'אותן אותיות בסדר אקראי · {k} טקסטים', oddsMillion: 'יותר ממיליון',
+  vRare: 'נדיר: בטקסט אקראי מצפים לבערך {e}, וכאן יש {r}. סיכוי של בערך 1 ל-{n} שזה במקרה. מעניין — אבל אם בודקים הרבה מילים, חלק ייצאו נדירים במקרה.',
+  vUnusual: 'קצת יותר מהרגיל (סיכוי של בערך 1 ל-{n} במקרה). מעניין, אבל לא חריג באמת.',
+  rankLine: 'הטקסט האמיתי עבר {b} מתוך {k} טקסטים מעורבבים.',
+  whyCtrlD2: 'הסיכוי ("1 ל-…") מחושב מהמספר הצפוי, ונבדק מול כמה טקסטים מעורבבים (אפשר לשנות כמה בהגדרות). אם תבדקו 100 שמות, צפוי שאחד-שניים ייצאו "1 ל-50" במקרה.',
+  cmpBtn: 'השווה בין הטקסטים', cmpRunning: 'משווה "{w}"', cmpText: 'טקסט', cmpRatio: 'יחס לצפוי', lettersShort: 'אותיות',
+  cmpExplain: '"{w}" בדילוגים {a}–{b} בכל טקסט. "יחס לצפוי" מעל 1 = יותר מהמקרה; מודגש = נדיר (פחות מ-1%).',
+  cmpNote: 'טקסט ארוך יותר נותן יותר מופעים — לכן משווים ליחס ולא למספר עצמו. מילים נפוצות בשפה של טקסט מסוים יופיעו בו יותר.',
+  parT: 'פרשת השבוע: {p}', parD: 'שבת {d}', parChag: 'לפניה: {c}', parMyName: 'השם שלי בפרשה', parSearch: 'חפש בפרשה', parRead: 'כל אות N בפרשה',
+  nameFirst: 'כתבו קודם שם בכרטיס "השם שלי בתורה"', parLbl: 'פרשה', parJoined: 'פרשות מחוברות השבוע: {p}', parOf: 'פרשת {p}', g_parasha: 'פרשה',
+  yrT: 'שנה או תאריך עברי', yrD: 'כותבים שנה (2026), שנה עברית (5787 או תשפ״ז) או תאריך (2026-11-13), ובוחרים אותה כמילה השנייה.',
+  yrJanSep: 'ינואר–ספטמבר {y}', yrSepDec: 'מראש השנה עד דצמבר {y}', yrDate: 'התאריך העברי: {t}', yrBad: 'לא הבנתי. נסו 2026, 5787 או 2026-11-13.', yrUse: 'לחיצה בוחרת כמילה השנייה:', yrSet: '"{w}" נבחרה כמילה השנייה',
+  nShufL: 'מספר טקסטים מעורבבים לבדיקת הביקורת', nShufD: 'יותר = הערכה מדויקת יותר, אבל חיפוש איטי יותר. 10 מספיק לרוב.',
+  pCloserK: 'בטקסט האמיתי הזוג קרוב יותר מבכל {k} הטקסטים המעורבבים. מעניין — אבל עדיין לא הוכחה.', pSameK: 'קרבה כזו או גדולה יותר יצאה גם ב-{c} מתוך {k} טקסטים מעורבבים — כנראה מקרי.',
+  srcParT: 'לוח פרשות השבוע', srcParD: 'גבולות הפרשות ולוח השבתות (ארץ ישראל, תשפ״ו–תשצ״ו) חושבו מראש בעזרת Hebcal ונשמרו כטבלה באפליקציה.'
+});
+Object.assign(LANG.en, {
+  ctrlSubN: 'Same letters in random order · {k} texts', oddsMillion: 'over a million',
+  vRare: 'Rare: a random text would give about {e}, here there are {r}. About 1 in {n} by chance. Interesting — but if you test many words, some will look rare by chance.',
+  vUnusual: 'A bit more than usual (about 1 in {n} by chance). Interesting, but not truly exceptional.',
+  rankLine: 'The real text beat {b} of {k} shuffled texts.',
+  whyCtrlD2: 'The odds ("1 in …") come from the expected number and are checked against several shuffled texts (set how many in Settings). Test 100 names and one or two will come out "1 in 50" by chance.',
+  cmpBtn: 'Compare across texts', cmpRunning: 'Comparing "{w}"', cmpText: 'Text', cmpRatio: 'vs expected', lettersShort: 'letters',
+  cmpExplain: '"{w}" at skips {a}–{b} in each text. "vs expected" above 1 = more than chance; highlighted = rare (under 1%).',
+  cmpNote: 'Longer texts give more hits — so compare the ratio, not the count. Words common in a text\'s language appear more in it.',
+  parT: 'This week\'s portion: {p}', parD: 'Shabbat {d}', parChag: 'before it: {c}', parMyName: 'My name in the portion', parSearch: 'Search the portion', parRead: 'Every Nth in the portion',
+  nameFirst: 'First type a name in "My name in the Torah"', parLbl: 'Portion', parJoined: 'Joined portions this week: {p}', parOf: 'Portion {p}', g_parasha: 'Portion',
+  yrT: 'Hebrew year or date', yrD: 'Type a year (2026), a Hebrew year (5787 or תשפ״ז) or a date (2026-11-13) and pick it as the second word.',
+  yrJanSep: 'January–September {y}', yrSepDec: 'Rosh Hashana to December {y}', yrDate: 'Hebrew date: {t}', yrBad: 'Not understood. Try 2026, 5787 or 2026-11-13.', yrUse: 'Tap to use as the second word:', yrSet: '"{w}" set as the second word',
+  nShufL: 'Shuffled texts for the control test', nShufD: 'More = more precise, but slower. 10 is usually enough.',
+  pCloserK: 'In the real text the pair is closer than in all {k} shuffled texts. Interesting — still not proof.', pSameK: 'Such closeness or more also appeared in {c} of {k} shuffled texts — probably chance.',
+  srcParT: 'Weekly Torah portions', srcParD: 'Portion boundaries and the Shabbat schedule (Israel, 2025–2036) were computed in advance with Hebcal and stored as a table in the app.'
+});
+Object.assign(LANG.ru, {
+  ctrlSubN: 'Те же буквы в случайном порядке · {k} текстов', oddsMillion: 'больше миллиона',
+  vRare: 'Редко: в случайном тексте ожидается около {e}, здесь {r}. Примерно 1 из {n} случайно. Интересно — но при проверке многих слов часть окажется редкой случайно.',
+  vUnusual: 'Немного больше обычного (около 1 из {n} случайно). Интересно, но не исключительно.',
+  rankLine: 'Настоящий текст превзошёл {b} из {k} перемешанных.',
+  whyCtrlD2: 'Шанс («1 из …») рассчитан по ожидаемому числу и проверен на нескольких перемешанных текстах (количество — в настройках).',
+  cmpBtn: 'Сравнить тексты', cmpRunning: 'Сравнение «{w}»', cmpText: 'Текст', cmpRatio: 'к ожидаемому', lettersShort: 'букв',
+  cmpExplain: '«{w}» с шагами {a}–{b} в каждом тексте. Больше 1 — больше случайного; выделено — редко (меньше 1%).',
+  cmpNote: 'В длинном тексте больше находок — поэтому сравнивайте отношение, а не число.',
+  parT: 'Недельная глава: {p}', parD: 'Шабат {d}', parChag: 'перед ней: {c}', parMyName: 'Моё имя в главе', parSearch: 'Искать в главе', parRead: 'Каждая N-я в главе',
+  nameFirst: 'Сначала введите имя в «Моё имя в Торе»', parLbl: 'Глава', parJoined: 'Объединённые главы: {p}', parOf: 'Глава {p}', g_parasha: 'Глава недели',
+  yrT: 'Еврейский год или дата', yrD: 'Введите год (2026), еврейский год (5787) или дату (2026-11-13) и выберите как второе слово.',
+  yrJanSep: 'январь–сентябрь {y}', yrSepDec: 'с Рош ха-Шана до декабря {y}', yrDate: 'Еврейская дата: {t}', yrBad: 'Не понял. Попробуйте 2026, 5787 или 2026-11-13.', yrUse: 'Нажмите, чтобы выбрать вторым словом:', yrSet: '«{w}» выбрано вторым словом',
+  nShufL: 'Перемешанных текстов для контроля', nShufD: 'Больше — точнее, но медленнее. Обычно достаточно 10.',
+  pCloserK: 'В настоящем тексте пара ближе, чем во всех {k} перемешанных. Интересно, но не доказательство.', pSameK: 'Такая близость была и в {c} из {k} перемешанных — вероятно, случайность.',
+  srcParT: 'Недельные главы Торы', srcParD: 'Границы глав и расписание (Израиль, 2025–2036) рассчитаны заранее с помощью Hebcal.'
+});
+Object.assign(LANG.es, {
+  ctrlSubN: 'Mismas letras en orden aleatorio · {k} textos', oddsMillion: 'más de un millón',
+  vRare: 'Raro: un texto aleatorio daría unos {e}, aquí hay {r}. Más o menos 1 en {n} por azar. Interesante, pero si pruebas muchas palabras, algunas parecerán raras por azar.',
+  vUnusual: 'Algo más de lo normal (1 en {n} por azar). Interesante, pero no excepcional.',
+  rankLine: 'El texto real superó a {b} de {k} textos mezclados.',
+  whyCtrlD2: 'La probabilidad («1 en …») sale del número esperado y se comprueba con varios textos mezclados (cuántos, en Ajustes).',
+  cmpBtn: 'Comparar textos', cmpRunning: 'Comparando «{w}»', cmpText: 'Texto', cmpRatio: 'vs esperado', lettersShort: 'letras',
+  cmpExplain: '«{w}» con saltos {a}–{b} en cada texto. Más de 1 = más que el azar; resaltado = raro (menos del 1%).',
+  cmpNote: 'Un texto más largo da más apariciones: compara la proporción, no el número.',
+  parT: 'Porción de la semana: {p}', parD: 'Shabat {d}', parChag: 'antes: {c}', parMyName: 'Mi nombre en la porción', parSearch: 'Buscar en la porción', parRead: 'Cada N en la porción',
+  nameFirst: 'Primero escribe un nombre en «Mi nombre en la Torá»', parLbl: 'Porción', parJoined: 'Porciones unidas esta semana: {p}', parOf: 'Porción {p}', g_parasha: 'Porción',
+  yrT: 'Año o fecha hebrea', yrD: 'Escribe un año (2026), un año hebreo (5787) o una fecha (2026-11-13) y úsalo como segunda palabra.',
+  yrJanSep: 'enero–septiembre {y}', yrSepDec: 'de Rosh Hashaná a diciembre {y}', yrDate: 'Fecha hebrea: {t}', yrBad: 'No entendí. Prueba 2026, 5787 o 2026-11-13.', yrUse: 'Toca para usar como segunda palabra:', yrSet: '«{w}» elegida como segunda palabra',
+  nShufL: 'Textos mezclados para el control', nShufD: 'Más = más preciso, pero más lento. 10 suele bastar.',
+  pCloserK: 'En el texto real el par está más cerca que en los {k} textos mezclados. Interesante, pero no es prueba.', pSameK: 'Una cercanía así apareció en {c} de {k} textos mezclados: probablemente azar.',
+  srcParT: 'Porciones semanales', srcParD: 'Los límites y el calendario (Israel, 2025–2036) se calcularon antes con Hebcal.'
+});
+Object.assign(LANG.ar, {
+  ctrlSubN: 'الحروف نفسها بترتيب عشوائي · {k} نصوص', oddsMillion: 'أكثر من مليون',
+  vRare: 'نادر: النص العشوائي يعطي نحو {e}، وهنا {r}. احتمال نحو 1 من {n} بالصدفة. مثير — لكن إن فحصت كلمات كثيرة سيبدو بعضها نادرًا بالصدفة.',
+  vUnusual: 'أكثر قليلًا من المعتاد (نحو 1 من {n} بالصدفة). مثير، لكنه ليس استثنائيًا.',
+  rankLine: 'تفوّق النص الحقيقي على {b} من {k} نصوص مخلوطة.',
+  whyCtrlD2: 'الاحتمال («1 من …») محسوب من العدد المتوقع ومفحوص على عدة نصوص مخلوطة (العدد في الإعدادات).',
+  cmpBtn: 'مقارنة بين النصوص', cmpRunning: 'مقارنة «{w}»', cmpText: 'النص', cmpRatio: 'مقابل المتوقع', lettersShort: 'حرف',
+  cmpExplain: '«{w}» بتخطي {a}–{b} في كل نص. أكثر من 1 = أكثر من الصدفة؛ المميّز = نادر (أقل من 1%).',
+  cmpNote: 'النص الأطول يعطي ظهورًا أكثر — لذلك قارن النسبة لا العدد.',
+  parT: 'قسم الأسبوع: {p}', parD: 'السبت {d}', parChag: 'قبله: {c}', parMyName: 'اسمي في القسم', parSearch: 'ابحث في القسم', parRead: 'كل حرف N في القسم',
+  nameFirst: 'اكتب اسمًا أولًا في «اسمي في التوراة»', parLbl: 'القسم', parJoined: 'أقسام مدمجة هذا الأسبوع: {p}', parOf: 'قسم {p}', g_parasha: 'القسم',
+  yrT: 'سنة أو تاريخ عبري', yrD: 'اكتب سنة (2026) أو سنة عبرية (5787) أو تاريخًا (2026-11-13) واخترها ككلمة ثانية.',
+  yrJanSep: 'يناير–سبتمبر {y}', yrSepDec: 'من رأس السنة حتى ديسمبر {y}', yrDate: 'التاريخ العبري: {t}', yrBad: 'لم أفهم. جرّب 2026 أو 5787 أو 2026-11-13.', yrUse: 'اضغط لاختيارها ككلمة ثانية:', yrSet: 'تم اختيار «{w}» ككلمة ثانية',
+  nShufL: 'عدد النصوص المخلوطة للمقارنة', nShufD: 'أكثر = أدق لكن أبطأ. 10 تكفي عادة.',
+  pCloserK: 'في النص الحقيقي الزوج أقرب من كل النصوص المخلوطة الـ{k}. مثير — لكنه ليس دليلًا.', pSameK: 'قرب كهذا ظهر في {c} من {k} نصوص مخلوطة — غالبًا صدفة.',
+  srcParT: 'أقسام التوراة الأسبوعية', srcParD: 'حدود الأقسام وجدول السبوت (إسرائيل، 2025–2036) حُسبت مسبقًا بمساعدة Hebcal.'
+});
+
+</script>
+<script>
+/* Parashot (Israel) — computed at build time with Hebcal (@hebcal/core, @hebcal/leyning). Data only. */
+var PARASHOT = [{"en":"Bereshit","he":"בראשית","b":0,"s":"1:1","e":"6:8","eb":0},{"en":"Noach","he":"נח","b":0,"s":"6:9","e":"11:32","eb":0},{"en":"Lech-Lecha","he":"לךלך","b":0,"s":"12:1","e":"17:27","eb":0},{"en":"Vayera","he":"וירא","b":0,"s":"18:1","e":"22:24","eb":0},{"en":"Chayei Sara","he":"חיי שרה","b":0,"s":"23:1","e":"25:18","eb":0},{"en":"Toldot","he":"תולדות","b":0,"s":"25:19","e":"28:9","eb":0},{"en":"Vayetzei","he":"ויצא","b":0,"s":"28:10","e":"32:3","eb":0},{"en":"Vayishlach","he":"וישלח","b":0,"s":"32:4","e":"36:43","eb":0},{"en":"Vayeshev","he":"וישב","b":0,"s":"37:1","e":"40:23","eb":0},{"en":"Miketz","he":"מקץ","b":0,"s":"41:1","e":"44:17","eb":0},{"en":"Vayigash","he":"ויגש","b":0,"s":"44:18","e":"47:27","eb":0},{"en":"Vayechi","he":"ויחי","b":0,"s":"47:28","e":"50:26","eb":0},{"en":"Shemot","he":"שמות","b":1,"s":"1:1","e":"6:1","eb":1},{"en":"Vaera","he":"וארא","b":1,"s":"6:2","e":"9:35","eb":1},{"en":"Bo","he":"בא","b":1,"s":"10:1","e":"13:16","eb":1},{"en":"Beshalach","he":"בשלח","b":1,"s":"13:17","e":"17:16","eb":1},{"en":"Yitro","he":"יתרו","b":1,"s":"18:1","e":"20:23","eb":1},{"en":"Mishpatim","he":"משפטים","b":1,"s":"21:1","e":"24:18","eb":1},{"en":"Terumah","he":"תרומה","b":1,"s":"25:1","e":"27:19","eb":1},{"en":"Tetzaveh","he":"תצוה","b":1,"s":"27:20","e":"30:10","eb":1},{"en":"Ki Tisa","he":"כי תשא","b":1,"s":"30:11","e":"34:35","eb":1},{"en":"Vayakhel","he":"ויקהל","b":1,"s":"35:1","e":"38:20","eb":1},{"en":"Pekudei","he":"פקודי","b":1,"s":"38:21","e":"40:38","eb":1},{"en":"Vayikra","he":"ויקרא","b":2,"s":"1:1","e":"5:26","eb":2},{"en":"Tzav","he":"צו","b":2,"s":"6:1","e":"8:36","eb":2},{"en":"Shmini","he":"שמיני","b":2,"s":"9:1","e":"11:47","eb":2},{"en":"Tazria","he":"תזריע","b":2,"s":"12:1","e":"13:59","eb":2},{"en":"Metzora","he":"מצרע","b":2,"s":"14:1","e":"15:33","eb":2},{"en":"Achrei Mot","he":"אחרי מות","b":2,"s":"16:1","e":"18:30","eb":2},{"en":"Kedoshim","he":"קדשים","b":2,"s":"19:1","e":"20:27","eb":2},{"en":"Emor","he":"אמור","b":2,"s":"21:1","e":"24:23","eb":2},{"en":"Behar","he":"בהר","b":2,"s":"25:1","e":"26:2","eb":2},{"en":"Bechukotai","he":"בחקתי","b":2,"s":"26:3","e":"27:34","eb":2},{"en":"Bamidbar","he":"במדבר","b":3,"s":"1:1","e":"4:20","eb":3},{"en":"Nasso","he":"נשא","b":3,"s":"4:21","e":"7:89","eb":3},{"en":"Beha'alotcha","he":"בהעלתך","b":3,"s":"8:1","e":"12:16","eb":3},{"en":"Sh'lach","he":"שלחלך","b":3,"s":"13:1","e":"15:41","eb":3},{"en":"Korach","he":"קרח","b":3,"s":"16:1","e":"18:32","eb":3},{"en":"Chukat","he":"חקת","b":3,"s":"19:1","e":"22:1","eb":3},{"en":"Balak","he":"בלק","b":3,"s":"22:2","e":"25:9","eb":3},{"en":"Pinchas","he":"פינחס","b":3,"s":"25:10","e":"30:1","eb":3},{"en":"Matot","he":"מטות","b":3,"s":"30:2","e":"32:42","eb":3},{"en":"Masei","he":"מסעי","b":3,"s":"33:1","e":"36:13","eb":3},{"en":"Devarim","he":"דברים","b":4,"s":"1:1","e":"3:22","eb":4},{"en":"Vaetchanan","he":"ואתחנן","b":4,"s":"3:23","e":"7:11","eb":4},{"en":"Eikev","he":"עקב","b":4,"s":"7:12","e":"11:25","eb":4},{"en":"Re'eh","he":"ראה","b":4,"s":"11:26","e":"16:17","eb":4},{"en":"Shoftim","he":"שופטים","b":4,"s":"16:18","e":"21:9","eb":4},{"en":"Ki Teitzei","he":"כיתצא","b":4,"s":"21:10","e":"25:19","eb":4},{"en":"Ki Tavo","he":"כיתבוא","b":4,"s":"26:1","e":"29:8","eb":4},{"en":"Nitzavim","he":"נצבים","b":4,"s":"29:9","e":"30:20","eb":4},{"en":"Vayeilech","he":"וילך","b":4,"s":"31:1","e":"31:30","eb":4},{"en":"Ha'azinu","he":"האזינו","b":4,"s":"32:1","e":"32:52","eb":4},{"en":"Vezot Haberakhah","he":"וזאת הברכה","b":4,"s":"33:1","e":"34:12","eb":4}];
+var PSCHED = {"2025-09-27":[51],"2025-10-04":[52],"2025-10-11":["#שבת חל המועד סכות"],"2025-10-18":[0],"2025-10-25":[1],"2025-11-01":[2],"2025-11-08":[3],"2025-11-15":[4],"2025-11-22":[5],"2025-11-29":[6],"2025-12-06":[7],"2025-12-13":[8],"2025-12-20":[9],"2025-12-27":[10],"2026-01-03":[11],"2026-01-10":[12],"2026-01-17":[13],"2026-01-24":[14],"2026-01-31":[15],"2026-02-07":[16],"2026-02-14":[17],"2026-02-21":[18],"2026-02-28":[19],"2026-03-07":[20],"2026-03-14":[21,22],"2026-03-21":[23],"2026-03-28":[24],"2026-04-04":["#שבת חל המועד פסח"],"2026-04-11":[25],"2026-04-18":[26,27],"2026-04-25":[28,29],"2026-05-02":[30],"2026-05-09":[31,32],"2026-05-16":[33],"2026-05-23":[34],"2026-05-30":[35],"2026-06-06":[36],"2026-06-13":[37],"2026-06-20":[38],"2026-06-27":[39],"2026-07-04":[40],"2026-07-11":[41,42],"2026-07-18":[43],"2026-07-25":[44],"2026-08-01":[45],"2026-08-08":[46],"2026-08-15":[47],"2026-08-22":[48],"2026-08-29":[49],"2026-09-05":[50,51],"2026-09-12":["#ראש השנה"],"2026-09-19":[52],"2026-09-26":["#סכות"],"2026-10-03":["#שמיני עצרת"],"2026-10-10":[0],"2026-10-17":[1],"2026-10-24":[2],"2026-10-31":[3],"2026-11-07":[4],"2026-11-14":[5],"2026-11-21":[6],"2026-11-28":[7],"2026-12-05":[8],"2026-12-12":[9],"2026-12-19":[10],"2026-12-26":[11],"2027-01-02":[12],"2027-01-09":[13],"2027-01-16":[14],"2027-01-23":[15],"2027-01-30":[16],"2027-02-06":[17],"2027-02-13":[18],"2027-02-20":[19],"2027-02-27":[20],"2027-03-06":[21],"2027-03-13":[22],"2027-03-20":[23],"2027-03-27":[24],"2027-04-03":[25],"2027-04-10":[26],"2027-04-17":[27],"2027-04-24":["#שבת חל המועד פסח"],"2027-05-01":[28],"2027-05-08":[29],"2027-05-15":[30],"2027-05-22":[31],"2027-05-29":[32],"2027-06-05":[33],"2027-06-12":[34],"2027-06-19":[35],"2027-06-26":[36],"2027-07-03":[37],"2027-07-10":[38],"2027-07-17":[39],"2027-07-24":[40],"2027-07-31":[41,42],"2027-08-07":[43],"2027-08-14":[44],"2027-08-21":[45],"2027-08-28":[46],"2027-09-04":[47],"2027-09-11":[48],"2027-09-18":[49],"2027-09-25":[50,51],"2027-10-02":["#ראש השנה"],"2027-10-09":[52],"2027-10-16":["#סכות"],"2027-10-23":["#שמיני עצרת"],"2027-10-30":[0],"2027-11-06":[1],"2027-11-13":[2],"2027-11-20":[3],"2027-11-27":[4],"2027-12-04":[5],"2027-12-11":[6],"2027-12-18":[7],"2027-12-25":[8],"2028-01-01":[9],"2028-01-08":[10],"2028-01-15":[11],"2028-01-22":[12],"2028-01-29":[13],"2028-02-05":[14],"2028-02-12":[15],"2028-02-19":[16],"2028-02-26":[17],"2028-03-04":[18],"2028-03-11":[19],"2028-03-18":[20],"2028-03-25":[21,22],"2028-04-01":[23],"2028-04-08":[24],"2028-04-15":["#שבת חל המועד פסח"],"2028-04-22":[25],"2028-04-29":[26,27],"2028-05-06":[28,29],"2028-05-13":[30],"2028-05-20":[31,32],"2028-05-27":[33],"2028-06-03":[34],"2028-06-10":[35],"2028-06-17":[36],"2028-06-24":[37],"2028-07-01":[38],"2028-07-08":[39],"2028-07-15":[40],"2028-07-22":[41,42],"2028-07-29":[43],"2028-08-05":[44],"2028-08-12":[45],"2028-08-19":[46],"2028-08-26":[47],"2028-09-02":[48],"2028-09-09":[49],"2028-09-16":[50,51],"2028-09-23":[52],"2028-09-30":["#יום כפור"],"2028-10-07":["#שבת חל המועד סכות"],"2028-10-14":[0],"2028-10-21":[1],"2028-10-28":[2],"2028-11-04":[3],"2028-11-11":[4],"2028-11-18":[5],"2028-11-25":[6],"2028-12-02":[7],"2028-12-09":[8],"2028-12-16":[9],"2028-12-23":[10],"2028-12-30":[11],"2029-01-06":[12],"2029-01-13":[13],"2029-01-20":[14],"2029-01-27":[15],"2029-02-03":[16],"2029-02-10":[17],"2029-02-17":[18],"2029-02-24":[19],"2029-03-03":[20],"2029-03-10":[21,22],"2029-03-17":[23],"2029-03-24":[24],"2029-03-31":["#פסח"],"2029-04-07":[25],"2029-04-14":[26,27],"2029-04-21":[28,29],"2029-04-28":[30],"2029-05-05":[31],"2029-05-12":[32],"2029-05-19":[33],"2029-05-26":[34],"2029-06-02":[35],"2029-06-09":[36],"2029-06-16":[37],"2029-06-23":[38],"2029-06-30":[39],"2029-07-07":[40],"2029-07-14":[41,42],"2029-07-21":[43],"2029-07-28":[44],"2029-08-04":[45],"2029-08-11":[46],"2029-08-18":[47],"2029-08-25":[48],"2029-09-01":[49],"2029-09-08":[50],"2029-09-15":[51],"2029-09-22":[52],"2029-09-29":["#שבת חל המועד סכות"],"2029-10-06":[0],"2029-10-13":[1],"2029-10-20":[2],"2029-10-27":[3],"2029-11-03":[4],"2029-11-10":[5],"2029-11-17":[6],"2029-11-24":[7],"2029-12-01":[8],"2029-12-08":[9],"2029-12-15":[10],"2029-12-22":[11],"2029-12-29":[12],"2030-01-05":[13],"2030-01-12":[14],"2030-01-19":[15],"2030-01-26":[16],"2030-02-02":[17],"2030-02-09":[18],"2030-02-16":[19],"2030-02-23":[20],"2030-03-02":[21],"2030-03-09":[22],"2030-03-16":[23],"2030-03-23":[24],"2030-03-30":[25],"2030-04-06":[26],"2030-04-13":[27],"2030-04-20":["#שבת חל המועד פסח"],"2030-04-27":[28],"2030-05-04":[29],"2030-05-11":[30],"2030-05-18":[31],"2030-05-25":[32],"2030-06-01":[33],"2030-06-08":[34],"2030-06-15":[35],"2030-06-22":[36],"2030-06-29":[37],"2030-07-06":[38],"2030-07-13":[39],"2030-07-20":[40],"2030-07-27":[41,42],"2030-08-03":[43],"2030-08-10":[44],"2030-08-17":[45],"2030-08-24":[46],"2030-08-31":[47],"2030-09-07":[48],"2030-09-14":[49],"2030-09-21":[50,51],"2030-09-28":["#ראש השנה"],"2030-10-05":[52],"2030-10-12":["#סכות"],"2030-10-19":["#שמיני עצרת"],"2030-10-26":[0],"2030-11-02":[1],"2030-11-09":[2],"2030-11-16":[3],"2030-11-23":[4],"2030-11-30":[5],"2030-12-07":[6],"2030-12-14":[7],"2030-12-21":[8],"2030-12-28":[9],"2031-01-04":[10],"2031-01-11":[11],"2031-01-18":[12],"2031-01-25":[13],"2031-02-01":[14],"2031-02-08":[15],"2031-02-15":[16],"2031-02-22":[17],"2031-03-01":[18],"2031-03-08":[19],"2031-03-15":[20],"2031-03-22":[21,22],"2031-03-29":[23],"2031-04-05":[24],"2031-04-12":["#שבת חל המועד פסח"],"2031-04-19":[25],"2031-04-26":[26,27],"2031-05-03":[28,29],"2031-05-10":[30],"2031-05-17":[31,32],"2031-05-24":[33],"2031-05-31":[34],"2031-06-07":[35],"2031-06-14":[36],"2031-06-21":[37],"2031-06-28":[38],"2031-07-05":[39],"2031-07-12":[40],"2031-07-19":[41,42],"2031-07-26":[43],"2031-08-02":[44],"2031-08-09":[45],"2031-08-16":[46],"2031-08-23":[47],"2031-08-30":[48],"2031-09-06":[49],"2031-09-13":[50,51],"2031-09-20":[52],"2031-09-27":["#יום כפור"],"2031-10-04":["#שבת חל המועד סכות"],"2031-10-11":[0],"2031-10-18":[1],"2031-10-25":[2],"2031-11-01":[3],"2031-11-08":[4],"2031-11-15":[5],"2031-11-22":[6],"2031-11-29":[7],"2031-12-06":[8],"2031-12-13":[9],"2031-12-20":[10],"2031-12-27":[11],"2032-01-03":[12],"2032-01-10":[13],"2032-01-17":[14],"2032-01-24":[15],"2032-01-31":[16],"2032-02-07":[17],"2032-02-14":[18],"2032-02-21":[19],"2032-02-28":[20],"2032-03-06":[21,22],"2032-03-13":[23],"2032-03-20":[24],"2032-03-27":["#פסח"],"2032-04-03":[25],"2032-04-10":[26,27],"2032-04-17":[28,29],"2032-04-24":[30],"2032-05-01":[31],"2032-05-08":[32],"2032-05-15":[33],"2032-05-22":[34],"2032-05-29":[35],"2032-06-05":[36],"2032-06-12":[37],"2032-06-19":[38],"2032-06-26":[39],"2032-07-03":[40],"2032-07-10":[41,42],"2032-07-17":[43],"2032-07-24":[44],"2032-07-31":[45],"2032-08-07":[46],"2032-08-14":[47],"2032-08-21":[48],"2032-08-28":[49],"2032-09-04":[50],"2032-09-11":[51],"2032-09-18":[52],"2032-09-25":["#שבת חל המועד סכות"],"2032-10-02":[0],"2032-10-09":[1],"2032-10-16":[2],"2032-10-23":[3],"2032-10-30":[4],"2032-11-06":[5],"2032-11-13":[6],"2032-11-20":[7],"2032-11-27":[8],"2032-12-04":[9],"2032-12-11":[10],"2032-12-18":[11],"2032-12-25":[12],"2033-01-01":[13],"2033-01-08":[14],"2033-01-15":[15],"2033-01-22":[16],"2033-01-29":[17],"2033-02-05":[18],"2033-02-12":[19],"2033-02-19":[20],"2033-02-26":[21],"2033-03-05":[22],"2033-03-12":[23],"2033-03-19":[24],"2033-03-26":[25],"2033-04-02":[26],"2033-04-09":[27],"2033-04-16":["#שבת חל המועד פסח"],"2033-04-23":[28],"2033-04-30":[29],"2033-05-07":[30],"2033-05-14":[31],"2033-05-21":[32],"2033-05-28":[33],"2033-06-04":[34],"2033-06-11":[35],"2033-06-18":[36],"2033-06-25":[37],"2033-07-02":[38],"2033-07-09":[39],"2033-07-16":[40],"2033-07-23":[41,42],"2033-07-30":[43],"2033-08-06":[44],"2033-08-13":[45],"2033-08-20":[46],"2033-08-27":[47],"2033-09-03":[48],"2033-09-10":[49],"2033-09-17":[50,51],"2033-09-24":["#ראש השנה"],"2033-10-01":[52],"2033-10-08":["#סכות"],"2033-10-15":["#שמיני עצרת"],"2033-10-22":[0],"2033-10-29":[1],"2033-11-05":[2],"2033-11-12":[3],"2033-11-19":[4],"2033-11-26":[5],"2033-12-03":[6],"2033-12-10":[7],"2033-12-17":[8],"2033-12-24":[9],"2033-12-31":[10],"2034-01-07":[11],"2034-01-14":[12],"2034-01-21":[13],"2034-01-28":[14],"2034-02-04":[15],"2034-02-11":[16],"2034-02-18":[17],"2034-02-25":[18],"2034-03-04":[19],"2034-03-11":[20],"2034-03-18":[21,22],"2034-03-25":[23],"2034-04-01":[24],"2034-04-08":["#שבת חל המועד פסח"],"2034-04-15":[25],"2034-04-22":[26,27],"2034-04-29":[28,29],"2034-05-06":[30],"2034-05-13":[31,32],"2034-05-20":[33],"2034-05-27":[34],"2034-06-03":[35],"2034-06-10":[36],"2034-06-17":[37],"2034-06-24":[38],"2034-07-01":[39],"2034-07-08":[40],"2034-07-15":[41,42],"2034-07-22":[43],"2034-07-29":[44],"2034-08-05":[45],"2034-08-12":[46],"2034-08-19":[47],"2034-08-26":[48],"2034-09-02":[49],"2034-09-09":[50,51],"2034-09-16":[52],"2034-09-23":["#יום כפור"],"2034-09-30":["#שבת חל המועד סכות"],"2034-10-07":[0],"2034-10-14":[1],"2034-10-21":[2],"2034-10-28":[3],"2034-11-04":[4],"2034-11-11":[5],"2034-11-18":[6],"2034-11-25":[7],"2034-12-02":[8],"2034-12-09":[9],"2034-12-16":[10],"2034-12-23":[11],"2034-12-30":[12],"2035-01-06":[13],"2035-01-13":[14],"2035-01-20":[15],"2035-01-27":[16],"2035-02-03":[17],"2035-02-10":[18],"2035-02-17":[19],"2035-02-24":[20],"2035-03-03":[21],"2035-03-10":[22],"2035-03-17":[23],"2035-03-24":[24],"2035-03-31":[25],"2035-04-07":[26],"2035-04-14":[27],"2035-04-21":[28],"2035-04-28":["#שבת חל המועד פסח"],"2035-05-05":[29],"2035-05-12":[30],"2035-05-19":[31],"2035-05-26":[32],"2035-06-02":[33],"2035-06-09":[34],"2035-06-16":[35],"2035-06-23":[36],"2035-06-30":[37],"2035-07-07":[38],"2035-07-14":[39],"2035-07-21":[40],"2035-07-28":[41],"2035-08-04":[42],"2035-08-11":[43],"2035-08-18":[44],"2035-08-25":[45],"2035-09-01":[46],"2035-09-08":[47],"2035-09-15":[48],"2035-09-22":[49],"2035-09-29":[50,51],"2035-10-06":[52],"2035-10-13":["#יום כפור"],"2035-10-20":["#שבת חל המועד סכות"],"2035-10-27":[0],"2035-11-03":[1],"2035-11-10":[2],"2035-11-17":[3],"2035-11-24":[4],"2035-12-01":[5],"2035-12-08":[6],"2035-12-15":[7],"2035-12-22":[8],"2035-12-29":[9],"2036-01-05":[10],"2036-01-12":[11],"2036-01-19":[12],"2036-01-26":[13],"2036-02-02":[14],"2036-02-09":[15],"2036-02-16":[16],"2036-02-23":[17],"2036-03-01":[18],"2036-03-08":[19],"2036-03-15":[20],"2036-03-22":[21,22],"2036-03-29":[23],"2036-04-05":[24],"2036-04-12":["#פסח"],"2036-04-19":[25],"2036-04-26":[26,27],"2036-05-03":[28,29],"2036-05-10":[30],"2036-05-17":[31],"2036-05-24":[32],"2036-05-31":[33],"2036-06-07":[34],"2036-06-14":[35],"2036-06-21":[36],"2036-06-28":[37],"2036-07-05":[38],"2036-07-12":[39],"2036-07-19":[40],"2036-07-26":[41,42],"2036-08-02":[43],"2036-08-09":[44],"2036-08-16":[45],"2036-08-23":[46],"2036-08-30":[47],"2036-09-06":[48],"2036-09-13":[49],"2036-09-20":[50]};
+
 </script>
 <script>
 /* הצופן התנכי · CodeNest — AppNest © 2026 Barak Aflalo */
 'use strict';
-var VERSION = '1.1.0', DATA_V = '1';
+var VERSION = '1.2.0', DATA_V = '1';
 var STORE_URL = 'https://appnest-store.pages.dev/';
 var FEEDBACK = 'appnest55@gmail.com';
 function $(id) { return document.getElementById(id); }
@@ -996,7 +1097,7 @@ var store = (function () {
     del: function (k) { try { if (has) localStorage.removeItem('cn_' + k); else delete mem[k]; } catch (e) { } }
   };
 })();
-var DEF = { lang: 'he', theme: 'gold', mode: 'dark', name: '', finals: false, maxSkip: 1000, guided: false, ai: { prov: '', key: '', model: '', url: '' } };
+var DEF = { lang: 'he', theme: 'gold', mode: 'dark', name: '', finals: false, maxSkip: 1000, nShuf: 10, guided: false, ai: { prov: '', key: '', model: '', url: '' } };
 var S = Object.assign({}, DEF, store.get('settings', {}));
 S.ai = Object.assign({}, DEF.ai, S.ai || {});
 function saveS() { store.set('settings', S); }
@@ -1019,7 +1120,7 @@ function applyLang() {
   document.querySelectorAll('[data-t]').forEach(function (el) { el.textContent = T(el.getAttribute('data-t')); });
   document.querySelectorAll('[data-tp]').forEach(function (el) { el.placeholder = T(el.getAttribute('data-tp')); });
   $('verLbl').textContent = T('version') + ' ' + VERSION;
-  updHeader(); updSavedCount(); renderScopes(); hello(); renderHelp();
+  updHeader(); updSavedCount(); renderScopes(); hello(); renderHelp(); renderParashaCard(); if (window.AppNestAssistant) AppNestAssistant.refresh();
 }
 function hello() { $('homeHello').textContent = S.name ? T('hello', { n: S.name }) : ''; }
 
@@ -1050,7 +1151,8 @@ var BOOKS = {
 };
 BOOKS.grc = BOOKS.nt;
 var GROUPS = { torah: ['tanach', 0, 5], neviim: ['tanach', 5, 26], ketuvim: ['tanach', 26, 39], tanach: ['tanach', 0, 39], nt: ['nt', 0, 27], grc: ['grc', 0, 27] };
-var GROUP_IDS = ['torah', 'neviim', 'ketuvim', 'tanach', 'nt', 'grc'];
+var GROUP_IDS = ['torah', 'parasha', 'neviim', 'ketuvim', 'tanach', 'nt', 'grc'];
+GROUPS.parasha = ['tanach', 0, 5];
 function bookName(src, bi) { var b = BOOKS[src][bi]; return (S.lang === 'he' || S.lang === 'ar') ? b[1] : b[3]; }
 function chv(n) { return S.lang === 'he' ? heNum(n) : String(n); }
 
@@ -1114,11 +1216,16 @@ function wordCodes(str, finals, A) {
 function cleanWord(str, A) { A = A || ALPH.he; var s = prepStr(str, A), o = ''; for (var i = 0; i < s.length; i++) if (A.CODE[s[i]] != null) o += s[i]; return o; }
 
 /* ---------- scope selector ---------- */
-var SCOPES = {}, SCOPE_GROUPS = { cScope: ['torah', 'neviim', 'ketuvim', 'tanach', 'nt'], hScope: ['torah', 'neviim', 'ketuvim', 'tanach', 'nt'] };
+var SCOPES = {}, SCOPE_GROUPS = { cScope: ['torah', 'parasha', 'neviim', 'ketuvim', 'tanach', 'nt'], hScope: ['torah', 'parasha', 'neviim', 'ketuvim', 'tanach', 'nt'] };
 function scopeHTML(id, withCh) {
   var sc = SCOPES[id] || (SCOPES[id] = { g: 'torah', b: -1, c1: 1, c2: 0, withCh: withCh });
   var o = '<div class="fld"><label>' + T('textLbl') + '</label><div class="chips">';
   (SCOPE_GROUPS[id] || GROUP_IDS).forEach(function (g) { o += '<button class="chip' + (sc.g === g ? ' on' : '') + '" data-sg="' + g + '">' + T('g_' + g) + '</button>'; });
+  if (sc.g === 'parasha') {
+    if (!sc.p) { var ts = thisShabbat(); sc.p = (ts.idx || [0]).slice(); }
+    o += '</div></div><div class="fld"><label>' + T('parLbl') + '</label><select data-sp>' + parashaOpts(sc.p[0]) + '</select>' + (sc.p.length > 1 ? '<div class="mut">' + esc(T('parJoined', { p: parashaName(sc.p) })) + '</div>' : '') + '</div>';
+    return o;
+  }
   o += '</div></div><div class="row"><div class="fld" style="flex:2"><label>' + T('bookLbl') + '</label><select data-sb>';
   var G = GROUPS[sc.g]; o += '<option value="-1">' + T('allBooks') + '</option>';
   for (var i = G[1]; i < G[2]; i++) o += '<option value="' + i + '"' + (sc.b === i ? ' selected' : '') + '>' + esc(bookName(G[0], i)) + '</option>';
@@ -1135,6 +1242,7 @@ function renderScope(id) {
   var el = $(id); if (!el) return; var sc = SCOPES[id]; el.innerHTML = scopeHTML(id, sc ? sc.withCh : el.getAttribute('data-ch') === '1');
   sc = SCOPES[id];
   el.querySelectorAll('[data-sg]').forEach(function (b) { b.onclick = function () { sc.g = b.getAttribute('data-sg'); sc.b = -1; sc.c1 = 1; sc.c2 = 0; renderScope(id); if (id === 'sScope') quickChips(); }; });
+  var sp = el.querySelector('[data-sp]'); if (sp) { sp.onchange = function () { sc.p = [+sp.value]; renderScope(id); }; return; }
   var sb = el.querySelector('[data-sb]'); sb.onchange = function () { sc.b = +sb.value; sc.c1 = 1; sc.c2 = 0; renderScope(id); };
   var c1 = el.querySelector('[data-c1]'), c2 = el.querySelector('[data-c2]');
   if (c1) c1.onchange = function () { sc.c1 = +c1.value; if (sc.c2 && sc.c2 < sc.c1) sc.c2 = sc.c1; renderScope(id); };
@@ -1142,6 +1250,7 @@ function renderScope(id) {
 }
 function renderScopes() { ['sScope', 'rScope', 'mScope', 'pScope', 'cScope', 'hScope'].forEach(renderScope); }
 function scopeLabel(sc) {
+  if (sc.g === 'parasha') return T('parOf', { p: parashaName(sc.p || [0]) });
   var G = GROUPS[sc.g];
   if (sc.b < 0) return T('g_' + sc.g);
   var s = bookName(G[0], sc.b);
@@ -1149,6 +1258,7 @@ function scopeLabel(sc) {
   return s;
 }
 function scopeRange(C, sc) {
+  if (sc.g === 'parasha') return parashaRange(C, sc.p || [0]);
   var G = GROUPS[sc.g];
   if (sc.b < 0) return { from: C.books[G[1]].l0, to: C.books[G[2] - 1].l1 };
   var B = C.books[sc.b];
@@ -1192,7 +1302,8 @@ function updHeader() {
 window.addEventListener('popstate', function () {
   if (hist.ignore > 0) { hist.ignore--; return; }
   hist.guard = false;
-  if (MODALS.length) closeModal(MODALS[MODALS.length - 1]);
+  if (window.AppNestAssistant && AppNestAssistant.isOpen()) AppNestAssistant.close();
+  else if (MODALS.length) closeModal(MODALS[MODALS.length - 1]);
   else if (guideOpen()) skipGuide();
   else if (busyCancelable()) cancelBusy();
   else if (curSc !== 'home') goBack();
@@ -1274,12 +1385,16 @@ function workerMain() {
     if (m.shuffle) { var R0 = rng(m.seed), Sx = new Uint8Array(T), a, b, t0; for (a = Sx.length - 1; a > 0; a--) { b = Math.floor(R0() * (a + 1)); t0 = Sx[a]; Sx[a] = Sx[b]; Sx[b] = t0; } T = Sx; }
     var r = els(T, m.w, m.dmin, m.dmax, m.both, m.maxRes, rep, 1), ctrl = null;
     var exp = expected(T, m.w, m.dmin, m.dmax, m.both);
+    var ctrls = [];
     if (m.control) {
-      var R = rng(m.seed), S2 = new Uint8Array(T), i, j, t;
-      for (i = S2.length - 1; i > 0; i--) { j = Math.floor(R() * (i + 1)); t = S2[i]; S2[i] = S2[j]; S2[j] = t; }
-      var c = els(S2, m.w, Math.max(2, m.dmin), m.dmax, m.both, 0, rep, 2); ctrl = c.count;
+      var K = Math.max(1, m.nShuf || 1), R = rng(m.seed), S2 = new Uint8Array(T), i, j, t;
+      for (var kk = 0; kk < K; kk++) {
+        for (i = S2.length - 1; i > 0; i--) { j = Math.floor(R() * (i + 1)); t = S2[i]; S2[i] = S2[j]; S2[j] = t; }
+        var c = els(S2, m.w, Math.max(2, m.dmin), m.dmax, m.both, 0, function (ph, f) { rep(2, (kk + f) / K); }, 2); ctrls.push(c.count);
+      }
+      ctrl = ctrls.reduce(function (a, b) { return a + b; }, 0) / ctrls.length;
     }
-    self.postMessage({ id: m.id, type: 'done', count: r.count, d1: r.d1, res: r.res, ctrl: ctrl, exp: exp, n: T.length });
+    self.postMessage({ id: m.id, type: 'done', count: r.count, d1: r.d1, res: r.res, ctrl: ctrl, ctrls: ctrls, exp: exp, n: T.length });
   };
 }
 var WK = null, wkId = 0;
@@ -1321,19 +1436,39 @@ function runSearch(opts) {
     busy(T('searching', { w: word }), 0, scopeLabel(sc), function () { killWorker(); toast(T('stopped')); });
     W.onmessage = function (e) {
       var m = e.data; if (m.id !== id) return;
-      if (m.type === 'prog') { busy(m.phase === 1 ? T('searching', { w: word }) : T('ctrlRunning'), m.frac, m.phase === 1 ? scopeLabel(sc) : T('ctrlSub')); return; }
+      if (m.type === 'prog') { busy(m.phase === 1 ? T('searching', { w: word }) : T('ctrlRunning'), m.frac, m.phase === 1 ? scopeLabel(sc) : T('ctrlSubN', { k: S.nShuf || 10 })); return; }
       busyOff();
       var res = []; for (var i = 0; i < m.res.length; i += 2) res.push({ s: m.res[i] + R.from, d: m.res[i + 1] });
       res.sort(function (a, b) { return Math.abs(a.d) - Math.abs(b.d) || a.s - b.s; });
-      LAST = { word: word, w: w, src: src, sc: JSON.parse(JSON.stringify(sc)), scLbl: scopeLabel(sc), dmin: dmin, dmax: dmax, both: both, count: m.count, d1: m.d1, ctrl: m.ctrl, exp: m.exp, res: res, ms: Date.now() - t0, shown: 50 };
+      LAST = { word: word, w: w, src: src, sc: JSON.parse(JSON.stringify(sc)), scLbl: scopeLabel(sc), dmin: dmin, dmax: dmax, both: both, count: m.count, d1: m.d1, ctrl: m.ctrl == null ? null : Math.round(m.ctrl * 10) / 10, ctrls: m.ctrls || [], exp: m.exp, res: res, ms: Date.now() - t0, shown: 50 };
       renderSearch();
       if (typeof opts.after === 'function') opts.after(LAST);
     };
     W.onerror = function () { busyOff(); toast(T('errGeneric')); killWorker(); };
-    W.postMessage({ id: id, T: Tt, w: w, dmin: dmin, dmax: dmax, both: both, maxRes: 500, control: ctrl, seed: 12345 + word.length * 7 });
+    W.postMessage({ id: id, T: Tt, w: w, dmin: dmin, dmax: dmax, both: both, maxRes: 500, control: ctrl, nShuf: S.nShuf || 10, seed: 12345 + word.length * 7 });
   });
 }
+function erfc(x) { var z = Math.abs(x), t = 1 / (1 + 0.5 * z), r = t * Math.exp(-z * z - 1.26551223 + t * (1.00002368 + t * (0.37409196 + t * (0.09678418 + t * (-0.18628806 + t * (0.27886807 + t * (-1.13520398 + t * (1.48851587 + t * (-0.82215223 + t * 0.17087277))))))))); return x >= 0 ? r : 2 - r; }
+function poisTail(k, lam) {
+  if (k <= 0) return 1; if (lam <= 0) return 0;
+  if (lam > 300) return 0.5 * erfc((k - 0.5 - lam) / Math.sqrt(lam) / Math.SQRT2);
+  var t = Math.exp(-lam), s = t; for (var i = 1; i < k; i++) { t *= lam / i; s += t; } return Math.max(0, 1 - s);
+}
+function oddsTxt(p) { if (p <= 1e-6) return T('oddsMillion'); var n = Math.round(1 / Math.max(p, 1e-9)); return fmtN(n > 1000 ? Math.round(n / 100) * 100 : n); }
+function statsOf(L) {
+  var real = L.count - (L.dmin <= 1 ? L.d1 : 0), p = poisTail(real, L.exp), ks = L.ctrls || [], ge = ks.filter(function (c) { return c >= real; }).length;
+  return { real: real, p: p, K: ks.length, beat: ks.length - ge };
+}
 function verdict(L) {
+  var st = statsOf(L);
+  if (L.count === 0) return T('vNone');
+  if (st.real === 0) return T('vOnlyPlain');
+  if (st.p < 0.001 && st.beat === st.K) return T('vRare', { e: fmtN(Math.round(L.exp * 10) / 10), r: fmtN(st.real), n: oddsTxt(st.p) });
+  if (st.p < 0.05) return T('vUnusual', { n: oddsTxt(st.p) });
+  if (st.real < L.exp * 0.6 && L.exp > 5) return T('vLess');
+  return T('vSame');
+}
+function verdictOld(L) {
   var real = L.count - (L.dmin <= 1 ? L.d1 : 0), e = L.exp;
   if (L.count === 0) return T('vNone');
   var o = '';
@@ -1358,7 +1493,10 @@ function renderSearch() {
   o += '<div><b>' + (L.ctrl == null ? '—' : fmtN(L.ctrl)) + '</b><span>' + T('stShuf') + '</span></div>';
   o += '<div><b>' + fmtN(Math.round(L.exp * 10) / 10) + '</b><span>' + T('stExp') + '</span></div></div>';
   if (L.dmin <= 1 && L.d1) o += '<div class="mut">' + T('plainNote', { n: fmtN(L.d1) }) + '</div>';
+  var st = statsOf(L);
+  if (st.K) o += '<div class="mut">' + T('rankLine', { b: st.beat, k: st.K }) + '</div>';
   o += '<div class="verdict" style="margin-top:8px">' + esc(verdict(L)) + ' <a href="#" id="whyCtrl" style="color:var(--acc)">' + T('whyCtrl') + '</a></div>';
+  if (alphOf(L.src).id === 'he') o += '<div class="row" style="margin-top:8px"><button class="btn sm" id="cmpBtn">📊 ' + T('cmpBtn') + '</button></div>';
   o += '</div>';
   if (L.res.length) {
     o += '<div class="card" style="padding:4px 8px"><div class="mut" style="padding:8px 6px">' + T('resShown', { n: fmtN(Math.min(L.shown, L.res.length)), t: fmtN(L.count) }) + '<br>' + T('resHow') + '</div>';
@@ -1370,7 +1508,8 @@ function renderSearch() {
     o += '</div>';
   }
   $('sOut').innerHTML = o;
-  $('whyCtrl').onclick = function (e) { e.preventDefault(); openModal(T('whyCtrlT'), '<p>' + esc(T('whyCtrlD')) + '</p>'); };
+  $('whyCtrl').onclick = function (e) { e.preventDefault(); openModal(T('whyCtrlT'), '<p>' + esc(T('whyCtrlD')) + '</p><p>' + esc(T('whyCtrlD2')) + '</p>'); };
+  if ($('cmpBtn')) $('cmpBtn').onclick = function () { compareTexts(L.word, L.dmin, L.dmax); };
   $('sOut').querySelectorAll('.res').forEach(function (el) { el.onclick = function (e) { if (e.target.closest('[data-mx]')) return; openResult(+el.getAttribute('data-i')); }; });
   $('sOut').querySelectorAll('[data-mx]').forEach(function (b) { b.onclick = function () { var r = L.res[+b.getAttribute('data-mx')]; matrixFromResult(L, r); }; });
   var mb = $('moreRes'); if (mb) mb.onclick = function () { L.shown += 50; renderSearch(); };
@@ -1692,8 +1831,8 @@ function runGem() {
     $('cOut').scrollIntoView({ behavior: 'smooth' });
   });
 }
-function gotoSearch(word, g, dmin, dmax, after) {
-  showSc('search'); $('sWord').value = word; SCOPES.sScope = SCOPES.sScope || {}; SCOPES.sScope.g = g; SCOPES.sScope.b = -1; renderScope('sScope'); quickChips();
+function gotoSearch(word, g, dmin, dmax, after, book) {
+  showSc('search'); $('sWord').value = word; SCOPES.sScope = SCOPES.sScope || {}; SCOPES.sScope.g = g; SCOPES.sScope.b = book == null ? -1 : book; renderScope('sScope'); quickChips();
   $('sMin').value = dmin; $('sMax').value = dmax; runSearch({ after: after });
 }
 function tabAtb() {
@@ -1837,14 +1976,21 @@ function runPair() {
     var lbl = scopeLabel(sc), out = {};
     var run = function (w, lim, k, sh) { return wkRun({ T: Tt, w: w, dmin: k === 'a' ? 2 : 1, dmax: lim, both: true, maxRes: k === 'a' ? 1500 : 4000, control: false, shuffle: sh, seed: seed }, T(sh ? 'ctrlRunning' : 'searching', { w: k === 'a' ? A : B }), lbl); };
     run(wA, limA, 'a', false).then(function (m) { out.ra = resList(m.res, wA.length); out.na = m.count; return run(wB, limB, 'b', false); })
-      .then(function (m) { out.rb = resList(m.res, wB.length); out.nb = m.count; if (!ctrl) return null; return run(wA, limA, 'a', true); })
-      .then(function (m) { if (!m) return null; out.sa = resList(m.res, wA.length); return run(wB, limB, 'b', true); })
       .then(function (m) {
+        out.rb = resList(m.res, wB.length); out.nb = m.count; out.sd = [];
+        if (!ctrl) return null;
+        var K = Math.min(S.nShuf || 10, 10), k = 0;
+        var loop = function () {
+          if (k >= K) return null; seed = 777 + k * 31;
+          return run(wA, limA, 'a', true).then(function (ma) { var sa = resList(ma.res, wA.length); return run(wB, limB, 'b', true).then(function (mb) { var bp = bestPairs(sa, resList(mb.res, wB.length), 1); out.sd.push(bp.length ? bp[0].dist : null); k++; return loop(); }); });
+        };
+        return loop();
+      })
+      .then(function () {
         busyOff();
-        if (m) out.sb = resList(m.res, wB.length);
         var pairs = bestPairs(out.ra, out.rb, 30); pairs.forEach(function (p) { p.a = { s: p.a.s + R.from, d: p.a.d, k: p.a.k }; p.b = { s: p.b.s + R.from, d: p.b.d, k: p.b.k }; });
-        var sp = out.sa ? bestPairs(out.sa, out.sb, 1) : null;
-        PLAST = { A: A, B: B, src: src, lbl: lbl, na: out.na, nb: out.nb, pairs: pairs, best: pairs.length ? pairs[0].dist : null, sbest: sp ? (sp.length ? sp[0].dist : null) : undefined, mode: P_MODE, dmax: dmax };
+        var sds = out.sd.filter(function (x) { return x != null; }), best = pairs.length ? pairs[0].dist : null;
+        PLAST = { A: A, B: B, src: src, lbl: lbl, na: out.na, nb: out.nb, pairs: pairs, best: best, sbest: ctrl ? (sds.length ? Math.min.apply(null, sds) : null) : undefined, sK: out.sd.length, sCloser: best == null ? 0 : out.sd.filter(function (x) { return x != null && x <= best; }).length, mode: P_MODE, dmax: dmax };
         renderPair();
       }).catch(function (e) { busyOff(); if (e.message === 'stopped') toast(T('stopped')); else toast(T('errGeneric')); });
   });
@@ -1856,8 +2002,8 @@ function renderPair() {
   var v = '';
   if (P.best == null) v = T('pNone');
   else if (P.sbest === undefined) v = T('pNoCtrl');
-  else if (P.sbest == null || P.best < P.sbest * 0.6) v = T('pCloser');
-  else v = T('pSame');
+  else if (P.sCloser === 0 && P.sK >= 5) v = T('pCloserK', { k: P.sK });
+  else v = T('pSameK', { c: P.sCloser, k: P.sK });
   o += '<p class="explain">' + esc(T('pExplain')) + '</p><div class="verdict">' + esc(v) + '</div></div>';
   if (P.pairs.length) {
     o += '<div class="card" style="padding:4px 8px">';
@@ -1874,11 +2020,13 @@ function pairMatrix(P, p) {
 }
 
 /* ---------- my name ---------- */
-function runName() {
-  var w = cleanWord($('nmIn').value);
+function runName(inParasha) {
+  var w = cleanWord($('nmIn').value || S.name || '');
   if (w.length < 2) { toast(T('wordShort')); return; }
   if (!S.name) { S.name = $('nmIn').value.trim().slice(0, 40); saveS(); hello(); }
-  gotoSearch(w, 'torah', 2, Math.min(S.maxSkip, 3000), function (L) {
+  var g = inParasha === true ? 'parasha' : 'torah';
+  if (g === 'parasha') { SCOPES.sScope = SCOPES.sScope || {}; SCOPES.sScope.p = (thisShabbat().idx || [0]).slice(); }
+  gotoSearch(w, g, 2, Math.min(S.maxSkip, 3000), function (L) {
     var r = L.res.filter(function (x) { return Math.abs(x.d) >= 2; })[0];
     if (r) matrixFromResult(L, r); else toast(T('nameNone'), 3500);
   });
@@ -1913,6 +2061,105 @@ function mxImage() {
     else download(name, blob, 'image/png');
     window.__LAST_IMG = blob.size;
   }, 'image/png');
+}
+
+/* ---------- compare one word across texts ---------- */
+function compareTexts(word, dmin, dmax) {
+  var plan = [['torah', 'tanach'], ['neviim', 'tanach'], ['ketuvim', 'tanach'], ['tanach', 'tanach'], ['nt', 'nt']], rows = [];
+  var step = function (i) {
+    if (i >= plan.length) { busyOff(); showCompare(word, dmin, dmax, rows); return; }
+    var g = plan[i][0];
+    loadCorp(plan[i][1]).then(function (C) {
+      var R = scopeRange(C, { g: g, b: -1 }), Tt = (S.finals ? C.disp : C.norm).slice(R.from, R.to), w = wordCodes(word, S.finals, C.A);
+      var lim = Math.min(dmax, Math.floor((Tt.length - 1) / (w.length - 1)));
+      return wkRun({ T: Tt, w: w, dmin: dmin, dmax: lim, both: true, maxRes: 0, control: true, nShuf: 3, seed: 999 }, T('cmpRunning', { w: word }) + ' · ' + T('g_' + g), (i + 1) + ' / ' + plan.length)
+        .then(function (m) { var L = { count: m.count, d1: m.d1, dmin: dmin, exp: m.exp, ctrls: m.ctrls }, st = statsOf(L); rows.push({ g: g, n: m.n, real: st.real, shuf: m.ctrl, exp: m.exp, p: st.p }); step(i + 1); });
+    }).catch(function (e) { busyOff(); if (e && e.message === 'stopped') toast(T('stopped')); });
+  };
+  step(0);
+}
+function showCompare(word, dmin, dmax, rows) {
+  var o = '<p class="explain">' + esc(T('cmpExplain', { w: word, a: dmin <= 1 ? 2 : dmin, b: dmax })) + '</p><div style="overflow:auto"><table class="tbl"><tr><th>' + T('cmpText') + '</th><th>' + T('stReal') + '</th><th>' + T('stShuf') + '</th><th>' + T('stExp') + '</th><th>' + T('cmpRatio') + '</th></tr>';
+  rows.forEach(function (r) {
+    var ratio = r.exp > 0 ? r.real / r.exp : 0;
+    o += '<tr><td>' + esc(T('g_' + r.g)) + '<small>' + fmtN(r.n) + ' ' + T('lettersShort') + '</small></td><td><b>' + fmtN(r.real) + '</b></td><td>' + fmtN(Math.round(r.shuf)) + '</td><td>' + fmtN(Math.round(r.exp * 10) / 10) + '</td><td class="' + (r.p < 0.01 ? 'hiR' : '') + '">×' + (Math.round(ratio * 100) / 100) + '</td></tr>';
+  });
+  o += '</table></div><p class="mut">' + esc(T('cmpNote')) + '</p>';
+  openModal('📊 ' + word, o);
+}
+
+/* ---------- parashot ---------- */
+function isoDate(d) { return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); }
+function thisShabbat(from) {
+  var d = from ? new Date(from) : new Date(); d.setHours(12, 0, 0, 0);
+  d.setDate(d.getDate() + ((6 - d.getDay() + 7) % 7));
+  var first = isoDate(d), chag = null;
+  for (var i = 0; i < 6; i++) {
+    var k = isoDate(d), v = (typeof PSCHED !== 'undefined') ? PSCHED[k] : null;
+    if (!v) return { date: first, idx: null, chag: chag };
+    if (typeof v[0] === 'string') { if (!chag) chag = { date: k, name: v[0].slice(1) }; d.setDate(d.getDate() + 7); continue; }
+    return { date: k, idx: v, chag: chag, first: first };
+  }
+  return { date: first, idx: null, chag: chag };
+}
+function parashaName(idx) { return idx.map(function (i) { return S.lang === 'he' || S.lang === 'ar' ? PARASHOT[i].he : PARASHOT[i].en; }).join(S.lang === 'he' ? '-' : '–'); }
+function parashaRange(C, idx) {
+  var a = PARASHOT[idx[0]], z = PARASHOT[idx[idx.length - 1]];
+  var vi = function (b, ref) { var p = ref.split(':'), B = C.books[b]; return B.chV[+p[0] - 1] + (+p[1]) - 1; };
+  var v0 = vi(a.b, a.s), v1 = vi(z.eb, z.e) + 1;
+  return { from: C.st[v0], to: v1 < C.st.length ? C.st[v1] : C.n };
+}
+function parashaOpts(sel) {
+  var o = '', cur = thisShabbat();
+  for (var i = 0; i < PARASHOT.length; i++) o += '<option value="' + i + '"' + (sel === i ? ' selected' : '') + '>' + esc(S.lang === 'he' || S.lang === 'ar' ? PARASHOT[i].he : PARASHOT[i].en) + (cur.idx && cur.idx.indexOf(i) >= 0 ? ' ★' : '') + '</option>';
+  return o;
+}
+function renderParashaCard() {
+  var el = $('parCard'); if (!el || typeof PARASHOT === 'undefined') return;
+  var t = thisShabbat(), name = t.idx ? parashaName(t.idx) : '—';
+  var dt = new Date(t.date + 'T12:00:00').toLocaleDateString(S.lang, { day: 'numeric', month: 'long' });
+  el.innerHTML = '<h3>📖 ' + esc(T('parT', { p: name })) + '</h3><div class="mut">' + esc(T('parD', { d: dt })) + (t.chag ? ' · ' + esc(T('parChag', { c: t.chag.name })) : '') + '</div>' +
+    '<div class="row" style="margin-top:10px"><button class="btn" id="parName">👤 ' + T('parMyName') + '</button><button class="btn" id="parSearch">🔍 ' + T('parSearch') + '</button><button class="btn" id="parRead">🔢 ' + T('parRead') + '</button></div>';
+  $('parName').onclick = function () { var w = cleanWord($('nmIn').value || S.name || ''); if (w.length < 2) { toast(T('nameFirst')); $('nmIn').focus(); return; } runName(true); };
+  $('parSearch').onclick = function () { showSc('search'); SCOPES.sScope = SCOPES.sScope || {}; SCOPES.sScope.g = 'parasha'; SCOPES.sScope.p = (t.idx || [0]).slice(); renderScope('sScope'); quickChips(); $('sWord').focus(); };
+  $('parRead').onclick = function () { showSc('reader'); SCOPES.rScope = SCOPES.rScope || { withCh: true }; SCOPES.rScope.g = 'parasha'; SCOPES.rScope.p = (t.idx || [0]).slice(); renderScope('rScope'); };
+}
+
+/* ---------- Hebrew years & dates ---------- */
+function hebYearLetters(n) { var y = n % 1000; return heNum(y); }
+function yearCandidates(input) {
+  var s = String(input || '').trim(), out = [];
+  var num = parseInt(s.replace(/[^\d]/g, ''), 10);
+  if (/^\d{4}$/.test(s) && num >= 1000 && num < 3000) { out.push({ h: num + 3760, note: T('yrJanSep', { y: num }) }); out.push({ h: num + 3761, note: T('yrSepDec', { y: num }) }); }
+  else if (/^\d{4}$/.test(s) && num >= 5000 && num < 6000) out.push({ h: num, note: '' });
+  else {
+    var heb = s.replace(/[^א-ת]/g, ''); if (heb) { var v = gemOf(heb, false); if (heb[0] === 'ה' && heb.length > 2) v = gemOf(heb.slice(1), false); out.push({ h: 5000 + v, note: '' }); }
+  }
+  return out.map(function (c) { return { h: c.h, w: hebYearLetters(c.h), note: c.note }; });
+}
+function hebDateParts(d) {
+  try {
+    var f = new Intl.DateTimeFormat('he-u-ca-hebrew', { day: 'numeric', month: 'long', year: 'numeric' }).formatToParts(d), o = {};
+    f.forEach(function (p) { o[p.type] = p.value; });
+    var day = parseInt(o.day, 10), month = (o.month || '').replace(/[^א-ת ]/g, '').trim(), year = parseInt(String(o.year).replace(/\D/g, ''), 10);
+    return { day: day, dayW: heNum(day), month: month, year: year, yearW: hebYearLetters(year), text: heNum(day) + ' ' + month + ' ' + hebYearLetters(year) };
+  } catch (e) { return null; }
+}
+function renderYearHelper() {
+  var el = $('yrOut'); if (!el) return;
+  var v = $('yrIn').value.trim(), chips = [];
+  if (/^\d{4}-\d{2}-\d{2}$/.test(v) || /^\d{1,2}[./]\d{1,2}[./]\d{4}$/.test(v)) {
+    var p = v.split(/[-./]/), d = p[0].length === 4 ? new Date(+p[0], +p[1] - 1, +p[2], 12) : new Date(+p[2], +p[1] - 1, +p[0], 12), hd = hebDateParts(d);
+    if (hd) { el.innerHTML = '<div class="explain">' + esc(T('yrDate', { t: hd.text })) + '</div>'; chips = [hd.yearW, hd.month.split(' ').pop(), hd.dayW + hd.month.replace(/ /g, '')]; }
+  } else {
+    var c = yearCandidates(v);
+    el.innerHTML = c.length ? c.map(function (x) { return '<div class="explain">' + esc(x.h + ' = ' + x.w) + (x.note ? ' <span class="mut">(' + esc(x.note) + ')</span>' : '') + '</div>'; }).join('') : '<p class="mut">' + T('yrBad') + '</p>';
+    chips = c.map(function (x) { return x.w; });
+  }
+  if (chips.length) {
+    el.innerHTML += '<div class="mut">' + T('yrUse') + '</div><div class="wl heb">' + chips.filter(Boolean).map(function (w) { return '<button class="chip" data-yw="' + esc(w) + '">' + esc(w) + '</button>'; }).join('') + '</div>';
+    el.querySelectorAll('[data-yw]').forEach(function (b) { b.onclick = function () { $('pB').value = b.getAttribute('data-yw'); P_MODE = 'any'; renderPairMode(); toast(T('yrSet', { w: b.getAttribute('data-yw') })); $('pB').scrollIntoView({ behavior: 'smooth', block: 'center' }); }; });
+  }
 }
 
 /* ---------- SAVED ---------- */
@@ -2132,12 +2379,13 @@ function renderSettings() {
   $('stTheme').querySelectorAll('[data-th]').forEach(function (b) { b.onclick = function () { S.theme = b.getAttribute('data-th'); saveS(); applyTheme(); renderSettings(); }; });
   $('stMode').innerHTML = ['dark', 'light'].map(function (m) { return '<button class="chip' + (S.mode === m ? ' on' : '') + '" data-m="' + m + '">' + (m === 'dark' ? '🌙 ' : '☀️ ') + esc(T('mode_' + m)) + '</button>'; }).join('');
   $('stMode').querySelectorAll('[data-m]').forEach(function (b) { b.onclick = function () { S.mode = b.getAttribute('data-m'); saveS(); applyTheme(); renderSettings(); }; });
-  $('stFinals').checked = !!S.finals; $('stMax').value = S.maxSkip;
+  $('stFinals').checked = !!S.finals; $('stMax').value = S.maxSkip; $('stShuf').value = String(S.nShuf || 10);
   renderAI();
 }
 function initSettings() {
   $('stName').onchange = function () { S.name = $('stName').value.trim().slice(0, 40); saveS(); hello(); quickChips(); toast(T('savedOk')); };
   $('stFinals').onchange = function () { S.finals = $('stFinals').checked; saveS(); };
+  $('stShuf').onchange = function () { S.nShuf = +$('stShuf').value || 10; saveS(); };
   $('stMax').onchange = function () { S.maxSkip = Math.max(10, Math.min(50000, parseInt($('stMax').value, 10) || 1000)); saveS(); $('sMax').value = S.maxSkip; };
   $('bkExp').onclick = function () {
     var ai = Object.assign({}, S.ai, { key: '' });
@@ -2168,6 +2416,7 @@ function renderSources() {
   var o = '<div class="card"><h3>' + T('srcWlcT') + ' <span class="tag ok">verified</span></h3><p class="mut">' + T('srcWlcD') + '</p><div class="mut">' + T('license') + ': Public Domain · <a style="color:var(--acc)" href="https://github.com/openscriptures/morphhb" target="_blank" rel="noopener">Open Scriptures Hebrew Bible</a> · <a style="color:var(--acc)" href="https://ebible.org/" target="_blank" rel="noopener">eBible.org</a></div></div>';
   o += '<div class="card"><h3>' + T('srcNtT') + ' <span class="tag rv">review</span></h3><p class="mut">' + T('srcNtD') + '</p><div class="mut">' + T('license') + ': Public Domain · <a style="color:var(--acc)" href="https://ebible.org/" target="_blank" rel="noopener">eBible.org</a> · <a style="color:var(--acc)" href="https://github.com/BibleNLP/ebible" target="_blank" rel="noopener">BibleNLP/ebible</a></div></div>';
   o += '<div class="card"><h3>' + T('srcGrcT') + ' <span class="tag ok">verified</span></h3><p class="mut">' + T('srcGrcD') + '</p><div class="mut">' + T('license') + ': Public Domain · <a style="color:var(--acc)" href="https://ebible.org/" target="_blank" rel="noopener">eBible.org</a></div></div>';
+  o += '<div class="card"><h3>' + T('srcParT') + '</h3><p class="mut">' + T('srcParD') + '</p><div class="mut"><a style="color:var(--acc)" href="https://www.hebcal.com/" target="_blank" rel="noopener">Hebcal</a></div></div>';
   o += '<div class="card"><h3>' + T('srcKorenT') + '</h3><p class="mut">' + T('srcKorenD') + '</p></div>';
   o += '<div class="card"><h3>' + T('srcRulesT') + '</h3><p class="mut">' + T('srcRulesD') + '</p></div>';
   $('srcBody').innerHTML = o;
@@ -2209,6 +2458,7 @@ function boot() {
   document.querySelectorAll('[data-go]').forEach(function (b) { b.onclick = function () { showSc(b.getAttribute('data-go')); }; });
   $('backBtn').onclick = goBack;
   $('helpBtn').onclick = showHelpAgain;
+  $('asstBtn').onclick = function () { if (window.AppNestAssistant) AppNestAssistant.toggle(); };
   $('themeBtn').onclick = function () { S.theme = THEMES[(THEMES.indexOf(S.theme) + 1) % THEMES.length]; saveS(); applyTheme(); toast('🎨 ' + T('th_' + S.theme)); };
   $('aboutBtn').onclick = function () { showSc('about'); };
   $('aiDotBtn').onclick = function () { showSc('settings'); setTimeout(function () { $('aiCard').scrollIntoView({ behavior: 'smooth' }); }, 120); };
@@ -2223,7 +2473,8 @@ function boot() {
   $('expCsv').onclick = exportCSV; $('expPdf').onclick = exportPDF;
   $('shareSaved').onclick = function () { if (!SAVED.length) { toast(T('noSaved')); return; } shareText(T('mSaved'), savedText()); };
   initSearch(); initReader(); initMatrix(); initSettings(); initAI(); initPair();
-  $('nmIn').value = S.name || ''; $('nmGo').onclick = runName; $('nmIn').addEventListener('keydown', function (e) { if (e.key === 'Enter') runName(); });
+  $('nmIn').value = S.name || ''; $('nmGo').onclick = function () { runName(false); }; renderParashaCard();
+  $('yrIn').addEventListener('input', renderYearHelper); $('nmIn').addEventListener('keydown', function (e) { if (e.key === 'Enter') runName(); });
   $('sGemSkip').onclick = function () { var w = cleanWord($('sWord').value); if (w.length < 2) { toast(T('wordShort')); return; } var v = gemOf($('sWord').value.replace(/[^\u05D0-\u05EA]/g, ''), false); $('sMin').value = v; $('sMax').value = v; toast(T('gemSet', { v: v })); };
   updSavedCount(); syncHistory();
   if (!S.guided && !/[?&]noguide/.test(location.search)) openGuide();
@@ -2234,5 +2485,284 @@ function boot() {
 boot();
 
 </script>
+<script>
+/* ═══════════════════════════════════════════════════════════════════════
+   CodeNest — מפת עוזר AppNest + "מוח מקומי" שעונה בלי מפתח AI
+   המוח מזהה פקודות (חיפוש, גימטריה, אתב"ש, פסוק, פרשה, ספירות…) ומאגר
+   שאלות-תשובות. מה שהוא לא יודע — עובר ל-AI אם חובר מפתח, אחרת עונה בכנות.
+   ═══════════════════════════════════════════════════════════════════════ */
+var BR = (function () {
+  function heUI() { return S.lang === 'he'; }
+  function L(he, en) { return heUI() ? he : en; }
+  function norm(s) {
+    return String(s || '').replace(/[֑-ׇ]/g, '').replace(/[״"׳'`]/g, '').replace(/[?!.,;:()\[\]{}…]/g, ' ').replace(/\s+/g, ' ').trim().toLowerCase();
+  }
+  /* ---- book names (Hebrew + English + common variants) ---- */
+  var BOOK_ALIASES = null;
+  function bookAliases() {
+    if (BOOK_ALIASES) return BOOK_ALIASES;
+    var A = [];
+    ['tanach', 'nt'].forEach(function (src) {
+      BOOKS[src].forEach(function (b, i) {
+        var names = [b[1], b[3].toLowerCase()];
+        if (b[1].indexOf(' ') > 0) names.push(b[1].replace(' ', ' '));
+        A.push({ src: src, i: i, names: names });
+      });
+    });
+    var extra = { 'ישעיה': ['tanach', 11], 'ירמיה': ['tanach', 12], 'תהלים': ['tanach', 26], 'שמואל': ['tanach', 7], 'מלכים': ['tanach', 9], 'דברי הימים': ['tanach', 37], 'שיר השירים': ['tanach', 29], 'מתיא': ['nt', 0], 'מעשים': ['nt', 4], 'התגלות': ['nt', 26], 'חזון יוחנן': ['nt', 26], 'psalm': ['tanach', 26] };
+    Object.keys(extra).forEach(function (k) { A.push({ src: extra[k][0], i: extra[k][1], names: [k] }); });
+    A.forEach(function (a) { a.names.sort(function (x, y) { return y.length - x.length; }); });
+    BOOK_ALIASES = A; return A;
+  }
+  function findBook(t) {
+    var best = null;
+    bookAliases().forEach(function (a) { a.names.forEach(function (n) { var p = t.indexOf(n); if (p >= 0 && (!best || n.length > best.n.length)) best = { src: a.src, i: a.i, n: n, pos: p }; }); });
+    return best;
+  }
+  function heToNum(s) { if (/^\d+$/.test(s)) return +s; var v = gemOf(s, false); return v || null; }
+  /* ---- answers that need the text ---- */
+  function countInfo(scopeKey) {
+    var g = scopeKey.g, src = GROUPS[g] ? GROUPS[g][0] : 'tanach';
+    return loadCorp(scopeKey.book != null ? scopeKey.src : src).then(function (C) {
+      var R = scopeKey.book != null ? { from: C.books[scopeKey.book].l0, to: C.books[scopeKey.book].l1 } : scopeRange(C, { g: g, b: -1 });
+      var v0 = verseOf(C, R.from), v1 = verseOf(C, R.to - 1) + 1, words = 0, chs = 0;
+      for (var v = v0; v < v1; v++) { if (C.verses[v]) words += C.verses[v].split(' ').length; if (C.vn[v] === 1) chs++; }
+      var verses = 0; for (v = v0; v < v1; v++) if (C.verses[v]) verses++;
+      return { letters: R.to - R.from, words: words, verses: verses, chapters: chs };
+    });
+  }
+  function wordCount(word, g) {
+    var src = GROUPS[g][0];
+    return loadCorp(src).then(function (C) {
+      var R = scopeRange(C, { g: g, b: -1 }), v0 = verseOf(C, R.from), v1 = verseOf(C, R.to - 1) + 1, u = unfin(word), n = 0, refs = [];
+      for (var v = v0; v < v1; v++) { var ws = C.verses[v].split(' '); for (var i = 0; i < ws.length; i++) if (unfin(ws[i]) === u) { n++; if (refs.length < 5) refs.push(refOf(C, C.st[v])); } }
+      return { n: n, refs: refs };
+    });
+  }
+  function scopeFromText(t) {
+    if (/ברית החדשה|ברית חדשה|new testament|\bnt\b/.test(t)) return 'nt';
+    if (/תנך|תנ ך|כל התנ|bible|tanach/.test(t)) return 'tanach';
+    if (/נביאים|prophets/.test(t)) return 'neviim';
+    if (/כתובים|writings/.test(t)) return 'ketuvim';
+    if (/פרשה|parash|parsha/.test(t)) return 'parasha';
+    return 'torah';
+  }
+  function pickWord(raw, after) {
+    var m = raw.replace(/[֑-ׇ]/g, '').match(after);
+    if (!m) return '';
+    var w = (m[1] || '').replace(/["'״׳]/g, '').trim().split(/\s+/)[0] || '';
+    return w.replace(/^(את|ה?מילה|ה?שם)$/, '');
+  }
+  /* ---- knowledge base: [keywords, he, en] ---- */
+  var KB = [
+    [['דילוג', 'els', 'צופן', 'letter skip', 'skip', 'bible code'], 'דילוג אותיות (ELS) פירושו: מורידים מהטקסט רווחים וניקוד, ומחפשים את אותיות המילה במרחק שווה זו מזו. למשל "תורה" מופיעה בבראשית כשמתחילים מה-ת׳ הראשונה וסופרים כל 50 אותיות: ת…ו…ר…ה. המרחק (50) נקרא "דילוג".', 'An equidistant letter sequence (ELS): remove spaces and vowels, then look for the word\'s letters at an equal distance. E.g. "תורה" appears in Genesis starting at the first ת and taking every 50th letter. The distance (50) is the "skip".'],
+    [['שלושה מספרים', 'המספרים', 'מעורבב', 'צפוי', 'בטקסט המעורבב', 'shuffled', 'expected', 'three numbers'], 'בתוצאות יש שלושה מספרים: כמה פעמים המילה נמצאה בטקסט האמיתי; כמה בממוצע בטקסטים מעורבבים (אותן אותיות בסדר אקראי); וכמה צפוי במקרה לפי שכיחות האותיות. אם האמיתי דומה לשניים האחרים — הממצא לא מיוחד. אם הוא הרבה מעל — כתוב כמה נדיר הוא ("בערך 1 ל-…").', 'Three numbers: hits in the real text; average hits in shuffled texts (same letters, random order); and the number expected by chance from letter frequencies. If the real number is close to the others, the finding is not special; if far above, the app says how rare it is.'],
+    [['ביקורת', 'מקרי', 'סטטיסטיק', 'הוכחה', 'אמיתי', 'זה נכון', 'נבואה', 'באמת', 'מדעי', 'proof', 'real', 'statistic', 'chance', 'random'], 'בכנות: בכל טקסט ארוך אפשר למצוא כמעט כל מילה קצרה באיזשהו דילוג — גם ב"מלחמה ושלום". לכן האפליקציה משווה תמיד לטקסטים מעורבבים ומחשבת כמה סביר שהממצא מקרי. ממצא נדיר הוא מעניין, אבל אם בודקים הרבה שמות — חלק ייצאו נדירים במקרה. זה לא שולל משמעות אישית, אבל זו לא הוכחה.', 'Honestly: in any long text almost any short word can be found at some skip — even in War and Peace. So the app always compares with shuffled texts and estimates how likely a finding is by chance. A rare finding is interesting, but if you test many names some will look rare by chance. Not proof.'],
+    [['ויצטום', 'ריפס', 'רוזנברג', 'מחקר', 'מקיי', 'דרוסנין', 'witztum', 'rips', 'mckay', 'drosnin', 'study'], 'המחקר המפורסם: דורון ויצטום, אליהו ריפס ויואב רוזנברג פרסמו ב-1994 בכתב העת Statistical Science מאמר על צירופים של שמות חכמים ותאריכים בספר בראשית. ב-1999 פרסמו ברנדן מקיי ועמיתיו תשובה, שבה הראו תוצאות דומות ב"מלחמה ושלום" וטענו שהבחירות בנתונים השפיעו על התוצאה. הוויכוח לא הוכרע לטובת הצופן בקהילה המדעית. מיכאל דרוסנין פרסם את "צופן התנ״ך" ב-1997 והפך את הנושא לפופולרי.', 'The famous study: Witztum, Rips and Rosenberg published in Statistical Science (1994) a paper on names of sages and dates in Genesis. In 1999 Brendan McKay and colleagues replied, finding similar results in War and Peace and arguing that data choices drove the result. The scientific community did not accept the code. Michael Drosnin\'s "The Bible Code" (1997) popularized it.'],
+    [['מטריצה', 'טבלה', 'אנכית', 'עמודה', 'matrix', 'grid', 'vertical', 'column'], 'במטריצה הטקסט נכתב בשורות באורך קבוע. כשרוחב השורה שווה לדילוג, המילה שנמצאה עומדת בעמודה מלמעלה למטה. אפשר לשנות רוחב (− / +), לחפש מילים נוספות בכל 8 הכיוונים, וללחוץ על אות כדי לראות את הפסוק שלה. כפתור 📷 יוצר תמונה לשיתוף.', 'In the matrix the text is written in rows of fixed width. When the width equals the skip, the word stands in a column. Change the width, search more words in 8 directions, tap a letter for its verse. 📷 makes a shareable image.'],
+    [['כל אות', 'אות שלישית', 'כל אות n', 'every', 'nth'], 'במסך "כל אות N" בוחרים טקסט ומספר: עם 3 לוקחים את האות הראשונה, ואז כל אות שלישית. הרצף נכתב ברצף, ומילים שנוצרות בו מסומנות. אפשר גם לבקש ממני: "כל אות 3 בשמות".', '"Every Nth letter": pick a text and a number. With 3 you take the first letter, then every third. Words formed in the sequence are marked. Or ask me: "every 3rd letter in Exodus".'],
+    [['גימטריה', 'gematria', 'ערך מספרי'], 'גימטריה: לכל אות ערך (א=1 … י=10, כ=20 … ק=100 … ת=400), ומחברים. אפשר לשאול אותי "מה הגימטריה של שלום", או לפתוח את המסך "גימטריה וצפנים" — שם רואים גם מילים ופסוקים עם אותו ערך, ואפשר לחפש את המילה בדילוג ששווה לגימטריה שלה.', 'Gematria: every letter has a value (א=1 … י=10, כ=20 … ק=100 … ת=400), and you add them. Ask me "gematria of שלום", or open "Gematria & ciphers" for words and verses with the same value.'],
+    [['אתבש', 'אלבם', 'atbash', 'albam', 'ששך', 'בבל'], 'אתב״ש: מחליפים את האות הראשונה באחרונה (א↔ת, ב↔ש, ג↔ר…). אלב״ם: חצי האלף-בית הראשון מתחלף בשני (א↔ל, ב↔מ…). בירמיהו כה:כו "ששך" הוא "בבל" באתב״ש. שאלו אותי "אתבש של ששך", או פתחו את המסך לסריקה של פרק שלם.', 'Atbash swaps first and last letters (א↔ת, ב↔ש…); albam swaps the two halves (א↔ל, ב↔מ…). In Jeremiah 25:26 "ששך" is "בבל" in atbash. Ask me "atbash of ששך".'],
+    [['ראשי תיבות', 'סופי תיבות', 'ראשי פסוקים', 'acronym', 'initials'], 'ראשי תיבות: לוקחים את האות הראשונה של כל מילה (או פסוק) וכותבים ברצף. בראשית א:א — בבאאהוה. במסך "גימטריה וצפנים" ← "ראשי תיבות" אפשר גם סופי תיבות וראשי/סופי פסוקים, ולחפש מילה בתוך הרצף.', 'Acronyms: take the first letter of every word (or verse) in a row. Genesis 1:1 gives בבאאהוה. Also word finals and verse initials/finals in "Gematria & ciphers".'],
+    [['מילה נסתרת', 'נסתר', 'בין מילים', 'hidden'], 'מילה נסתרת היא מילה שכתובה ברצף בטקסט, אבל מתחילה במילה אחת ונגמרת בבאה — כך שבקריאה רגילה לא רואים אותה. במסך "גימטריה וצפנים" ← "מילה נסתרת".', 'A hidden word is written continuously but starts in one word and ends in the next. See "Gematria & ciphers" → "Hidden word".'],
+    [['זוג', 'קרוב', 'קרבה', 'שתי מילים', 'pair', 'close', 'proximity'], 'זוג מילים: מחפשים שתי מילים (שם ומקום, שם ושנה) ובודקים כמה קרוב הן בטבלה. זו השיטה של המחקרים. האפליקציה מריצה את אותו חיפוש גם על עד 10 טקסטים מעורבבים ומראה בכמה מהם יצאה קרבה דומה. אפשר לבקש ממני: "משה ליד מצרים".', 'Word pairs: search two words and check how close they are in the grid — the method of the studies. The app repeats it on up to 10 shuffled texts. Ask me: "משה near מצרים".'],
+    [['שנה', 'תאריך', 'תשפ', 'year', 'date'], 'שנים ותאריכים: במסך "זוג מילים" יש מחשבון — כותבים 2026 ומקבלים תשפו/תשפז (תלוי בחודש), או תאריך מלא (2026-11-13) ומקבלים את התאריך העברי. אפשר גם לשאול אותי "איך כותבים 2026 בעברית".', 'Years & dates: the "Word pairs" screen has a converter — 2026 gives תשפו/תשפז, a full date gives the Hebrew date. Or ask me "2026 in Hebrew".'],
+    [['יוונית', 'greek', 'מקור', 'original'], 'הברית החדשה נכתבה ביוונית, ולכן יש באפליקציה גם את המקור היווני (Textus Receptus). מקלידים באותיות יווניות — אפשר עם סימנים, למשל Ἰησοῦς — והאפליקציה מנקה אותם. בתרגום העברי, כל דילוג תלוי במילים שבחר המתרגם.', 'The New Testament was written in Greek, so the app includes the Greek original (Textus Receptus). Type Greek letters — accents are fine (Ἰησοῦς).'],
+    [['נוסח', 'קורן', 'לנינגרד', 'כתיב', 'קרי', 'koren', 'leningrad', 'version'], 'הנוסח: תורה ותנ״ך לפי כתב יד לנינגרד (WLC), כתיב ולא קרי, בלי ניקוד וסימני פרשה. בתורה 304,850 אותיות. המחקרים השתמשו בנוסח קורן (304,805 אותיות) — לכן ממצאים מפורסמים יכולים להיראות אחרת. הברית החדשה בעברית — תרגום דליטש (נחלת הכלל).', 'Text: Leningrad Codex (WLC), ketiv not qere, no vowels or paragraph marks — 304,850 letters in the Torah. The studies used Koren (304,805), so famous findings may differ. Hebrew NT: Delitzsch translation (public domain).'],
+    [['סופיות', 'ך', 'ם', 'final'], 'אותיות סופיות (ך ם ן ף ץ) נחשבות כרגילות בחיפוש, כמו שנהוג. אפשר להפעיל הבחנה בהגדרות ← חיפוש.', 'Final letters (ך ם ן ף ץ) count as regular letters, as usual. You can change it in Settings → Search.'],
+    [['שמור', 'שמירה', 'ממצאים', 'save', 'saved', 'findings'], 'בכל תוצאה ובכל מטריצה יש כפתור ★ שמור. הממצאים נמצאים במסך "הממצאים שלי", עם הערות, ייצוא ל-PDF ול-CSV ושיתוף.', 'Every result and matrix has ★ Save. Findings live in "My findings", with notes, PDF/CSV export and sharing.'],
+    [['גיבוי', 'שחזור', 'backup', 'restore', 'מחיקה', 'delete'], 'גיבוי ושחזור: הגדרות ← נתונים וגיבוי. הקובץ כולל ממצאים והגדרות (בלי מפתח ה-AI). שם גם "מחיקת הכל" עם אישור כפול.', 'Backup & restore: Settings → Data & backup. The file has findings and settings (not the AI key). "Delete everything" is there too.'],
+    [['מפתח', 'בינה', 'ai', 'key', 'gemini', 'claude', 'chatgpt'], 'אני עונה על הרבה דברים גם בלי מפתח. מפתח AI (לא חובה) מוסיף הסבר חופשי לממצאים ותשובות לשאלות פתוחות. Gemini נותן מפתח חינמי: הגדרות ← בינה מלאכותית ← Gemini, ושם יש הוראות.', 'I answer many things without a key. An AI key (optional) adds free-form explanations. Gemini has a free key: Settings → AI → Gemini, with instructions.'],
+    [['התקנה', 'להתקין', 'אופליין', 'בלי אינטרנט', 'install', 'offline'], 'אפשר להתקין את האפליקציה מהדפדפן ("הוסף למסך הבית"). אחרי הפתיחה הראשונה היא עובדת גם בלי אינטרנט — הטקסטים שמורים במכשיר.', 'Install from the browser ("Add to home screen"). After the first open it works offline — the texts are stored on the device.'],
+    [['פרטיות', 'privacy', 'מידע'], 'הכל נשמר רק במכשיר. אין חשבון, אין מעקב. רק אם חיברתם AI וביקשתם הסבר — הממצא נשלח ישירות לספק שבחרתם.', 'Everything stays on the device. No account, no tracking. Only with an AI key, an explanation request goes directly to your provider.'],
+    [['שפה', 'עיצוב', 'צבע', 'language', 'theme', 'dark', 'לילה'], 'שפה, ערכת צבעים ומצב יום/לילה — בהגדרות. כפתור 🎨 בדף הבית מחליף ערכת צבעים בלחיצה.', 'Language, color theme and day/night are in Settings. 🎨 on Home cycles the theme.'],
+    [['תמונה', 'שתף', 'וואטסאפ', 'share', 'image', 'whatsapp'], 'במטריצה יש כפתור 📷 "תמונה לשיתוף" — יוצר תמונה מעוצבת עם הממצא ושולח לוואטסאפ או שומר.', 'In the matrix, 📷 "Share image" creates a designed picture to send or save.'],
+    [['פרשה', 'פרשת השבוע', 'parasha', 'parsha', 'portion'], '', ''],
+    [['תודה', 'thanks', 'thank'], 'בשמחה! 🙂 אם תרצה, אפשר לחפש עוד משהו.', 'You\'re welcome! 🙂'],
+    [['שלום', 'היי', 'הי', 'hello', 'hi', 'hey', 'בוקר טוב', 'ערב טוב'], 'היי! 👋 אני העוזר של הצופן. אפשר לבקש ממני חיפוש ("חפש משה בתורה"), גימטריה, אתב״ש, פסוק ("בראשית א א"), פרשת השבוע, ספירות ("כמה אותיות בתורה") — או לשאול איך משהו עובד.', 'Hi! 👋 Ask me to search ("search משה in the Torah"), gematria, atbash, a verse ("Genesis 1 1"), this week\'s portion, counts ("how many letters in the Torah") — or how something works.'],
+    [['מי אתה', 'מה אתה יודע', 'מה אפשר', 'עזרה', 'help', 'who are you', 'what can you'], '', '']
+  ];
+  function capabilities() {
+    return {
+      text: L('אני יודע לעשות הרבה בלי מפתח AI:\n• חיפוש בדילוגים — "חפש משה בתורה"\n• השם שלך בתורה או בפרשה — "השם שלי"\n• גימטריה — "מה הגימטריה של שלום"\n• אתב״ש / אלב״ם — "אתבש של ששך"\n• פסוק — "מה כתוב בבראשית א א"\n• כמה פעמים מופיעה מילה — "כמה פעמים מופיעה המילה אור"\n• ספירות — "כמה אותיות בתורה", "כמה פרקים בישעיהו"\n• פרשת השבוע ותאריך עברי\n• שנה בעברית — "איך כותבים 2026"\n• זוג מילים — "משה ליד מצרים"\n• כל אות N — "כל אות 3 בשמות"\n• ולהסביר כל מסך ומושג באפליקציה.',
+        'Without an AI key I can:\n• search skips — "search משה in the Torah"\n• your name in the Torah or this week\'s portion — "my name"\n• gematria — "gematria of שלום"\n• atbash / albam — "atbash of ששך"\n• a verse — "Genesis 1 1"\n• how often a word appears — "how many times אור"\n• counts — "how many letters in the Torah"\n• this week\'s portion and the Hebrew date\n• a year in Hebrew — "2026 in Hebrew"\n• word pairs — "משה near מצרים"\n• every Nth letter — "every 3 in Exodus"\n• and explain every screen and idea in the app.'),
+      chips: sugg()
+    };
+  }
+  function sugg() {
+    return heUI() ? ['מה זה דילוג אותיות?', 'חפש משה בתורה', 'מה הגימטריה של שלום?', 'מה פרשת השבוע?', 'כמה אותיות יש בתורה?', 'מה כתוב בבראשית א א?', 'האם זה אמיתי?']
+      : ['What is a letter skip?', 'Search משה in the Torah', 'Gematria of שלום', 'This week\'s portion', 'How many letters in the Torah?', 'Genesis 1 1', 'Is it real?'];
+  }
+  function kbMatch(t) {
+    var best = null, bs = 0;
+    KB.forEach(function (e) { var sc = 0; e[0].forEach(function (k) { if (t.indexOf(k) >= 0) sc += k.length > 3 ? 2 : 1; }); if (sc > bs) { bs = sc; best = e; } });
+    return bs >= 2 ? best : (bs === 1 && t.length < 25 ? best : null);
+  }
+  function parashaAnswer() {
+    var t = thisShabbat(); if (!t.idx) return { text: L('לא מצאתי את הפרשה לתאריך הזה.', 'I could not find the portion for this date.') };
+    var P0 = PARASHOT[t.idx[0]], P1 = PARASHOT[t.idx[t.idx.length - 1]], bk = BOOKS.tanach[P0.b][1];
+    var dt = new Date(t.date + 'T12:00:00').toLocaleDateString(S.lang, { day: 'numeric', month: 'long' });
+    var txt = L('פרשת השבוע: ' + parashaName(t.idx) + ' (שבת ' + dt + '). ' + bk + ' ' + heNum(+P0.s.split(':')[0]) + ':' + heNum(+P0.s.split(':')[1]) + ' עד ' + heNum(+P1.e.split(':')[0]) + ':' + heNum(+P1.e.split(':')[1]) + '.',
+      'This week\'s portion: ' + parashaName(t.idx) + ' (Shabbat ' + dt + '). ' + BOOKS.tanach[P0.b][3] + ' ' + P0.s + ' – ' + P1.e + '.') + (t.chag ? '\n' + L('לפני כן, בשבת ' + t.chag.date + ': ' + t.chag.name + '.', 'Before it: ' + t.chag.name + '.') : '') + (S.lang === 'he' ? '\n(לוח הפרשות של ארץ ישראל.)' : ' (Israel schedule.)');
+    return { text: txt, chips: [{ label: L('👤 השם שלי בפרשה', '👤 My name in the portion'), value: '#parname', send: true }, { label: L('🔍 חפש בפרשה', '🔍 Search the portion'), value: '#parsearch', send: true }] };
+  }
+  function verseAnswer(t, raw) {
+    var b = findBook(t); if (!b) return null;
+    var rest = t.slice(b.pos + b.n.length).replace(/פרק|פסוק|chapter|verse/g, ' ');
+    var m = rest.match(/^\s*([א-ת]{1,3}|\d{1,3})\s*[: ,]\s*([א-ת]{1,3}|\d{1,3})(?:\s|$)/);
+    if (!m) return null;
+    var c = heToNum(m[1]), v = heToNum(m[2]); if (!c || !v) return null;
+    return loadCorp(b.src).then(function (C) {
+      var B = C.books[b.i]; if (c > B.chV.length) return { text: L('ב' + BOOKS[b.src][b.i][1] + ' יש רק ' + B.chV.length + ' פרקים.', BOOKS[b.src][b.i][3] + ' has only ' + B.chV.length + ' chapters.') };
+      var vi = B.chV[c - 1] + v - 1, end = c < B.chV.length ? B.chV[c] : B.v1;
+      if (vi >= end || !C.verses[vi]) return { text: L('אין פסוק כזה.', 'No such verse.') };
+      var ref = refOf(C, C.st[vi]), txt = C.verses[vi];
+      return { text: ref + '\n' + txt + '\n\n' + L('(' + fmtN(txt.replace(/ /g, '').length) + ' אותיות · גימטריה ' + fmtN(b.src === 'grc' ? 0 : gemOf(txt, false)) + ')', '(' + fmtN(txt.replace(/ /g, '').length) + ' letters · gematria ' + fmtN(gemOf(txt, false)) + ')'),
+        chips: [{ label: L('▦ פתח במטריצה', '▦ Open in matrix'), value: '#mx:' + b.src + ':' + C.st[vi], send: true }] };
+    });
+  }
+  /* ---- the brain ---- */
+  function brain(msg, ctx) {
+    var raw = String(msg || ''), t = norm(raw);
+    // internal chip commands
+    if (raw === '#parname') { $('nmIn').value = $('nmIn').value || S.name || ''; if (cleanWord($('nmIn').value).length < 2) return { text: L('מה השם? כתבו: "השם שלי דוד"', 'What is the name? Type: "my name דוד"') }; AppNestAssistant.close(); runName(true); return { text: L('מחפש את השם בפרשת השבוע…', 'Searching the name in this week\'s portion…') }; }
+    if (raw === '#parsearch') { AppNestAssistant.close(); $('parSearch') && $('parSearch').click(); return { text: L('פתחתי חיפוש בפרשת השבוע.', 'Opened a search in this week\'s portion.') }; }
+    if (raw.indexOf('#mx:') === 0) { var q = raw.split(':'); AppNestAssistant.close(); matrixOpen({ src: q[1], W: 20, center: +q[2], primary: [], title: L('פסוק', 'Verse') }); return { text: L('פתחתי מטריצה ברוחב 20 סביב הפסוק.', 'Opened a 20-wide matrix around the verse.') }; }
+    if (raw.indexOf('#pairyear:') === 0) { var yw = raw.split(':')[1]; AppNestAssistant.close(); showSc('pair'); $('pA').value = cleanWord(S.name || $('nmIn').value || ''); $('pB').value = yw; P_MODE = 'any'; renderPairMode(); if (cleanWord($('pA').value).length >= 2) runPair(); return { text: L('מחפש את הזוג…', 'Searching the pair…') }; }
+    if (raw.indexOf('#go:') === 0) { AppNestAssistant.close(); showSc(raw.slice(4)); return { text: L('פתחתי.', 'Opened.') }; }
+    // capabilities / help
+    if (/^(עזרה|help|\?|מה אתה יודע|מה אתה יכול|מה אפשר לעשות|מי אתה|what can you do|who are you)/.test(t)) return capabilities();
+    // gematria
+    var mg = raw.replace(/[֑-ׇ]/g, '').match(/(?:גימטרי[הא]|gematria|כמה שווה|מה הערך של)\s*(?:של|of)?\s*["'״]?([א-ת][א-ת ]*)/i);
+    if (mg) {
+      var gw = mg[1].trim(), gv = gemOf(gw, false);
+      return gemIndex().then(function (g) {
+        var same = (g.get(gv) || []).slice().sort(function (x, y) { return WFREQ.get(y) - WFREQ.get(x); }).filter(function (w) { return unfin(w) !== unfin(gw.replace(/ /g, '')); }).slice(0, 8);
+        return { text: L('הגימטריה של "' + gw + '" היא ' + fmtN(gv) + '.\n' + gemParts(gw, false) + (same.length ? '\nמילים בתנ״ך עם אותו ערך: ' + same.join(', ') : ''), 'The gematria of "' + gw + '" is ' + fmtN(gv) + '.\n' + gemParts(gw, false) + (same.length ? '\nBible words with the same value: ' + same.join(', ') : '')),
+          chips: [{ label: L('🔍 חפש בדילוג ' + gv, '🔍 Search at skip ' + gv), value: 'חפש ' + gw.replace(/ /g, '') + ' בדילוג ' + gv, send: true }] };
+      });
+    }
+    // atbash / albam
+    var ma = raw.replace(/[֑-ׇ]/g, '').match(/(אתב["'״]?ש|atbash|אלב["'״]?ם|albam)\s*(?:של|of)?\s*["'״]?([א-ת][א-ת ]*)/i);
+    if (ma) {
+      var mode = /אלב|albam/i.test(ma[1]) ? 'albam' : 'atbash', words = ma[2].trim().split(/\s+/), outW = words.map(function (w) { return finalize(substWord(w, mode)); });
+      return getDict('tanach').then(function (D) {
+        var known = outW.filter(function (w) { return D.has(unfin(w)); });
+        return { text: L('ב' + (mode === 'atbash' ? 'אתב״ש' : 'אלב״ם') + ': ' + words.join(' ') + ' ← ' + outW.join(' ') + (known.length ? '\n✓ ' + known.join(', ') + ' — מילה שמופיעה בתנ״ך.' : '\nהתוצאה לא מופיעה כמילה בתנ״ך.'), (mode === 'atbash' ? 'Atbash' : 'Albam') + ': ' + words.join(' ') + ' → ' + outW.join(' ') + (known.length ? '\n✓ ' + known.join(', ') + ' appears in the Bible.' : '\nThe result is not a Bible word.')) };
+      });
+    }
+    // parasha
+    if (/פרש(ת|ה|ות)|parash|parsha|portion|torah reading/.test(t) && !/חפש|search/.test(t)) return parashaAnswer();
+    // Hebrew date today
+    if (/תאריך עברי|התאריך העברי|איזה תאריך|hebrew date|מה התאריך/.test(t)) { var hd = hebDateParts(new Date()); return { text: hd ? L('היום ' + hd.text + ' (' + new Date().toLocaleDateString('he') + ').', 'Today is ' + hd.text + ' (' + new Date().toLocaleDateString(S.lang) + ').') : L('לא הצלחתי לחשב.', 'Could not compute.') }; }
+    // year in Hebrew
+    var my = t.match(/(?:^|\s)(1\d{3}|2\d{3}|5\d{3})(?:\s|$)/);
+    if (my && /שנה|כותבים|בעברית|עברית|year|hebrew|תש/.test(t) && !/חפש|search/.test(t)) {
+      var cs = yearCandidates(my[1]);
+      return { text: cs.map(function (c) { return c.h + ' = ' + c.w + (c.note ? ' (' + c.note + ')' : ''); }).join('\n') + L('\nבחיפוש כותבים בלי הה׳ של האלפים, למשל ' + cs[0].w + '.', '\nIn searches the thousands are dropped, e.g. ' + cs[0].w + '.'),
+        chips: cs.map(function (c) { return { label: L('🔗 השם שלי + ' + c.w, '🔗 My name + ' + c.w), value: '#pairyear:' + c.w, send: true }; }) };
+    }
+    // counts: how many letters/words/verses/chapters
+    var mc = t.match(/כמה (אותיות|מילים|פסוקים|פרקים)|how many (letters|words|verses|chapters)/);
+    if (mc && !/פעמים|times/.test(t)) {
+      var what = mc[1] || mc[2], map = { 'אותיות': 'letters', 'מילים': 'words', 'פסוקים': 'verses', 'פרקים': 'chapters' }; what = map[what] || what;
+      var bk = findBook(t), key = bk ? { book: bk.i, src: bk.src } : { g: scopeFromText(t) };
+      return countInfo(key).then(function (r) {
+        var nm = bk ? (heUI() ? BOOKS[bk.src][bk.i][1] : BOOKS[bk.src][bk.i][3]) : T('g_' + key.g);
+        var n = r[what], lbl = { letters: L('אותיות', 'letters'), words: L('מילים', 'words'), verses: L('פסוקים', 'verses'), chapters: L('פרקים', 'chapters') }[what];
+        var extra = (what === 'letters' && !bk && key.g === 'torah') ? L('\nלפי המסורת (נוסח קורן) בתורה 304,805 אותיות; בנוסח לנינגרד שבאפליקציה — 304,850.', '\nBy tradition (Koren) the Torah has 304,805 letters; the app\'s Leningrad text has 304,850.') : '';
+        return { text: L('ב' + nm + ' יש ' + fmtN(n) + ' ' + lbl + ' (לפי הנוסח באפליקציה: ' + fmtN(r.letters) + ' אותיות, ' + fmtN(r.words) + ' מילים, ' + fmtN(r.verses) + ' פסוקים, ' + fmtN(r.chapters) + ' פרקים).', nm + ' has ' + fmtN(n) + ' ' + lbl + ' (in the app\'s text: ' + fmtN(r.letters) + ' letters, ' + fmtN(r.words) + ' words, ' + fmtN(r.verses) + ' verses, ' + fmtN(r.chapters) + ' chapters).') + extra + L('\n(מילים עם מקף נספרות כשתיים.)', '\n(Hyphenated words count as two.)') };
+      });
+    }
+    // word frequency
+    var mf = raw.replace(/[֑-ׇ]/g, '').match(/(?:כמה פעמים(?: מופיעה| מופיע| כתוב| יש)?(?: את)?(?: ה?מילה| ה?שם)?|how many times(?: does)?(?: the word)?)\s*["'״]?([א-ת]+)/i);
+    if (mf) {
+      var fw = mf[1], fg = scopeFromText(t.replace(norm(fw), ''));
+      if (fg === 'parasha') fg = 'torah';
+      return wordCount(fw, fg).then(function (r) { return { text: L('"' + fw + '" מופיעה ' + fmtN(r.n) + ' פעמים כמילה שלמה ב' + T('g_' + fg) + (r.refs.length ? ' — למשל ' + r.refs.join(', ') : '') + '.\n(בלי תחיליות כמו ו-, ה-, ב-.)', '"' + fw + '" appears ' + fmtN(r.n) + ' times as a whole word in ' + T('g_' + fg) + (r.refs.length ? ' — e.g. ' + r.refs.join(', ') : '') + '.'), chips: [{ label: L('🔍 חפש בדילוגים', '🔍 Search skips'), value: 'חפש ' + fw + ' ב' + T('g_' + fg), send: true }] }; });
+    }
+    // every N
+    var mn = t.match(/כל אות (\d+)|כל (\d+) אותיות|every (\d+)/);
+    if (mn) {
+      var N = +(mn[1] || mn[2] || mn[3]), b2 = findBook(t);
+      AppNestAssistant.close(); showSc('reader');
+      SCOPES.rScope = SCOPES.rScope || { withCh: true };
+      if (b2 && b2.src !== 'grc') { var gg = b2.src === 'nt' ? 'nt' : (b2.i < 5 ? 'torah' : b2.i < 26 ? 'neviim' : 'ketuvim'); SCOPES.rScope.g = gg; SCOPES.rScope.b = b2.i; SCOPES.rScope.c1 = 1; SCOPES.rScope.c2 = 0; }
+      renderScope('rScope'); $('rN').value = N; $('rStart').value = 1; runReader();
+      return { text: L('מוציא כל אות ' + N + (b2 ? ' ב' + BOOKS[b2.src][b2.i][1] : '') + '…', 'Extracting every ' + N + (b2 ? ' in ' + BOOKS[b2.src][b2.i][3] : '') + '…') };
+    }
+    // pair: X ליד Y / X ו Y קרובים
+    var mp = raw.replace(/[֑-ׇ]/g, '').match(/([א-ת]{2,})\s+(?:ליד|קרוב ל-?|ועם|near|with|\+)\s*([א-ת]{2,})/);
+    if (mp && !/גימטרי|אתב/.test(t)) {
+      AppNestAssistant.close(); showSc('pair'); $('pA').value = mp[1]; $('pB').value = mp[2]; runPair();
+      return { text: L('מחפש כמה קרוב "' + mp[1] + '" ו"' + mp[2] + '"…', 'Checking how close "' + mp[1] + '" and "' + mp[2] + '" are…') };
+    }
+    // my name
+    if (/השם שלי|my name/.test(t)) {
+      var nmw = pickWord(raw, /(?:השם שלי|my name)\s*(?:הוא|is)?\s*([א-ת]+)/i) || cleanWord(S.name || '');
+      if (nmw.length < 2) return { text: L('איך קוראים לך? כתבו למשל: "השם שלי דוד".', 'What\'s your name? Type e.g. "my name דוד".') };
+      $('nmIn').value = nmw; AppNestAssistant.close(); runName(/פרש|portion/.test(t));
+      return { text: L('מחפש את "' + nmw + '"' + (/פרש/.test(t) ? ' בפרשת השבוע' : ' בתורה') + ' ופותח את הטבלה…', 'Searching "' + nmw + '" and opening the grid…') };
+    }
+    // ELS search
+    var ms = raw.replace(/[֑-ׇ]/g, '').match(/(?:^|\s)(?:חפש|תחפש|מצא|תמצא|חיפוש|search|find)\s+(?:את\s+)?(?:ה?מילה\s+|ה?שם\s+)?["'״]?([א-ת]{2,}|[α-ωά-ώ]{2,})/i);
+    if (ms) {
+      var sw = ms[1], sg = scopeFromText(t.replace(norm(sw), '')), skp = t.match(/בדילוג (\d+)|skip (\d+)/), b3 = findBook(t.replace(norm(sw), ''));
+      if (/[α-ω]/i.test(sw)) sg = 'grc';
+      var bi = null; if (b3) { sg = b3.src === 'nt' ? 'nt' : (b3.i < 5 ? 'torah' : b3.i < 26 ? 'neviim' : 'ketuvim'); bi = b3.i; }
+      var d = skp ? +(skp[1] || skp[2]) : null;
+      AppNestAssistant.close();
+      gotoSearch(sw, sg, d || 1, d || Math.min(S.maxSkip, 3000), null, bi);
+      return { text: L('מחפש "' + sw + '" ב' + (b3 ? BOOKS[b3.src][bi][1] : T('g_' + sg)) + (d ? ' בדילוג ' + d : '') + '…', 'Searching "' + sw + '"…') };
+    }
+    // open a screen
+    var scr = [['הגדרות|settings', 'settings'], ['מטריצה|matrix', 'matrix'], ['גימטריה|צפנים|cipher|gematria', 'ciphers'], ['ממצאים|saved|findings', 'saved'], ['מקורות|sources', 'sources'], ['אודות|about', 'about'], ['זוג|pair', 'pair']];
+    if (/^(פתח|עבור ל|תפתח|open|go to)/.test(t)) { for (var i = 0; i < scr.length; i++) if (new RegExp(scr[i][0]).test(t)) { AppNestAssistant.close(); showSc(scr[i][1]); return { text: L('פתחתי.', 'Opened.') }; } }
+    // verse lookup
+    var va = verseAnswer(t, raw); if (va) return va;
+    // knowledge base
+    var kb = kbMatch(t);
+    if (!kb && /^(מה זה|איך (זה )?עובד|איך זה|what is|how does)/.test(t) && t.length < 30) kb = KB[0];
+    if (kb) {
+      if (kb[0][0] === 'פרשה') return parashaAnswer();
+      if (kb[0][0] === 'מי אתה') return capabilities();
+      return { text: heUI() ? kb[1] : kb[2] };
+    }
+    // unknown → AI if connected, else honest answer
+    if (!ctx || !ctx.noAI) return null;
+    return { text: L('עוד לא יודע לענות על זה בלי מפתח AI. נסו לנסח אחרת, או בחרו אחת מהאפשרויות:', 'I can\'t answer that without an AI key yet. Try rephrasing, or pick one:'), chips: sugg() };
+  }
+  return { brain: brain, sugg: sugg, norm: norm, findBook: findBook };
+})();
+
+window.APPNEST_ASSISTANT_CONFIG = {
+  appName: 'הצופן התנכי',
+  lang: function () { return S.lang; },
+  appDescription: 'אפליקציה לחיפוש דילוגי אותיות (ELS) בתורה, בתנ״ך ובברית החדשה (עברית ויוונית), עם גימטריה, אתב״ש, ראשי תיבות, מילים נסתרות, זוג מילים קרובות ופרשת השבוע. כל חיפוש מושווה לטקסטים מעורבבים. היה כן: ממצאי דילוגים אינם הוכחה או נבואה; בכל טקסט ארוך יש צירופים מקריים.',
+  tabs: [{ name: 'חיפוש', screen: 'search' }, { name: 'כל אות N', screen: 'reader' }, { name: 'מטריצה', screen: 'matrix' }, { name: 'גימטריה וצפנים', screen: 'ciphers' }, { name: 'זוג מילים', screen: 'pair' }, { name: 'הממצאים שלי', screen: 'saved' }, { name: 'הגדרות', screen: 'settings' }, { name: 'מקורות', screen: 'sources' }],
+  fields: [],
+  navigate: function (screen) { AppNestAssistant.close(); showSc(screen); },
+  readAiConfig: function () { return aiReady() ? { provider: S.ai.prov } : null; },
+  callAI: function (prompt) { return aiCall(prompt); },
+  readState: function () {
+    var o = 'מסך: ' + curSc;
+    if (LAST) o += '\nחיפוש אחרון: "' + LAST.word + '" ב' + LAST.scLbl + ' — ' + LAST.count + ' בטקסט, ' + (LAST.ctrl == null ? '—' : LAST.ctrl) + ' במעורבב, ' + (Math.round(LAST.exp * 10) / 10) + ' צפוי.';
+    if (MX && curSc === 'matrix') o += '\nמטריצה: ' + MX.title + ', רוחב ' + MX.W;
+    return o;
+  },
+  actions: {
+    search: { desc: 'חיפוש מילה בדילוגים', args: '{word, scope: torah|neviim|ketuvim|tanach|nt|grc|parasha, min, max}', run: function (a) { AppNestAssistant.close(); gotoSearch(a.word || '', a.scope || 'torah', a.min || 1, a.max || S.maxSkip); return 'מחפש…'; } },
+    gematria: { desc: 'פתיחת מסך גימטריה עם מילה', args: '{word}', run: function (a) { AppNestAssistant.close(); showSc('ciphers'); CTAB = 'gem'; renderCiphers(); $('gIn').value = a.word || ''; runGem(); return 'פתחתי.'; } }
+  },
+  ui: { noFab: true, panelBottom: '16px', panelH: '520px' },
+  chipsFill: false,
+  welcome: function () { return S.lang === 'he' ? 'היי! אני העוזר של הצופן 🪄 אני עונה גם בלי מפתח AI: אפשר לבקש חיפוש, גימטריה, אתב״ש, פסוק, פרשת השבוע, ספירות — או לשאול איך משהו עובד.' : 'Hi! I\'m the Bible Code assistant 🪄 I work without an AI key too: ask for a search, gematria, atbash, a verse, this week\'s portion, counts — or how something works.'; },
+  suggestions: function () { return BR.sugg(); },
+  localBrain: function (msg, ctx) { return BR.brain(msg, ctx); },
+  onToggle: function (open) { disarmExit(); syncHistory(); }
+};
+
+</script>
+<script src="appnest-assistant.js?v=3.0"></script>
 </body>
 </html>

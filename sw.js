@@ -20,11 +20,11 @@ CacheStorage.prototype.match=function(){return sm.apply(this,arguments).then(cle
 })();
 
 /* ── CodeNest service worker ── */
-var V = '1.1.0', DATA_V = '1';
+var V = '1.2.0', DATA_V = '1';
 var CACHE = 'codenest-v' + V + '-d' + DATA_V;
 var MARK = "VERSION = '" + V + "'";
 /* required: install fails (and the previous version stays) unless all arrive and the page carries this version */
-var CORE = ['./', 'tanach.json?v=' + DATA_V, 'nt.json?v=' + DATA_V, 'grc.json?v=' + DATA_V];
+var CORE = ['./', 'appnest-assistant.js?v=3.0', 'tanach.json?v=' + DATA_V, 'nt.json?v=' + DATA_V, 'grc.json?v=' + DATA_V];
 /* optional: never block an update */
 var OPT = ['manifest.json', 'icon-192.png', 'icon-512.png', 'privacy_policy.html'];
 
