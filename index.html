@@ -1,0 +1,1592 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>הצופן התנכי · CodeNest</title>
+<meta name="description" content="חיפוש דילוגי אותיות (ELS) בתורה, בתנ״ך ובברית החדשה — שמות, מטריצות וקריאה אנכית, עם בדיקת ביקורת כנה.">
+<meta name="theme-color" content="#0b0b0c">
+<meta property="og:title" content="הצופן התנכי · CodeNest">
+<meta property="og:description" content="חיפוש דילוגי אותיות בתורה, בתנ״ך ובברית החדשה — AppNest">
+<meta property="og:image" content="icon-512.png">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<style>
+:root{--acc:#d4af37;--acc2:#f3d77a;--bg:#0b0b0c;--card:#141416;--card2:#1b1b1f;--line:#2c2c31;--txt:#f2efe6;--mut:#a29f96;--hl1:#d4af37;--hl2:#4fc3f7;--hl3:#ef6f8f;--hl4:#7ed37a;--hl5:#c18cff;--danger:#e5484d;--ok:#3ecf8e}
+[data-theme=sapphire]{--acc:#7fb3ff;--acc2:#bcd6ff}
+[data-theme=emerald]{--acc:#3ecf8e;--acc2:#9de8c4}
+[data-theme=ruby]{--acc:#e0607e;--acc2:#f3a9ba}
+[data-theme=parchment]{--acc:#c8a165;--acc2:#e6cfa5}
+[data-mode=light]{--bg:#f6f3ea;--card:#fffdf8;--card2:#f0ece0;--line:#d8d2c2;--txt:#1d1b16;--mut:#6c675b}
+[data-mode=light][data-theme=gold]{--acc:#a5801a;--hl1:#a5801a}
+[data-mode=light][data-theme=sapphire]{--acc:#2f6fd0}
+[data-mode=light][data-theme=emerald]{--acc:#16895a}
+[data-mode=light][data-theme=ruby]{--acc:#b8324f}
+[data-mode=light][data-theme=parchment]{--acc:#8b6a33}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;background:var(--bg);color:var(--txt);font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;font-size:16px;line-height:1.5}
+body{padding-bottom:env(safe-area-inset-bottom)}
+.heb{font-family:"Frank Ruehl CLM","David Libre","David","Times New Roman",FreeSerif,serif}
+button,input,select,textarea{font:inherit;color:inherit}
+header#hdr{position:sticky;top:0;z-index:40;background:var(--bg);border-bottom:1px solid var(--line);display:flex;align-items:center;gap:8px;padding:10px 12px;padding-top:calc(10px + env(safe-area-inset-top));min-height:56px}
+#hdr .ttl{flex:1;font-weight:700;font-size:18px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#hdr .ttl small{color:var(--acc);font-weight:600}
+.ib{background:transparent;border:1px solid var(--line);border-radius:10px;min-width:40px;height:40px;padding:0 10px;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:6px}
+.ib:active{transform:scale(.96)}
+#backBtn{border-color:var(--acc);color:var(--acc);font-weight:600;max-width:46%;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+.dot{width:10px;height:10px;border-radius:50%;background:#666;display:inline-block}
+.dot.on{background:var(--ok)}.dot.off{background:var(--danger)}
+main{max-width:760px;margin:0 auto;padding:14px 12px 40px}
+.sc{display:none;animation:fade .18s ease}
+.sc.on{display:block}
+@keyframes fade{from{opacity:.3;transform:translateY(4px)}to{opacity:1;transform:none}}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;margin-bottom:12px}
+.card h3{margin:0 0 8px;font-size:17px;color:var(--acc)}
+.mut{color:var(--mut);font-size:14px}
+.big{display:flex;align-items:center;gap:14px;width:100%;text-align:start;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;margin-bottom:10px;cursor:pointer}
+.big .ic{font-size:28px;width:44px;height:44px;display:flex;align-items:center;justify-content:center;border:1px solid var(--acc);border-radius:12px;color:var(--acc);flex:none}
+.big b{display:block;font-size:17px}
+.big span{color:var(--mut);font-size:14px}
+.big:active{border-color:var(--acc)}
+.btn{background:transparent;border:1.5px solid var(--acc);color:var(--acc);border-radius:12px;padding:10px 16px;cursor:pointer;font-weight:600;min-height:44px}
+.btn.pri{background:var(--acc);color:#111;border-color:var(--acc)}
+[data-mode=light] .btn.pri{color:#fff}
+.btn.sm{padding:6px 10px;min-height:36px;font-size:14px;border-radius:10px}
+.btn.dng{border-color:var(--danger);color:var(--danger)}
+.btn:disabled{opacity:.45}
+.btn.wide{width:100%}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.row>*{flex:1 1 auto}
+.fld{margin-bottom:10px}
+.fld label{display:block;font-size:14px;color:var(--mut);margin-bottom:4px}
+input[type=text],input[type=number],input[type=password],input[type=url],select,textarea{width:100%;background:var(--card2);border:1px solid var(--line);border-radius:10px;padding:10px;min-height:44px}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--acc)}
+.word-in{font-size:22px;text-align:center;letter-spacing:2px}
+.chk{display:flex;align-items:center;gap:8px;margin:6px 0;font-size:15px}
+.chk input{width:20px;height:20px;accent-color:var(--acc)}
+.chips{display:flex;gap:6px;flex-wrap:wrap;margin:6px 0}
+.chip{border:1px solid var(--line);border-radius:999px;padding:6px 12px;background:var(--card2);cursor:pointer;font-size:14px}
+.chip.on{border-color:var(--acc);color:var(--acc);font-weight:700}
+.stat{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:10px 0}
+.stat div{background:var(--card2);border:1px solid var(--line);border-radius:12px;padding:10px;text-align:center}
+.stat b{display:block;font-size:22px;color:var(--acc)}
+.stat span{font-size:12px;color:var(--mut)}
+.verdict{border-inline-start:3px solid var(--acc);padding:6px 10px;background:var(--card2);border-radius:8px;font-size:15px}
+.res{display:flex;align-items:center;gap:10px;padding:10px;border-bottom:1px solid var(--line);cursor:pointer}
+.res:last-child{border-bottom:0}
+.res .sk{min-width:64px;text-align:center;font-weight:700;color:var(--acc);border:1px solid var(--line);border-radius:10px;padding:4px}
+.res .rf{flex:1;font-size:15px}
+.res .rf small{display:block;color:var(--mut)}
+.pbar{height:8px;background:var(--card2);border-radius:99px;overflow:hidden;margin:10px 0}
+.pbar i{display:block;height:100%;width:0;background:var(--acc);transition:width .15s}
+mark{background:transparent;color:var(--acc);font-weight:800;border-bottom:2px solid var(--acc)}
+.verse{font-size:19px;line-height:1.9;margin:4px 0 10px}
+.verse .hit{background:var(--acc);color:#111;border-radius:4px;padding:0 2px;font-weight:800}
+.seq{font-size:20px;line-height:2;word-break:break-all;letter-spacing:1px;background:var(--card2);border:1px solid var(--line);border-radius:12px;padding:10px;max-height:46vh;overflow:auto}
+.seq mark{cursor:pointer}
+.wl{display:flex;flex-wrap:wrap;gap:6px}
+.wl .chip b{color:var(--acc)}
+/* matrix */
+.mxwrap{overflow:auto;border:1px solid var(--line);border-radius:12px;background:var(--card2);max-height:62vh;-webkit-overflow-scrolling:touch}
+.mx{display:grid;gap:1px;padding:6px;width:max-content;margin:0 auto}
+.mx div{width:var(--cs,26px);height:calc(var(--cs,26px) + 2px);display:flex;align-items:center;justify-content:center;font-size:calc(var(--cs,26px)*.72);border-radius:5px;cursor:pointer;user-select:none}
+.stepper{display:flex;gap:6px}.stepper .btn{flex:0 0 52px;padding:0}.stepper input{flex:1;text-align:center}
+.mx div.e{opacity:.15}
+.mx .h1{background:var(--hl1);color:#111;font-weight:800}
+.mx .h2{background:var(--hl2);color:#111;font-weight:800}
+.mx .h3{background:var(--hl3);color:#111;font-weight:800}
+.mx .h4{background:var(--hl4);color:#111;font-weight:800}
+.mx .h5{background:var(--hl5);color:#111;font-weight:800}
+.mx .vb{box-shadow:inset 0 0 0 1px var(--line)}
+.lg{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0;font-size:14px}
+.lg i{display:inline-block;width:14px;height:14px;border-radius:4px;vertical-align:middle;margin-inline-end:4px}
+.navpad{display:flex;gap:6px;justify-content:center;margin:8px 0;flex-wrap:wrap}
+/* overlays */
+#ovl .bk{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:60;display:flex;align-items:flex-end;justify-content:center}
+#ovl .md{background:var(--card);border:1px solid var(--line);border-bottom:0;border-radius:18px 18px 0 0;width:100%;max-width:760px;max-height:88vh;overflow:auto;padding:16px 16px calc(18px + env(safe-area-inset-bottom));animation:up .2s ease}
+@media(min-width:700px){#ovl .bk{align-items:center}#ovl .md{border-radius:18px;border-bottom:1px solid var(--line)}}
+@keyframes up{from{transform:translateY(30px);opacity:.4}to{transform:none;opacity:1}}
+.md h3{margin:0 0 10px;color:var(--acc);display:flex;align-items:center;gap:8px}
+.md h3 .x{margin-inline-start:auto}
+#toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom));transform:translateX(-50%);background:var(--card2);border:1px solid var(--acc);color:var(--txt);padding:10px 16px;border-radius:12px;z-index:90;opacity:0;pointer-events:none;transition:opacity .2s;max-width:90vw;text-align:center}
+#toast.on{opacity:1}
+#busy{position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:80;display:none;align-items:center;justify-content:center;padding:20px}
+#busy.on{display:flex}
+#busy .md{background:var(--card);border:1px solid var(--acc);border-radius:16px;padding:18px;width:100%;max-width:420px;text-align:center}
+#guide{position:fixed;inset:0;z-index:70;background:var(--bg);display:none;flex-direction:column;padding:24px 18px calc(24px + env(safe-area-inset-bottom))}
+#guide.on{display:flex}
+#guide .gbody{flex:1;display:flex;flex-direction:column;justify-content:center;max-width:560px;margin:0 auto;text-align:center}
+#guide .gic{font-size:64px;margin-bottom:10px}
+#guide h2{color:var(--acc);margin:6px 0}
+#guide .dots{display:flex;gap:6px;justify-content:center;margin:16px 0}
+#guide .dots i{width:8px;height:8px;border-radius:50%;background:var(--line)}
+#guide .dots i.on{background:var(--acc)}
+.foot{text-align:center;color:var(--mut);font-size:13px;margin-top:20px}
+.badge{display:inline-block;border:1px solid var(--acc);color:var(--acc);border-radius:999px;padding:2px 10px;font-size:12px;font-weight:700}
+.tag{display:inline-block;font-size:11px;border-radius:6px;padding:1px 6px;border:1px solid var(--line);color:var(--mut);margin-inline-start:6px}
+.tag.ok{border-color:var(--ok);color:var(--ok)}.tag.rv{border-color:#e9a23b;color:#e9a23b}
+.pv{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
+.pv button{height:54px;border-radius:12px;border:2px solid var(--line);cursor:pointer;font-size:12px}
+.pv button.on{border-color:var(--txt)}
+.ans{white-space:pre-wrap;background:var(--card2);border:1px solid var(--line);border-radius:12px;padding:12px;font-size:15px;max-height:50vh;overflow:auto}
+.empty{text-align:center;color:var(--mut);padding:30px 10px}
+#bootfail{display:none;position:fixed;inset:auto 10px 10px;background:#400;color:#fff;padding:12px;border-radius:10px;z-index:99;animation:bf 0s 9s forwards}
+@keyframes bf{to{display:block}}
+#print{display:none}
+@media print{body>*{display:none!important}#print{display:block!important;color:#000;background:#fff;font-family:serif}#print h1{font-size:20px}#print .it{border-bottom:1px solid #999;padding:8px 0}}
+</style>
+</head>
+<body>
+<div id="bootfail">⚠️ The app did not finish loading. Check your connection and reload. · האפליקציה לא נטענה עד הסוף — בדקו חיבור ורעננו.</div>
+<header id="hdr">
+  <button class="ib" id="backBtn" style="display:none"></button>
+  <div class="ttl" id="hdrTitle"></div>
+  <button class="ib" id="aiDotBtn" aria-label="AI"><i class="dot" id="aiDot"></i><span style="font-size:13px">AI</span></button>
+  <button class="ib" id="themeBtn" aria-label="theme">🎨</button>
+  <button class="ib" id="aboutBtn" aria-label="about">ℹ️</button>
+</header>
+<main id="app">
+<!-- HOME -->
+<section class="sc on" id="sc-home">
+  <div class="card" style="text-align:center">
+    <div style="font-size:34px;line-height:1" class="heb">הַצֹּפֶן</div>
+    <div class="mut" data-t="homeSub"></div>
+    <div id="homeHello" style="margin-top:6px;font-weight:600"></div>
+  </div>
+  <button class="big" data-go="search"><span class="ic">🔍</span><div><b data-t="mSearch"></b><span data-t="mSearchD"></span></div></button>
+  <button class="big" data-go="reader"><span class="ic">🔢</span><div><b data-t="mReader"></b><span data-t="mReaderD"></span></div></button>
+  <button class="big" data-go="matrix"><span class="ic">▦</span><div><b data-t="mMatrix"></b><span data-t="mMatrixD"></span></div></button>
+  <button class="big" data-go="saved"><span class="ic">★</span><div><b data-t="mSaved"></b><span id="savedCount"></span></div></button>
+  <div class="card">
+    <h3 data-t="demoT"></h3>
+    <div class="mut" data-t="demoD"></div>
+    <div class="row" style="margin-top:10px"><button class="btn" id="demoBtn" data-t="demoBtn"></button></div>
+  </div>
+  <div class="row">
+    <button class="btn" data-go="sources" data-t="mSources"></button>
+    <button class="btn" data-go="settings" data-t="mSettings"></button>
+  </div>
+  <div class="foot"><span id="verLbl"></span><br><span class="badge">AppNest</span></div>
+</section>
+
+<!-- SEARCH (ELS) -->
+<section class="sc" id="sc-search">
+  <div class="card">
+    <div class="fld"><label data-t="wordLbl"></label>
+      <input type="text" id="sWord" class="word-in heb" autocomplete="off" dir="rtl" data-tp="wordPh">
+      <div class="chips" id="sQuick"></div>
+    </div>
+    <div class="scope" id="sScope"></div>
+    <div class="row">
+      <div class="fld"><label data-t="skipMin"></label><input type="number" id="sMin" min="1" value="1" inputmode="numeric"></div>
+      <div class="fld"><label data-t="skipMax"></label><input type="number" id="sMax" min="1" value="1000" inputmode="numeric"></div>
+    </div>
+    <label class="chk"><input type="checkbox" id="sBoth" checked><span data-t="bothDir"></span></label>
+    <label class="chk"><input type="checkbox" id="sCtrl" checked><span data-t="ctrlRun"></span></label>
+    <button class="btn pri wide" id="sGo" data-t="searchBtn"></button>
+  </div>
+  <div id="sOut"></div>
+</section>
+
+<!-- READER (every N) -->
+<section class="sc" id="sc-reader">
+  <div class="card">
+    <div class="mut" data-t="readerIntro" style="margin-bottom:8px"></div>
+    <div class="scope" id="rScope" data-ch="1"></div>
+    <div class="row">
+      <div class="fld"><label data-t="everyN"></label><input type="number" id="rN" min="1" value="3" inputmode="numeric"></div>
+      <div class="fld"><label data-t="startAt"></label><input type="number" id="rStart" min="1" value="1" inputmode="numeric"></div>
+      <div class="fld"><label data-t="maxLetters"></label><input type="number" id="rMax" min="10" value="2000" inputmode="numeric"></div>
+    </div>
+    <label class="chk"><input type="checkbox" id="rBack"><span data-t="readBack"></span></label>
+    <button class="btn pri wide" id="rGo" data-t="readBtn"></button>
+  </div>
+  <div id="rOut"></div>
+</section>
+
+<!-- MATRIX -->
+<section class="sc" id="sc-matrix">
+  <div class="card" id="mSetup">
+    <div class="mut" data-t="matrixIntro" style="margin-bottom:8px"></div>
+    <div class="scope" id="mScope" data-ch="1"></div>
+    <div class="row">
+      <div class="fld"><label data-t="rowWidth"></label><input type="number" id="mW" min="2" max="400" value="22" inputmode="numeric"></div>
+      <div class="fld"><label data-t="rowsN"></label><input type="number" id="mR" min="5" max="80" value="24" inputmode="numeric"></div>
+    </div>
+    <button class="btn pri wide" id="mGo" data-t="buildMatrix"></button>
+  </div>
+  <div id="mOut"></div>
+</section>
+
+<!-- SAVED -->
+<section class="sc" id="sc-saved">
+  <div class="row" style="margin-bottom:10px">
+    <button class="btn sm" id="expPdf">PDF</button>
+    <button class="btn sm" id="expCsv">CSV</button>
+    <button class="btn sm" id="shareSaved" data-t="share"></button>
+  </div>
+  <div id="savedList"></div>
+</section>
+
+<!-- SOURCES -->
+<section class="sc" id="sc-sources"><div id="srcBody"></div></section>
+
+<!-- SETTINGS -->
+<section class="sc" id="sc-settings">
+  <div class="card">
+    <h3 data-t="general"></h3>
+    <div class="fld"><label data-t="userName"></label><input type="text" id="stName" data-tp="userNamePh"></div>
+    <div class="fld"><label data-t="language"></label>
+      <div class="chips" id="stLang"></div></div>
+    <div class="fld"><label data-t="themeLbl"></label><div class="pv" id="stTheme"></div></div>
+    <div class="chips" id="stMode"></div>
+  </div>
+  <div class="card">
+    <h3 data-t="searchSet"></h3>
+    <label class="chk"><input type="checkbox" id="stFinals"><span data-t="finalsLbl"></span></label>
+    <div class="mut" data-t="finalsD"></div>
+    <div class="fld" style="margin-top:8px"><label data-t="defMax"></label><input type="number" id="stMax" min="10" max="50000" inputmode="numeric"></div>
+  </div>
+  <div class="card" id="aiCard">
+    <h3>🤖 <span data-t="aiTitle"></span></h3>
+    <div class="mut" data-t="aiIntro"></div>
+    <div class="chips" id="aiProv"></div>
+    <div id="aiHelp" class="mut" style="margin:6px 0"></div>
+    <div class="fld" id="aiKeyF"><label data-t="aiKey"></label><input type="password" id="aiKey" autocomplete="off" spellcheck="false"></div>
+    <div class="fld" id="aiUrlF"><label data-t="aiUrl"></label><input type="url" id="aiUrl" placeholder="http://localhost:11434/v1"></div>
+    <div class="fld"><label data-t="aiModel"></label>
+      <div class="row"><select id="aiModel" style="flex:3"></select><button class="btn sm" id="aiRefresh" data-t="aiRefresh" style="flex:1"></button></div></div>
+    <div class="row"><button class="btn" id="aiTest" data-t="aiTest"></button><button class="btn dng" id="aiOff" data-t="aiOff"></button></div>
+    <div class="mut" style="margin-top:8px">🔒 <span data-t="aiPriv"></span></div>
+  </div>
+  <div class="card">
+    <h3 data-t="dataT"></h3>
+    <div class="row">
+      <button class="btn" id="bkExp" data-t="backupExp"></button>
+      <button class="btn" id="bkImp" data-t="backupImp"></button>
+    </div>
+    <input type="file" id="bkFile" accept="application/json,.json" style="display:none">
+    <div class="row" style="margin-top:8px"><button class="btn" id="guideAgain" data-t="guideAgain"></button><button class="btn" data-go="about" data-t="about"></button></div>
+    <div class="row" style="margin-top:8px"><button class="btn dng" id="wipeAll" data-t="wipeAll"></button></div>
+  </div>
+</section>
+
+<!-- ABOUT -->
+<section class="sc" id="sc-about"><div id="aboutBody"></div></section>
+</main>
+
+<div id="ovl"></div>
+<div id="busy"><div class="md"><div id="busyTxt" style="font-weight:600"></div><div class="pbar"><i id="busyBar"></i></div><div id="busySub" class="mut"></div><button class="btn sm" id="busyCancel" style="margin-top:10px" data-t="cancel"></button></div></div>
+<div id="guide"><div class="gbody"><div class="gic" id="gIc"></div><h2 id="gT"></h2><div id="gD" class="mut" style="font-size:16px"></div><div class="dots" id="gDots"></div></div>
+  <div class="row" style="max-width:560px;margin:0 auto;width:100%"><button class="btn" id="gSkip" data-t="skip"></button><button class="btn pri" id="gNext"></button></div></div>
+<div id="toast"></div>
+<div id="print"></div>
+
+<script>
+/* CodeNest — interface strings. Content (Bible text) stays in Hebrew in every language. */
+var LANG = {};
+LANG.he = {
+  appName: 'הצופן התנכי', home: 'בית', about: 'אודות', version: 'גרסה', dataV: 'נתונים',
+  homeSub: 'דילוגי אותיות בתורה, בתנ״ך ובברית החדשה', hello: 'שלום, {n}',
+  mSearch: 'חיפוש שם או מילה', mSearchD: 'מוצא את המילה בדילוגי אותיות קבועים',
+  mReader: 'כל אות N', mReaderD: 'כל אות שלישית בספר שמות, ומה יוצא ממנה',
+  mMatrix: 'מטריצה וקריאה אנכית', mMatrixD: 'הטקסט בטבלה — קוראים מלמעלה למטה',
+  mSaved: 'הממצאים שלי', mSavedD: 'עוד אין ממצאים שמורים', savedN: '{n} ממצאים שמורים',
+  mSources: '📚 מקורות', mSettings: '⚙️ הגדרות',
+  demoT: 'נסו דוגמה מפורסמת', demoD: 'מתחילים מה-ת׳ הראשונה בבראשית ומדלגים כל 50 אותיות — יוצא "תורה". בדיקת הביקורת תראה כמה פעמים זה קורה גם בטקסט מעורבב.', demoBtn: 'הרץ: "תורה" בספר בראשית',
+  wordLbl: 'מילה או שם בעברית', wordPh: 'למשל: משה', textLbl: 'איפה לחפש', bookLbl: 'ספר', allBooks: '— כל הספרים —', chFrom: 'מפרק', chTo: 'עד פרק',
+  g_torah: 'תורה', g_neviim: 'נביאים', g_ketuvim: 'כתובים', g_tanach: 'כל התנ״ך', g_nt: 'הברית החדשה',
+  skipMin: 'דילוג מינימלי', skipMax: 'דילוג מקסימלי', bothDir: 'גם קדימה וגם אחורה', ctrlRun: 'בדיקת ביקורת על טקסט מעורבב (מומלץ)',
+  searchBtn: '🔍 חפש', searching: 'מחפש "{w}"…', ctrlRunning: 'בדיקת ביקורת…', ctrlSub: 'אותן אותיות בסדר אקראי', stopped: 'החיפוש נעצר',
+  wordShort: 'צריך לפחות 2 אותיות בעברית', wordLong: 'עד 14 אותיות', rangeBad: 'טווח הדילוגים לא תקין לטקסט הזה',
+  skipsRange: 'דילוגים {a}–{b}', stReal: 'בטקסט האמיתי', stShuf: 'בטקסט מעורבב', stExp: 'צפוי במקרה',
+  plainNote: 'מתוכם {n} בדילוג 1 — כלומר המילה פשוט כתובה בטקסט.',
+  vNone: 'לא נמצא בטווח הזה. נסו טווח דילוגים רחב יותר או טקסט ארוך יותר.',
+  vOnlyPlain: 'נמצא רק כמילה רגילה בטקסט (דילוג 1).',
+  vSame: 'בערך כמו בטקסט המעורבב — כמות כזו צפויה גם במקרה.',
+  vSameE: 'בערך כמו שצפוי במקרה.',
+  vMore: 'יותר ממה שיצא בטקסט המעורבב. מעניין — אבל זו לא הוכחה; מילים נפוצות בעברית המקראית נוטות להופיע יותר.',
+  vLess: 'פחות ממה שיצא בטקסט המעורבב.',
+  whyCtrl: 'מה זה אומר?', whyCtrlT: 'בדיקת הביקורת',
+  whyCtrlD: 'בכל טקסט ארוך, כמעט כל מילה קצרה תופיע איפשהו באיזשהו דילוג. לכן האפליקציה מערבבת את אותן האותיות בסדר אקראי ומחפשת שם את אותה מילה. אם בתורה יצא בערך אותו מספר כמו בטקסט המעורבב — הממצא לא מיוחד סטטיסטית. "צפוי במקרה" הוא חישוב לפי שכיחות האותיות. בבדיקה הזו לא נספרים ממצאים בדילוג 1. זה לא שולל משמעות אישית או פרשנית — רק מראה מה מקרי ומה לא.',
+  resShown: 'מוצגים {n} מתוך {t}, מהדילוג הקטן לגדול', until: 'עד', showMore: 'הצג עוד', skipIs: 'דילוג',
+  save: 'שמור', saveBtn: 'שמירה', savedOk: 'נשמר ★', saveFail: 'השמירה במכשיר נכשלה — ייתכן שהאחסון מלא',
+  readerIntro: 'בוחרים טקסט ומספר N, ומקבלים את רצף האותיות: האות הראשונה, ואז כל אות N. מילים שנמצאות ברצף מסומנות.',
+  everyN: 'כל אות (N)', startAt: 'להתחיל מאות מס׳', maxLetters: 'מקסימום אותיות', readBack: 'מהסוף להתחלה', readBtn: '🔢 הוצא רצף',
+  readerRes: 'כל אות {n} · {l}', lettersN: '{n} אותיות ברצף', dispCut: 'מוצגות {n} הראשונות', tapMark: 'הקישו על מילה מסומנת כדי לראות מאילו פסוקים באו האותיות.',
+  wordsFound: 'מילים שנמצאו ברצף ({n})', dictNote: 'המילון הוא כל צורות המילים שמופיעות בתנ״ך (3–9 אותיות). התאמה למילה לא אומרת שיש משמעות.',
+  wordFromLetters: 'המילה בנויה מ-{n} אותיות, מהפסוקים האלה:',
+  matrixIntro: 'הטקסט נפרש לשורות ברוחב קבוע. קוראים עמודות מלמעלה למטה, מוסיפים מילים לחיפוש בתוך הטבלה, ומקישים על אות כדי לראות מאיזה פסוק היא.',
+  rowWidth: 'רוחב שורה', rowsN: 'מספר שורות', buildMatrix: '▦ בנה מטריצה',
+  mxRange: 'מ{a} עד {b}', mxExtra: 'חיפוש מילה נוספת בטבלה (בכל 8 הכיוונים)', mxExtraPh: 'למשל: שלום', find: 'חפש', clear: 'נקה',
+  mxTap: 'הקשה על אות: הפסוק שלה, וקריאה אנכית מהאות הזו.', mxNotFound: '"{w}" לא נמצא בטבלה שעל המסך', mxFound: '"{w}" נמצא {n} פעמים בטבלה',
+  letterIs: 'האות', posN: 'אות מס׳ {n}', readDown: 'קרא למטה', readUp: 'קרא למעלה', colFrom: 'עמודה מ{r}',
+  noSaved: 'עוד לא שמרתם ממצאים. בכל תוצאה יש כפתור ★ שמור.', editT: 'עריכת ממצא', note: 'הערה', delete: 'מחיקה', delConfirm: 'למחוק את הממצא הזה?',
+  everyNshort: 'כל אות {n}', share: '📤 שיתוף', copy: 'העתק', copied: 'הועתק', summaryN: 'סה״כ {n} ממצאים',
+  csvType: 'סוג', csvTitle: 'כותרת', csvDetail: 'פרטים', csvDate: 'תאריך',
+  general: 'כללי', userName: 'שם משתמש', userNamePh: 'שם, כינוי או משפחה', language: 'שפה', themeLbl: 'ערכת צבעים',
+  th_gold: 'זהב', th_sapphire: 'ספיר', th_emerald: 'אזמרגד', th_ruby: 'אודם', th_parchment: 'קלף', mode_dark: 'לילה', mode_light: 'יום',
+  searchSet: 'חיפוש', finalsLbl: 'הבחנה באותיות סופיות (ך ם ן ף ץ)', finalsD: 'כבוי (ברירת מחדל): מ ו-ם נחשבות לאותה אות, כמו שנהוג בחיפוש דילוגים.', defMax: 'דילוג מקסימלי כברירת מחדל',
+  aiTitle: 'בינה מלאכותית (לא חובה)', aiIntro: 'האפליקציה עובדת במלואה גם בלי בינה. מי שרוצה הסבר ופרשנות לממצא — מחבר מפתח משלו. המפתח נשמר רק במכשיר.',
+  aiPick: 'בחרו ספק כדי להתחיל.', aiKey: 'מפתח API', aiUrl: 'כתובת השרת', aiModel: 'מודל', aiRefresh: 'רענן מודלים', aiTest: 'בדוק חיבור', aiOff: 'נתק', aiCustom: 'כתובת מותאמת',
+  aiPriv: 'כשמבקשים הסבר, הממצא והפסוקים נשלחים ישירות לספק שבחרתם — לא דרך AppNest.',
+  aiHelpGemini: '1. היכנסו ל-<a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener">aistudio.google.com/app/apikey</a> 2. "Create API key" 3. העתיקו והדביקו כאן. יש שכבה חינמית בלי כרטיס אשראי. <a href="https://www.youtube.com/results?search_query=gemini+api+key+aistudio" target="_blank" rel="noopener">סרטון הדרכה</a>',
+  aiHelpClaude: '1. <a href="https://console.anthropic.com/" target="_blank" rel="noopener">console.anthropic.com</a> 2. API Keys → Create Key 3. הדביקו כאן. בתשלום לפי שימוש.',
+  aiHelpOpenai: '1. <a href="https://platform.openai.com/api-keys" target="_blank" rel="noopener">platform.openai.com/api-keys</a> 2. Create new secret key 3. הדביקו כאן. בתשלום לפי שימוש.',
+  aiHelpOllama: 'בינה במחשב שלכם, בלי עלות ובפרטיות מלאה. התקינו Ollama או LM Studio, הריצו מודל, והשאירו את הכתובת.',
+  aiHelpCustom: 'כל שרת שתואם ל-OpenAI: כתובת בסיס (עד /v1) ומפתח אם צריך.',
+  aiNeedKey: 'חסר מפתח או כתובת', aiTesting: 'בודק חיבור…', aiOk: 'מחובר', aiErr: 'הבינה לא ענתה', aiDisc: 'הבינה נותקה', aiModelsN: 'נמצאו {n} מודלים', aiNoModel: 'אין מודל זמין',
+  aiExplain: 'הסבר עם AI', aiSending: 'שולח ל-{p}…', aiConnect: 'חיבור בינה',
+  aiFreeT: 'הסבר עם בינה', aiFreeD: 'לא חוברה בינה. אפשר להעתיק את הבקשה המוכנה ולהדביק אותה באפליקציית בינה כלשהי, או לחבר מפתח בהגדרות.',
+  aiDisclaimer: 'זו פרשנות של בינה מלאכותית, לא הוכחה ולא פסק דין. בדקו בעצמכם.',
+  aiPromptHead: 'אני משתמש באפליקציה לחיפוש דילוגי אותיות (ELS) בתנ״ך ובברית החדשה. ענה ב{lang}, בקצרה ובכנות.',
+  aiEls: 'נמצאה המילה "{w}" בדילוג {d} אותיות, מ{a} עד {b} (חיפוש ב: {scope}). הפסוקים שבהם נמצאות האותיות:',
+  aiCtrlLine: 'בדיקת ביקורת לדילוגים {a}–{b}: בטקסט האמיתי {real} מופעים, בטקסט מעורבב עם אותן אותיות {shuf}, וצפוי במקרה כ-{exp}.',
+  aiAsk: 'בבקשה: 1) הצע קשרים ופירושים אפשריים בין המילה לבין הפסוקים וההקשר שלהם. 2) ציין מה אומרת בדיקת הביקורת, ושזו פרשנות ולא הוכחה.',
+  aiReader: 'הוצאתי רצף של כל אות {n} מתוך: {l}. תחילת הרצף:', aiWords: 'מילים שזוהו ברצף:',
+  aiAskReader: 'האם יש במילים האלה צירופים או רעיונות מעניינים? הצע פרשנויות אפשריות, וציין שברצף ארוך מילים קצרות מופיעות גם במקרה.',
+  aiMatrix: 'מטריצת דילוגים סביב "{t}", ברוחב שורה {w}, מ{a} עד {b}. כל שורה כתובה מימין לשמאל:', aiExtras: 'מילים נוספות שמצאתי בטבלה:',
+  dataT: 'נתונים וגיבוי', backupExp: '💾 ייצוא גיבוי', backupImp: '📂 שחזור מגיבוי', guideAgain: '📖 המדריך', wipeAll: 'מחיקת הכל',
+  restoreConfirm: 'השחזור יחליף את כל הנתונים ב-{n} הממצאים מהקובץ. להמשיך?', restore: 'שחזר', restored: 'השחזור הושלם', badFile: 'הקובץ לא נראה כמו גיבוי של האפליקציה',
+  wipe1: 'למחוק את כל הממצאים וההגדרות?', wipe2: 'בטוחים? אי אפשר לבטל את זה.', wiped: 'הכל נמחק', continue: 'המשך',
+  confirmT: 'אישור', cancel: 'ביטול', pressAgainExit: 'לחצו שוב כדי לצאת', loadingText: 'טוען את הטקסט…', loadFail: 'טעינת הטקסט נכשלה. בדקו חיבור ונסו שוב.', errGeneric: 'משהו השתבש. נסו שוב.',
+  srcWlcT: 'תורה ותנ״ך — כתב יד לנינגרד (WLC)',
+  srcWlcD: 'נוסח Westminster Leningrad Codex, דרך פרויקט Open Scriptures ו-eBible.org. הוסרו ניקוד, טעמים וסימני פרשה (פ/ס); בכתיב וקרי נלקח הכתיב. בתורה 304,850 אותיות, בכל התנ״ך כ-1,197,000. מספור פסוקים לפי המסורה. סדר הספרים לפי המסורת היהודית.',
+  srcNtT: 'הברית החדשה — תרגום עברי',
+  srcNtD: 'הטקסט "The Holy Bible in Modern Hebrew" מ-eBible.org, מסומן נחלת הכלל. לפי הפסוקים שנבדקו הוא תואם לתרגום של פרנץ דליטש (1877). זיהוי המהדורה לא נבדק לעומק. חשוב: הברית החדשה נכתבה ביוונית — כל דילוג כאן הוא על תרגום, ומתרגם אחר היה נותן רצפים אחרים. כ-429,000 אותיות.',
+  srcKorenT: 'למה ממצאים מפורסמים יכולים להיראות אחרת', srcKorenD: 'המחקרים הידועים השתמשו בנוסח קורן, שקצר ב-45 אותיות בתורה (304,805). אות אחת שזזה משנה כל דילוג שעובר דרכה. נוסח קורן לא זמין בחינם, ולכן כאן משתמשים בלנינגרד.',
+  srcRulesT: 'כללי החיפוש', srcRulesD: 'רק אותיות נספרות (בלי רווחים). אותיות סופיות נחשבות כרגילות, אלא אם הפעלתם הבחנה בהגדרות. דילוג חיובי — קדימה, שלילי — אחורה. החיפוש רץ כולו במכשיר.',
+  license: 'רישיון', developer: 'פותח על ידי', platform: 'פלטפורמה', storageLbl: 'אחסון', onDevice: 'על המכשיר בלבד',
+  disclaimer: 'האפליקציה נועדה לעיון, למחקר אישי ולהנאה. ממצאי דילוגי אותיות אינם הוכחה, אינם נבואה ואינם פסיקה דתית. בכל טקסט ארוך אפשר למצוא צירופים במקרה — לכן יש בדיקת ביקורת.',
+  transNote: 'התרגום לאנגלית, רוסית, ספרדית וערבית עוד לא נבדק על ידי דובר שפת אם.',
+  store: 'חנות AppNest', shareApp: 'שתף את האפליקציה', shareAppText: 'הצופן התנכי — חיפוש דילוגי אותיות בתנ״ך', feedback: 'שלח משוב', guide: 'מדריך', privacy: 'מדיניות פרטיות',
+  g1t: 'ברוכים הבאים לצופן', g1d: 'כאן מחפשים מילים ושמות שמסתתרים בדילוגי אותיות קבועים — בתורה, בכל התנ״ך ובברית החדשה.',
+  g2t: 'חיפוש שם או מילה', g2d: 'כותבים שם, בוחרים טקסט וטווח דילוגים, והאפליקציה מוצאת כל מקום שבו האותיות מופיעות במרחק קבוע.',
+  g3t: 'כל אות N', g3d: 'למשל כל אות שלישית בספר שמות. מילים שנוצרות ברצף מסומנות, ואפשר לראות מאילו פסוקים באו.',
+  g4t: 'מטריצה וקריאה אנכית', g4d: 'הטקסט נפרש לטבלה. כך רואים מילים מלמעלה למטה ובאלכסון, ומוסיפים מילים לחיפוש סביב הממצא.',
+  g5t: 'בדיקת ביקורת כנה', g5d: 'כל חיפוש רץ גם על טקסט מעורבב עם אותן אותיות. כך יודעים אם ממצא באמת יוצא דופן, או שהוא צפוי במקרה.',
+  g6t: 'שמירה ובינה', g6d: 'שומרים ממצאים עם הערות, מייצאים ומשתפים. מי שרוצה — מחבר בינה משלו לקבלת הסבר ופרשנות.',
+  skip: 'דלג', next: 'הבא', start: 'בואו נתחיל'
+};
+LANG.en = {
+  appName: 'Bible Code', home: 'Home', about: 'About', version: 'Version', dataV: 'data',
+  homeSub: 'Letter skips in the Torah, the Hebrew Bible and the New Testament', hello: 'Hello, {n}',
+  mSearch: 'Search a name or word', mSearchD: 'Finds the word at a fixed letter skip',
+  mReader: 'Every Nth letter', mReaderD: 'e.g. every 3rd letter of Exodus — and what it spells',
+  mMatrix: 'Matrix & vertical reading', mMatrixD: 'The text as a grid — read top to bottom',
+  mSaved: 'My findings', mSavedD: 'No saved findings yet', savedN: '{n} saved findings',
+  mSources: '📚 Sources', mSettings: '⚙️ Settings',
+  demoT: 'Try a famous example', demoD: 'Start at the first ת of Genesis and take every 50th letter — it spells "תורה" (Torah). The control test shows how often that also happens in shuffled text.', demoBtn: 'Run: "תורה" in Genesis',
+  wordLbl: 'Hebrew word or name', wordPh: 'e.g. משה', textLbl: 'Where to search', bookLbl: 'Book', allBooks: '— all books —', chFrom: 'From chapter', chTo: 'To chapter',
+  g_torah: 'Torah', g_neviim: 'Prophets', g_ketuvim: 'Writings', g_tanach: 'Whole Hebrew Bible', g_nt: 'New Testament',
+  skipMin: 'Minimum skip', skipMax: 'Maximum skip', bothDir: 'Forward and backward', ctrlRun: 'Control test on shuffled text (recommended)',
+  searchBtn: '🔍 Search', searching: 'Searching "{w}"…', ctrlRunning: 'Control test…', ctrlSub: 'Same letters in random order', stopped: 'Search stopped',
+  wordShort: 'At least 2 Hebrew letters needed', wordLong: 'Up to 14 letters', rangeBad: 'The skip range does not fit this text',
+  skipsRange: 'skips {a}–{b}', stReal: 'In the real text', stShuf: 'In shuffled text', stExp: 'Expected by chance',
+  plainNote: '{n} of them at skip 1 — the word is simply written in the text.',
+  vNone: 'Not found in this range. Try a wider skip range or a longer text.',
+  vOnlyPlain: 'Found only as a plain word in the text (skip 1).',
+  vSame: 'About the same as in the shuffled text — this many is expected by chance.',
+  vSameE: 'About what chance would predict.',
+  vMore: 'More than in the shuffled text. Interesting — but not proof; common biblical words tend to appear more.',
+  vLess: 'Fewer than in the shuffled text.',
+  whyCtrl: 'What does this mean?', whyCtrlT: 'The control test',
+  whyCtrlD: 'In any long text almost every short word appears somewhere at some skip. So the app shuffles the very same letters into random order and searches there too. If the Torah gives about the same number as the shuffled text, the finding is not statistically special. "Expected by chance" is computed from letter frequencies. Skip-1 hits are not counted in this test. This does not rule out personal or interpretive meaning — it only shows what is chance and what is not.',
+  resShown: 'Showing {n} of {t}, smallest skip first', until: 'to', showMore: 'Show more', skipIs: 'Skip',
+  save: 'Save', saveBtn: 'Save', savedOk: 'Saved ★', saveFail: 'Saving on the device failed — storage may be full',
+  readerIntro: 'Pick a text and a number N to get the letter sequence: the first letter, then every Nth letter. Words found in the sequence are marked.',
+  everyN: 'Every Nth letter', startAt: 'Start at letter #', maxLetters: 'Maximum letters', readBack: 'From end to start', readBtn: '🔢 Extract sequence',
+  readerRes: 'Every {n} letters · {l}', lettersN: '{n} letters in the sequence', dispCut: 'first {n} shown', tapMark: 'Tap a marked word to see which verses its letters come from.',
+  wordsFound: 'Words found in the sequence ({n})', dictNote: 'The dictionary is every word form in the Hebrew Bible (3–9 letters). A match does not imply meaning.',
+  wordFromLetters: 'The word is built from {n} letters, from these verses:',
+  matrixIntro: 'The text is laid out in rows of fixed width. Read columns top to bottom, look for more words inside the grid, and tap a letter to see its verse.',
+  rowWidth: 'Row width', rowsN: 'Rows', buildMatrix: '▦ Build matrix',
+  mxRange: 'From {a} to {b}', mxExtra: 'Find another word in the grid (all 8 directions)', mxExtraPh: 'e.g. שלום', find: 'Find', clear: 'Clear',
+  mxTap: 'Tap a letter: its verse, and vertical reading from that letter.', mxNotFound: '"{w}" is not in the grid on screen', mxFound: '"{w}" found {n} times in the grid',
+  letterIs: 'Letter', posN: 'letter #{n}', readDown: 'Read down', readUp: 'Read up', colFrom: 'column from {r}',
+  noSaved: 'No findings saved yet. Every result has a ★ Save button.', editT: 'Edit finding', note: 'Note', delete: 'Delete', delConfirm: 'Delete this finding?',
+  everyNshort: 'every {n}', share: '📤 Share', copy: 'Copy', copied: 'Copied', summaryN: '{n} findings in total',
+  csvType: 'Type', csvTitle: 'Title', csvDetail: 'Details', csvDate: 'Date',
+  general: 'General', userName: 'User name', userNamePh: 'Name, nickname or family', language: 'Language', themeLbl: 'Color theme',
+  th_gold: 'Gold', th_sapphire: 'Sapphire', th_emerald: 'Emerald', th_ruby: 'Ruby', th_parchment: 'Parchment', mode_dark: 'Night', mode_light: 'Day',
+  searchSet: 'Search', finalsLbl: 'Distinguish final letters (ך ם ן ף ץ)', finalsD: 'Off (default): מ and ם count as the same letter, as is usual in letter-skip searches.', defMax: 'Default maximum skip',
+  aiTitle: 'AI (optional)', aiIntro: 'The app works fully without AI. For an explanation of a finding, connect your own key. The key stays on this device.',
+  aiPick: 'Pick a provider to start.', aiKey: 'API key', aiUrl: 'Server address', aiModel: 'Model', aiRefresh: 'Refresh models', aiTest: 'Test connection', aiOff: 'Disconnect', aiCustom: 'Custom endpoint',
+  aiPriv: 'When you ask for an explanation, the finding and verses are sent directly to the provider you chose — not through AppNest.',
+  aiHelpGemini: '1. Open <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener">aistudio.google.com/app/apikey</a> 2. "Create API key" 3. Paste it here. There is a free tier, no credit card. <a href="https://www.youtube.com/results?search_query=gemini+api+key+aistudio" target="_blank" rel="noopener">Video guide</a>',
+  aiHelpClaude: '1. <a href="https://console.anthropic.com/" target="_blank" rel="noopener">console.anthropic.com</a> 2. API Keys → Create Key 3. Paste it here. Pay per use.',
+  aiHelpOpenai: '1. <a href="https://platform.openai.com/api-keys" target="_blank" rel="noopener">platform.openai.com/api-keys</a> 2. Create new secret key 3. Paste it here. Pay per use.',
+  aiHelpOllama: 'AI on your own computer, free and private. Install Ollama or LM Studio, run a model, keep the address.',
+  aiHelpCustom: 'Any OpenAI-compatible server: base address (up to /v1) and a key if needed.',
+  aiNeedKey: 'Key or address missing', aiTesting: 'Testing…', aiOk: 'Connected', aiErr: 'The AI did not answer', aiDisc: 'AI disconnected', aiModelsN: '{n} models found', aiNoModel: 'No model available',
+  aiExplain: 'Explain with AI', aiSending: 'Sending to {p}…', aiConnect: 'Connect AI',
+  aiFreeT: 'Explain with AI', aiFreeD: 'No AI is connected. Copy the ready-made request and paste it into any AI app, or connect a key in Settings.',
+  aiDisclaimer: 'This is an AI interpretation — not proof and not a ruling. Check for yourself.',
+  aiPromptHead: 'I am using an app that searches equidistant letter sequences (ELS) in the Hebrew Bible and the New Testament. Answer in {lang}, briefly and honestly.',
+  aiEls: 'The word "{w}" was found at a skip of {d} letters, from {a} to {b} (searched in: {scope}). The verses containing the letters:',
+  aiCtrlLine: 'Control test for skips {a}–{b}: {real} hits in the real text, {shuf} in a shuffled text with the same letters, about {exp} expected by chance.',
+  aiAsk: 'Please: 1) suggest possible connections and interpretations between the word and the verses and their context. 2) Say what the control test shows, and that this is interpretation, not proof.',
+  aiReader: 'I extracted every {n}th letter from: {l}. Start of the sequence:', aiWords: 'Words detected in the sequence:',
+  aiAskReader: 'Are there interesting combinations or ideas in these words? Suggest possible interpretations, and note that short words also appear by chance in a long sequence.',
+  aiMatrix: 'A letter-skip matrix around "{t}", row width {w}, from {a} to {b}. Each row is written right to left:', aiExtras: 'More words I found in the grid:',
+  dataT: 'Data & backup', backupExp: '💾 Export backup', backupImp: '📂 Restore backup', guideAgain: '📖 Guide', wipeAll: 'Delete everything',
+  restoreConfirm: 'Restoring replaces all data with the {n} findings in the file. Continue?', restore: 'Restore', restored: 'Restore complete', badFile: 'This file does not look like a backup of this app',
+  wipe1: 'Delete all findings and settings?', wipe2: 'Are you sure? This cannot be undone.', wiped: 'Everything deleted', continue: 'Continue',
+  confirmT: 'Confirm', cancel: 'Cancel', pressAgainExit: 'Press back again to exit', loadingText: 'Loading the text…', loadFail: 'Loading the text failed. Check your connection and try again.', errGeneric: 'Something went wrong. Try again.',
+  srcWlcT: 'Torah & Hebrew Bible — Leningrad Codex (WLC)',
+  srcWlcD: 'Westminster Leningrad Codex, via the Open Scriptures project and eBible.org. Vowels, cantillation and paragraph marks (פ/ס) removed; where ketiv and qere differ, the ketiv is used. 304,850 letters in the Torah, about 1,197,000 in the whole Bible. Masoretic verse numbering, Jewish book order.',
+  srcNtT: 'New Testament — Hebrew translation',
+  srcNtD: '"The Holy Bible in Modern Hebrew" from eBible.org, marked public domain. On the verses checked it matches Franz Delitzsch\'s translation (1877); the exact edition has not been verified in depth. Important: the New Testament was written in Greek — every skip here runs over a translation, and another translator would give different sequences. About 429,000 letters.',
+  srcKorenT: 'Why famous findings may look different', srcKorenD: 'The well-known studies used the Koren edition, which is 45 letters shorter in the Torah (304,805). One shifted letter changes every skip that passes through it. Koren is not freely available, so the Leningrad text is used here.',
+  srcRulesT: 'Search rules', srcRulesD: 'Only letters count (no spaces). Final letters count as regular ones unless you turn on the distinction in Settings. A positive skip reads forward, negative backward. All searching runs on your device.',
+  license: 'License', developer: 'Developed by', platform: 'Platform', storageLbl: 'Storage', onDevice: 'on this device only',
+  disclaimer: 'This app is for study, personal exploration and fun. Letter-skip findings are not proof, not prophecy and not religious rulings. Any long text contains combinations by chance — that is why there is a control test.',
+  transNote: 'The English, Russian, Spanish and Arabic interface has not yet been reviewed by native speakers.',
+  store: 'AppNest store', shareApp: 'Share the app', shareAppText: 'Bible Code — letter-skip search in the Hebrew Bible', feedback: 'Send feedback', guide: 'Guide', privacy: 'Privacy policy',
+  g1t: 'Welcome to Bible Code', g1d: 'Search for words and names hidden at fixed letter skips — in the Torah, the whole Hebrew Bible and the New Testament.',
+  g2t: 'Search a name or word', g2d: 'Type a name, pick a text and a skip range, and the app finds every place where its letters appear at an equal distance.',
+  g3t: 'Every Nth letter', g3d: 'For example every 3rd letter of Exodus. Words formed in the sequence are marked, with the verses they come from.',
+  g4t: 'Matrix & vertical reading', g4d: 'The text is laid out as a grid, so you can see words top-down and diagonally, and look for more words around a finding.',
+  g5t: 'An honest control test', g5d: 'Every search also runs on a shuffled text with the same letters, so you know whether a finding is unusual or expected by chance.',
+  g6t: 'Saving & AI', g6d: 'Save findings with notes, export and share them. Optionally connect your own AI for explanations.',
+  skip: 'Skip', next: 'Next', start: 'Let\'s start'
+};
+LANG.ru = {
+  appName: 'Библейский код', home: 'Главная', about: 'О приложении', version: 'Версия', dataV: 'данные',
+  homeSub: 'Пропуски букв в Торе, Танахе и Новом Завете', hello: 'Здравствуйте, {n}',
+  mSearch: 'Поиск имени или слова', mSearchD: 'Находит слово с постоянным шагом букв',
+  mReader: 'Каждая N-я буква', mReaderD: 'например, каждая 3-я буква книги Исход',
+  mMatrix: 'Матрица и чтение сверху вниз', mMatrixD: 'Текст в виде таблицы',
+  mSaved: 'Мои находки', mSavedD: 'Пока нет сохранённых находок', savedN: 'Сохранено находок: {n}',
+  mSources: '📚 Источники', mSettings: '⚙️ Настройки',
+  demoT: 'Известный пример', demoD: 'Начните с первой ת в Бытии и берите каждую 50-ю букву — получится «תורה». Контрольная проверка покажет, как часто это бывает и в перемешанном тексте.', demoBtn: 'Запустить: «תורה» в Бытии',
+  wordLbl: 'Слово или имя на иврите', wordPh: 'например: משה', textLbl: 'Где искать', bookLbl: 'Книга', allBooks: '— все книги —', chFrom: 'С главы', chTo: 'По главу',
+  g_torah: 'Тора', g_neviim: 'Пророки', g_ketuvim: 'Писания', g_tanach: 'Весь Танах', g_nt: 'Новый Завет',
+  skipMin: 'Мин. шаг', skipMax: 'Макс. шаг', bothDir: 'Вперёд и назад', ctrlRun: 'Контроль на перемешанном тексте (рекомендуется)',
+  searchBtn: '🔍 Искать', searching: 'Поиск «{w}»…', ctrlRunning: 'Контрольная проверка…', ctrlSub: 'Те же буквы в случайном порядке', stopped: 'Поиск остановлен',
+  wordShort: 'Нужно минимум 2 буквы иврита', wordLong: 'До 14 букв', rangeBad: 'Диапазон шагов не подходит для этого текста',
+  skipsRange: 'шаги {a}–{b}', stReal: 'В настоящем тексте', stShuf: 'В перемешанном', stExp: 'Ожидается случайно',
+  plainNote: 'Из них {n} с шагом 1 — слово просто написано в тексте.',
+  vNone: 'Не найдено в этом диапазоне. Попробуйте шире диапазон или длиннее текст.',
+  vOnlyPlain: 'Найдено только как обычное слово в тексте (шаг 1).',
+  vSame: 'Примерно как в перемешанном тексте — столько ожидается и случайно.',
+  vSameE: 'Примерно как ожидается случайно.',
+  vMore: 'Больше, чем в перемешанном тексте. Интересно — но это не доказательство; частые библейские слова встречаются чаще.',
+  vLess: 'Меньше, чем в перемешанном тексте.',
+  whyCtrl: 'Что это значит?', whyCtrlT: 'Контрольная проверка',
+  whyCtrlD: 'В любом длинном тексте почти любое короткое слово найдётся с каким-нибудь шагом. Поэтому приложение перемешивает те же буквы и ищет и там. Если в Торе примерно столько же, сколько в перемешанном тексте, находка статистически не особенная. «Ожидается случайно» — расчёт по частоте букв. Шаг 1 в проверке не учитывается. Это не отменяет личного или толковательного смысла — лишь показывает, что случайно, а что нет.',
+  resShown: 'Показано {n} из {t}, от меньшего шага', until: 'до', showMore: 'Показать ещё', skipIs: 'Шаг',
+  save: 'Сохранить', saveBtn: 'Сохранить', savedOk: 'Сохранено ★', saveFail: 'Не удалось сохранить — возможно, память заполнена',
+  readerIntro: 'Выберите текст и число N: получите последовательность — первая буква, затем каждая N-я. Найденные слова отмечены.',
+  everyN: 'Каждая N-я буква', startAt: 'Начать с буквы №', maxLetters: 'Макс. букв', readBack: 'С конца к началу', readBtn: '🔢 Получить последовательность',
+  readerRes: 'Каждая {n}-я · {l}', lettersN: 'Букв в последовательности: {n}', dispCut: 'показаны первые {n}', tapMark: 'Нажмите на отмеченное слово, чтобы увидеть стихи.',
+  wordsFound: 'Найденные слова ({n})', dictNote: 'Словарь — все формы слов Танаха (3–9 букв). Совпадение не означает смысл.',
+  wordFromLetters: 'Слово из {n} букв, из этих стихов:',
+  matrixIntro: 'Текст разбит на строки одинаковой ширины. Читайте столбцы сверху вниз, ищите слова в таблице, нажмите на букву, чтобы увидеть стих.',
+  rowWidth: 'Ширина строки', rowsN: 'Строк', buildMatrix: '▦ Построить матрицу',
+  mxRange: 'От {a} до {b}', mxExtra: 'Найти ещё слово в таблице (8 направлений)', mxExtraPh: 'например: שלום', find: 'Найти', clear: 'Очистить',
+  mxTap: 'Нажмите на букву: её стих и чтение сверху вниз.', mxNotFound: '«{w}» нет в таблице на экране', mxFound: '«{w}» найдено {n} раз',
+  letterIs: 'Буква', posN: 'буква №{n}', readDown: 'Читать вниз', readUp: 'Читать вверх', colFrom: 'столбец от {r}',
+  noSaved: 'Пока ничего не сохранено. У каждого результата есть кнопка ★.', editT: 'Изменить находку', note: 'Заметка', delete: 'Удалить', delConfirm: 'Удалить эту находку?',
+  everyNshort: 'каждая {n}-я', share: '📤 Поделиться', copy: 'Копировать', copied: 'Скопировано', summaryN: 'Всего находок: {n}',
+  csvType: 'Тип', csvTitle: 'Название', csvDetail: 'Подробности', csvDate: 'Дата',
+  general: 'Общие', userName: 'Имя пользователя', userNamePh: 'Имя, ник или семья', language: 'Язык', themeLbl: 'Цветовая тема',
+  th_gold: 'Золото', th_sapphire: 'Сапфир', th_emerald: 'Изумруд', th_ruby: 'Рубин', th_parchment: 'Пергамент', mode_dark: 'Ночь', mode_light: 'День',
+  searchSet: 'Поиск', finalsLbl: 'Различать конечные буквы (ך ם ן ף ץ)', finalsD: 'Выкл. (по умолчанию): מ и ם считаются одной буквой.', defMax: 'Макс. шаг по умолчанию',
+  aiTitle: 'ИИ (необязательно)', aiIntro: 'Приложение полностью работает без ИИ. Для объяснения находки подключите свой ключ. Ключ хранится только на устройстве.',
+  aiPick: 'Выберите провайдера.', aiKey: 'API-ключ', aiUrl: 'Адрес сервера', aiModel: 'Модель', aiRefresh: 'Обновить модели', aiTest: 'Проверить', aiOff: 'Отключить', aiCustom: 'Свой адрес',
+  aiPriv: 'При запросе объяснения находка и стихи отправляются напрямую выбранному провайдеру, не через AppNest.',
+  aiHelpGemini: '1. <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener">aistudio.google.com/app/apikey</a> 2. «Create API key» 3. Вставьте сюда. Есть бесплатный уровень.',
+  aiHelpClaude: '1. <a href="https://console.anthropic.com/" target="_blank" rel="noopener">console.anthropic.com</a> 2. API Keys → Create Key 3. Вставьте сюда. Оплата по использованию.',
+  aiHelpOpenai: '1. <a href="https://platform.openai.com/api-keys" target="_blank" rel="noopener">platform.openai.com/api-keys</a> 2. Create new secret key 3. Вставьте сюда.',
+  aiHelpOllama: 'ИИ на вашем компьютере, бесплатно и приватно. Установите Ollama или LM Studio.',
+  aiHelpCustom: 'Любой сервер, совместимый с OpenAI: базовый адрес (до /v1) и ключ при необходимости.',
+  aiNeedKey: 'Нет ключа или адреса', aiTesting: 'Проверка…', aiOk: 'Подключено', aiErr: 'ИИ не ответил', aiDisc: 'ИИ отключён', aiModelsN: 'Найдено моделей: {n}', aiNoModel: 'Нет доступной модели',
+  aiExplain: 'Объяснить с ИИ', aiSending: 'Отправка в {p}…', aiConnect: 'Подключить ИИ',
+  aiFreeT: 'Объяснить с ИИ', aiFreeD: 'ИИ не подключён. Скопируйте готовый запрос в любое приложение ИИ или подключите ключ в настройках.',
+  aiDisclaimer: 'Это толкование ИИ — не доказательство. Проверяйте сами.',
+  aiPromptHead: 'Я пользуюсь приложением для поиска равноотстоящих буквенных последовательностей (ELS) в Танахе и Новом Завете. Ответь на {lang} языке, кратко и честно.',
+  aiEls: 'Слово «{w}» найдено с шагом {d} букв, от {a} до {b} (поиск в: {scope}). Стихи, в которых находятся буквы:',
+  aiCtrlLine: 'Контроль для шагов {a}–{b}: в настоящем тексте {real}, в перемешанном {shuf}, случайно ожидается около {exp}.',
+  aiAsk: 'Пожалуйста: 1) предложи возможные связи и толкования между словом и стихами. 2) Скажи, что показывает контрольная проверка, и что это толкование, а не доказательство.',
+  aiReader: 'Я извлёк каждую {n}-ю букву из: {l}. Начало последовательности:', aiWords: 'Найденные слова:',
+  aiAskReader: 'Есть ли в этих словах интересные сочетания? Предложи толкования и отметь, что короткие слова появляются и случайно.',
+  aiMatrix: 'Матрица вокруг «{t}», ширина строки {w}, от {a} до {b}. Каждая строка справа налево:', aiExtras: 'Ещё слова в таблице:',
+  dataT: 'Данные и резервная копия', backupExp: '💾 Экспорт копии', backupImp: '📂 Восстановить', guideAgain: '📖 Руководство', wipeAll: 'Удалить всё',
+  restoreConfirm: 'Восстановление заменит все данные {n} находками из файла. Продолжить?', restore: 'Восстановить', restored: 'Восстановлено', badFile: 'Файл не похож на копию этого приложения',
+  wipe1: 'Удалить все находки и настройки?', wipe2: 'Вы уверены? Отменить нельзя.', wiped: 'Всё удалено', continue: 'Продолжить',
+  confirmT: 'Подтверждение', cancel: 'Отмена', pressAgainExit: 'Нажмите ещё раз для выхода', loadingText: 'Загрузка текста…', loadFail: 'Не удалось загрузить текст. Проверьте соединение.', errGeneric: 'Что-то пошло не так.',
+  srcWlcT: 'Тора и Танах — Ленинградский кодекс (WLC)',
+  srcWlcD: 'Westminster Leningrad Codex через проект Open Scriptures и eBible.org. Огласовки, знаки кантилляции и разметка (פ/ס) удалены; при расхождении ктив/кри взят ктив. В Торе 304 850 букв, во всём Танахе около 1 197 000.',
+  srcNtT: 'Новый Завет — перевод на иврит',
+  srcNtD: '«The Holy Bible in Modern Hebrew» с eBible.org, общественное достояние. По проверенным стихам совпадает с переводом Франца Делича (1877); издание не проверено детально. Новый Завет написан по-гречески — все пропуски здесь идут по переводу. Около 429 000 букв.',
+  srcKorenT: 'Почему известные находки могут выглядеть иначе', srcKorenD: 'Известные исследования использовали издание Корен, в Торе на 45 букв короче (304 805). Одна сдвинутая буква меняет каждый проходящий через неё шаг.',
+  srcRulesT: 'Правила поиска', srcRulesD: 'Считаются только буквы. Конечные буквы равны обычным, если не включено различие. Положительный шаг — вперёд, отрицательный — назад. Поиск идёт на устройстве.',
+  license: 'Лицензия', developer: 'Разработчик', platform: 'Платформа', storageLbl: 'Хранение', onDevice: 'только на устройстве',
+  disclaimer: 'Приложение предназначено для изучения и развлечения. Находки не являются доказательством, пророчеством или религиозным постановлением. В любом длинном тексте случайно встречаются сочетания — поэтому есть контрольная проверка.',
+  transNote: 'Перевод интерфейса ещё не проверен носителями языка.',
+  store: 'Магазин AppNest', shareApp: 'Поделиться приложением', shareAppText: 'Библейский код — поиск пропусков букв в Танахе', feedback: 'Отзыв', guide: 'Руководство', privacy: 'Конфиденциальность',
+  g1t: 'Добро пожаловать', g1d: 'Ищите слова и имена, скрытые с постоянным шагом букв — в Торе, Танахе и Новом Завете.',
+  g2t: 'Поиск имени или слова', g2d: 'Введите имя, выберите текст и диапазон шагов — приложение найдёт все места на равном расстоянии.',
+  g3t: 'Каждая N-я буква', g3d: 'Например, каждая 3-я буква Исхода. Найденные слова отмечены, видно, из каких стихов они.',
+  g4t: 'Матрица', g4d: 'Текст в виде таблицы: слова сверху вниз и по диагонали, поиск слов рядом с находкой.',
+  g5t: 'Честная проверка', g5d: 'Каждый поиск идёт и по перемешанному тексту — так видно, необычна ли находка.',
+  g6t: 'Сохранение и ИИ', g6d: 'Сохраняйте находки с заметками, экспортируйте и делитесь. При желании подключите свой ИИ.',
+  skip: 'Пропустить', next: 'Далее', start: 'Начать'
+};
+LANG.es = {
+  appName: 'Código Bíblico', home: 'Inicio', about: 'Acerca de', version: 'Versión', dataV: 'datos',
+  homeSub: 'Saltos de letras en la Torá, el Tanaj y el Nuevo Testamento', hello: 'Hola, {n}',
+  mSearch: 'Buscar un nombre o palabra', mSearchD: 'Encuentra la palabra con un salto fijo de letras',
+  mReader: 'Cada N letras', mReaderD: 'p. ej. cada 3.ª letra de Éxodo',
+  mMatrix: 'Matriz y lectura vertical', mMatrixD: 'El texto como tabla, de arriba abajo',
+  mSaved: 'Mis hallazgos', mSavedD: 'Aún no hay hallazgos guardados', savedN: '{n} hallazgos guardados',
+  mSources: '📚 Fuentes', mSettings: '⚙️ Ajustes',
+  demoT: 'Prueba un ejemplo famoso', demoD: 'Desde la primera ת de Génesis, cada 50 letras se lee «תורה». La prueba de control muestra cuántas veces pasa también en un texto mezclado.', demoBtn: 'Ejecutar: «תורה» en Génesis',
+  wordLbl: 'Palabra o nombre en hebreo', wordPh: 'p. ej. משה', textLbl: 'Dónde buscar', bookLbl: 'Libro', allBooks: '— todos los libros —', chFrom: 'Desde capítulo', chTo: 'Hasta capítulo',
+  g_torah: 'Torá', g_neviim: 'Profetas', g_ketuvim: 'Escritos', g_tanach: 'Todo el Tanaj', g_nt: 'Nuevo Testamento',
+  skipMin: 'Salto mínimo', skipMax: 'Salto máximo', bothDir: 'Hacia adelante y atrás', ctrlRun: 'Prueba de control con texto mezclado (recomendado)',
+  searchBtn: '🔍 Buscar', searching: 'Buscando «{w}»…', ctrlRunning: 'Prueba de control…', ctrlSub: 'Las mismas letras en orden aleatorio', stopped: 'Búsqueda detenida',
+  wordShort: 'Se necesitan al menos 2 letras hebreas', wordLong: 'Hasta 14 letras', rangeBad: 'El rango de saltos no sirve para este texto',
+  skipsRange: 'saltos {a}–{b}', stReal: 'En el texto real', stShuf: 'En texto mezclado', stExp: 'Esperado por azar',
+  plainNote: '{n} de ellos con salto 1: la palabra simplemente está escrita en el texto.',
+  vNone: 'No encontrado en este rango. Prueba un rango mayor o un texto más largo.',
+  vOnlyPlain: 'Solo aparece como palabra normal en el texto (salto 1).',
+  vSame: 'Más o menos como en el texto mezclado: esta cantidad se espera por azar.',
+  vSameE: 'Más o menos lo que predice el azar.',
+  vMore: 'Más que en el texto mezclado. Interesante, pero no es prueba; las palabras bíblicas comunes aparecen más.',
+  vLess: 'Menos que en el texto mezclado.',
+  whyCtrl: '¿Qué significa?', whyCtrlT: 'La prueba de control',
+  whyCtrlD: 'En cualquier texto largo casi toda palabra corta aparece con algún salto. Por eso la app mezcla las mismas letras al azar y busca también allí. Si la Torá da más o menos lo mismo, el hallazgo no es estadísticamente especial. «Esperado por azar» se calcula con la frecuencia de letras. El salto 1 no cuenta en esta prueba. No descarta un sentido personal o interpretativo: solo muestra qué es azar y qué no.',
+  resShown: 'Se muestran {n} de {t}, del salto menor al mayor', until: 'hasta', showMore: 'Mostrar más', skipIs: 'Salto',
+  save: 'Guardar', saveBtn: 'Guardar', savedOk: 'Guardado ★', saveFail: 'No se pudo guardar; puede que el almacenamiento esté lleno',
+  readerIntro: 'Elige un texto y un número N: obtienes la secuencia — la primera letra y luego cada N letras. Las palabras encontradas se marcan.',
+  everyN: 'Cada N letras', startAt: 'Empezar en la letra n.º', maxLetters: 'Máximo de letras', readBack: 'Del final al inicio', readBtn: '🔢 Extraer secuencia',
+  readerRes: 'Cada {n} letras · {l}', lettersN: '{n} letras en la secuencia', dispCut: 'se muestran las primeras {n}', tapMark: 'Toca una palabra marcada para ver de qué versículos vienen sus letras.',
+  wordsFound: 'Palabras encontradas ({n})', dictNote: 'El diccionario son todas las formas de palabra del Tanaj (3–9 letras). Una coincidencia no implica significado.',
+  wordFromLetters: 'La palabra se forma con {n} letras, de estos versículos:',
+  matrixIntro: 'El texto se dispone en filas de ancho fijo. Lee columnas de arriba abajo, busca más palabras en la tabla y toca una letra para ver su versículo.',
+  rowWidth: 'Ancho de fila', rowsN: 'Filas', buildMatrix: '▦ Crear matriz',
+  mxRange: 'De {a} a {b}', mxExtra: 'Buscar otra palabra en la tabla (8 direcciones)', mxExtraPh: 'p. ej. שלום', find: 'Buscar', clear: 'Limpiar',
+  mxTap: 'Toca una letra: su versículo y lectura vertical desde ella.', mxNotFound: '«{w}» no está en la tabla de la pantalla', mxFound: '«{w}» encontrada {n} veces',
+  letterIs: 'Letra', posN: 'letra n.º {n}', readDown: 'Leer hacia abajo', readUp: 'Leer hacia arriba', colFrom: 'columna desde {r}',
+  noSaved: 'Aún no guardaste hallazgos. Cada resultado tiene un botón ★ Guardar.', editT: 'Editar hallazgo', note: 'Nota', delete: 'Eliminar', delConfirm: '¿Eliminar este hallazgo?',
+  everyNshort: 'cada {n}', share: '📤 Compartir', copy: 'Copiar', copied: 'Copiado', summaryN: '{n} hallazgos en total',
+  csvType: 'Tipo', csvTitle: 'Título', csvDetail: 'Detalles', csvDate: 'Fecha',
+  general: 'General', userName: 'Nombre de usuario', userNamePh: 'Nombre, apodo o familia', language: 'Idioma', themeLbl: 'Tema de color',
+  th_gold: 'Oro', th_sapphire: 'Zafiro', th_emerald: 'Esmeralda', th_ruby: 'Rubí', th_parchment: 'Pergamino', mode_dark: 'Noche', mode_light: 'Día',
+  searchSet: 'Búsqueda', finalsLbl: 'Distinguir letras finales (ך ם ן ף ץ)', finalsD: 'Desactivado (por defecto): מ y ם cuentan como la misma letra.', defMax: 'Salto máximo por defecto',
+  aiTitle: 'IA (opcional)', aiIntro: 'La app funciona por completo sin IA. Para una explicación, conecta tu propia clave. La clave queda solo en este dispositivo.',
+  aiPick: 'Elige un proveedor.', aiKey: 'Clave API', aiUrl: 'Dirección del servidor', aiModel: 'Modelo', aiRefresh: 'Actualizar modelos', aiTest: 'Probar conexión', aiOff: 'Desconectar', aiCustom: 'Dirección propia',
+  aiPriv: 'Al pedir una explicación, el hallazgo y los versículos se envían directamente al proveedor elegido, no a través de AppNest.',
+  aiHelpGemini: '1. <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener">aistudio.google.com/app/apikey</a> 2. «Create API key» 3. Pégala aquí. Hay un nivel gratuito.',
+  aiHelpClaude: '1. <a href="https://console.anthropic.com/" target="_blank" rel="noopener">console.anthropic.com</a> 2. API Keys → Create Key 3. Pégala aquí. Pago por uso.',
+  aiHelpOpenai: '1. <a href="https://platform.openai.com/api-keys" target="_blank" rel="noopener">platform.openai.com/api-keys</a> 2. Create new secret key 3. Pégala aquí.',
+  aiHelpOllama: 'IA en tu propio ordenador, gratis y privada. Instala Ollama o LM Studio.',
+  aiHelpCustom: 'Cualquier servidor compatible con OpenAI: dirección base (hasta /v1) y clave si hace falta.',
+  aiNeedKey: 'Falta la clave o la dirección', aiTesting: 'Probando…', aiOk: 'Conectado', aiErr: 'La IA no respondió', aiDisc: 'IA desconectada', aiModelsN: '{n} modelos encontrados', aiNoModel: 'No hay modelo disponible',
+  aiExplain: 'Explicar con IA', aiSending: 'Enviando a {p}…', aiConnect: 'Conectar IA',
+  aiFreeT: 'Explicar con IA', aiFreeD: 'No hay IA conectada. Copia la solicitud lista y pégala en cualquier app de IA, o conecta una clave en Ajustes.',
+  aiDisclaimer: 'Es una interpretación de IA, no una prueba. Compruébalo tú mismo.',
+  aiPromptHead: 'Uso una app que busca secuencias de letras equidistantes (ELS) en el Tanaj y el Nuevo Testamento. Responde en {lang}, breve y honestamente.',
+  aiEls: 'Se encontró la palabra «{w}» con un salto de {d} letras, de {a} a {b} (búsqueda en: {scope}). Los versículos con las letras:',
+  aiCtrlLine: 'Prueba de control para saltos {a}–{b}: {real} en el texto real, {shuf} en un texto mezclado con las mismas letras, unos {exp} esperados por azar.',
+  aiAsk: 'Por favor: 1) sugiere posibles conexiones e interpretaciones entre la palabra y los versículos. 2) Di qué muestra la prueba de control y que es interpretación, no prueba.',
+  aiReader: 'Extraje cada {n} letras de: {l}. Inicio de la secuencia:', aiWords: 'Palabras detectadas:',
+  aiAskReader: '¿Hay combinaciones o ideas interesantes en estas palabras? Sugiere interpretaciones y recuerda que las palabras cortas también aparecen por azar.',
+  aiMatrix: 'Una matriz alrededor de «{t}», ancho de fila {w}, de {a} a {b}. Cada fila se lee de derecha a izquierda:', aiExtras: 'Más palabras en la tabla:',
+  dataT: 'Datos y copia de seguridad', backupExp: '💾 Exportar copia', backupImp: '📂 Restaurar copia', guideAgain: '📖 Guía', wipeAll: 'Borrar todo',
+  restoreConfirm: 'Restaurar reemplaza todos los datos con los {n} hallazgos del archivo. ¿Continuar?', restore: 'Restaurar', restored: 'Restauración completa', badFile: 'El archivo no parece una copia de esta app',
+  wipe1: '¿Borrar todos los hallazgos y ajustes?', wipe2: '¿Seguro? No se puede deshacer.', wiped: 'Todo borrado', continue: 'Continuar',
+  confirmT: 'Confirmar', cancel: 'Cancelar', pressAgainExit: 'Pulsa atrás otra vez para salir', loadingText: 'Cargando el texto…', loadFail: 'No se pudo cargar el texto. Revisa la conexión.', errGeneric: 'Algo salió mal.',
+  srcWlcT: 'Torá y Tanaj — Códice de Leningrado (WLC)',
+  srcWlcD: 'Westminster Leningrad Codex, vía Open Scriptures y eBible.org. Sin vocales, acentos ni marcas de párrafo (פ/ס); donde difieren ketiv y qere se usa el ketiv. 304.850 letras en la Torá, unas 1.197.000 en todo el Tanaj.',
+  srcNtT: 'Nuevo Testamento — traducción hebrea',
+  srcNtD: '«The Holy Bible in Modern Hebrew» de eBible.org, dominio público. En los versículos revisados coincide con la traducción de Franz Delitzsch (1877); la edición exacta no se verificó a fondo. El Nuevo Testamento se escribió en griego: aquí los saltos recorren una traducción. Unas 429.000 letras.',
+  srcKorenT: 'Por qué hallazgos famosos pueden verse distintos', srcKorenD: 'Los estudios conocidos usaron la edición Koren, 45 letras más corta en la Torá (304.805). Una letra desplazada cambia cada salto que pasa por ella.',
+  srcRulesT: 'Reglas de búsqueda', srcRulesD: 'Solo cuentan las letras. Las finales cuentan como normales salvo que actives la distinción. Salto positivo: adelante; negativo: atrás. Todo se calcula en tu dispositivo.',
+  license: 'Licencia', developer: 'Desarrollado por', platform: 'Plataforma', storageLbl: 'Almacenamiento', onDevice: 'solo en el dispositivo',
+  disclaimer: 'Esta app es para estudio, exploración personal y diversión. Los hallazgos no son prueba, profecía ni dictamen religioso. Todo texto largo contiene combinaciones por azar: por eso existe la prueba de control.',
+  transNote: 'La interfaz traducida aún no fue revisada por hablantes nativos.',
+  store: 'Tienda AppNest', shareApp: 'Compartir la app', shareAppText: 'Código Bíblico — búsqueda de saltos de letras en el Tanaj', feedback: 'Enviar comentarios', guide: 'Guía', privacy: 'Privacidad',
+  g1t: 'Bienvenido', g1d: 'Busca palabras y nombres ocultos en saltos fijos de letras: en la Torá, todo el Tanaj y el Nuevo Testamento.',
+  g2t: 'Buscar un nombre', g2d: 'Escribe un nombre, elige texto y rango de saltos, y la app encuentra cada lugar con sus letras a igual distancia.',
+  g3t: 'Cada N letras', g3d: 'Por ejemplo cada 3.ª letra de Éxodo. Las palabras que se forman se marcan, con sus versículos.',
+  g4t: 'Matriz', g4d: 'El texto como tabla: palabras de arriba abajo y en diagonal, y más palabras alrededor de un hallazgo.',
+  g5t: 'Prueba de control honesta', g5d: 'Cada búsqueda corre también sobre un texto mezclado, para saber si un hallazgo es inusual o esperado por azar.',
+  g6t: 'Guardar e IA', g6d: 'Guarda hallazgos con notas, exporta y comparte. Opcionalmente conecta tu propia IA.',
+  skip: 'Saltar', next: 'Siguiente', start: 'Empezar'
+};
+LANG.ar = {
+  appName: 'شيفرة الكتاب', home: 'الرئيسية', about: 'حول', version: 'الإصدار', dataV: 'البيانات',
+  homeSub: 'تخطي الحروف في التوراة والتناخ والعهد الجديد', hello: 'مرحبًا، {n}',
+  mSearch: 'البحث عن اسم أو كلمة', mSearchD: 'يجد الكلمة بتخطٍّ ثابت للحروف',
+  mReader: 'كل حرف رقم N', mReaderD: 'مثلًا كل حرف ثالث في سفر الخروج',
+  mMatrix: 'مصفوفة وقراءة عمودية', mMatrixD: 'النص كجدول من الأعلى للأسفل',
+  mSaved: 'نتائجي', mSavedD: 'لا توجد نتائج محفوظة بعد', savedN: '{n} نتائج محفوظة',
+  mSources: '📚 المصادر', mSettings: '⚙️ الإعدادات',
+  demoT: 'جرّب مثالًا مشهورًا', demoD: 'من أول حرف ת في سفر التكوين، كل 50 حرفًا تُقرأ «תורה». يُظهر اختبار المقارنة كم مرة يحدث ذلك في نص مخلوط أيضًا.', demoBtn: 'تشغيل: «תורה» في التكوين',
+  wordLbl: 'كلمة أو اسم بالعبرية', wordPh: 'مثلًا: משה', textLbl: 'أين تبحث', bookLbl: 'السفر', allBooks: '— كل الأسفار —', chFrom: 'من الإصحاح', chTo: 'إلى الإصحاح',
+  g_torah: 'التوراة', g_neviim: 'الأنبياء', g_ketuvim: 'الكتب', g_tanach: 'التناخ كله', g_nt: 'العهد الجديد',
+  skipMin: 'أقل تخطٍّ', skipMax: 'أكبر تخطٍّ', bothDir: 'للأمام وللخلف', ctrlRun: 'اختبار مقارنة على نص مخلوط (مُستحسن)',
+  searchBtn: '🔍 بحث', searching: 'جارٍ البحث عن «{w}»…', ctrlRunning: 'اختبار المقارنة…', ctrlSub: 'نفس الحروف بترتيب عشوائي', stopped: 'توقف البحث',
+  wordShort: 'يلزم حرفان عبريان على الأقل', wordLong: 'حتى 14 حرفًا', rangeBad: 'نطاق التخطي لا يناسب هذا النص',
+  skipsRange: 'تخطٍّ {a}–{b}', stReal: 'في النص الحقيقي', stShuf: 'في النص المخلوط', stExp: 'متوقع بالصدفة',
+  plainNote: 'منها {n} بتخطي 1 — أي أن الكلمة مكتوبة في النص ببساطة.',
+  vNone: 'لم يُعثر عليها في هذا النطاق. جرّب نطاقًا أوسع أو نصًا أطول.',
+  vOnlyPlain: 'وُجدت فقط ككلمة عادية في النص (تخطي 1).',
+  vSame: 'تقريبًا مثل النص المخلوط — هذا العدد متوقع بالصدفة.',
+  vSameE: 'تقريبًا كما تتوقع الصدفة.',
+  vMore: 'أكثر من النص المخلوط. مثير للاهتمام — لكنه ليس دليلًا؛ الكلمات الشائعة تظهر أكثر.',
+  vLess: 'أقل من النص المخلوط.',
+  whyCtrl: 'ماذا يعني هذا؟', whyCtrlT: 'اختبار المقارنة',
+  whyCtrlD: 'في أي نص طويل تظهر تقريبًا كل كلمة قصيرة بتخطٍّ ما. لذلك يخلط التطبيق الحروف نفسها عشوائيًا ويبحث فيها أيضًا. إذا كان العدد في التوراة قريبًا من النص المخلوط، فالنتيجة ليست مميزة إحصائيًا. «المتوقع بالصدفة» محسوب من تكرار الحروف. لا يُحتسب التخطي 1 في هذا الاختبار. هذا لا ينفي معنى شخصيًا أو تفسيريًا — بل يبين ما هو صدفة وما ليس كذلك.',
+  resShown: 'عرض {n} من {t}، من أصغر تخطٍّ', until: 'حتى', showMore: 'عرض المزيد', skipIs: 'تخطٍّ',
+  save: 'حفظ', saveBtn: 'حفظ', savedOk: 'تم الحفظ ★', saveFail: 'فشل الحفظ على الجهاز — ربما التخزين ممتلئ',
+  readerIntro: 'اختر نصًا ورقمًا N لتحصل على تسلسل الحروف: الحرف الأول ثم كل حرف رقم N. الكلمات الموجودة مُعلَّمة.',
+  everyN: 'كل حرف رقم N', startAt: 'البدء من الحرف رقم', maxLetters: 'أقصى عدد حروف', readBack: 'من النهاية للبداية', readBtn: '🔢 استخراج التسلسل',
+  readerRes: 'كل {n} حروف · {l}', lettersN: '{n} حرفًا في التسلسل', dispCut: 'تُعرض أول {n}', tapMark: 'اضغط على كلمة مُعلَّمة لترى الآيات التي جاءت منها حروفها.',
+  wordsFound: 'كلمات وُجدت ({n})', dictNote: 'القاموس هو كل صيغ الكلمات في التناخ (3–9 حروف). التطابق لا يعني وجود معنى.',
+  wordFromLetters: 'الكلمة مكونة من {n} حروف من هذه الآيات:',
+  matrixIntro: 'يُعرض النص في صفوف بعرض ثابت. اقرأ الأعمدة من الأعلى للأسفل، وابحث عن كلمات أخرى في الجدول، واضغط على حرف لترى آيته.',
+  rowWidth: 'عرض الصف', rowsN: 'عدد الصفوف', buildMatrix: '▦ إنشاء مصفوفة',
+  mxRange: 'من {a} إلى {b}', mxExtra: 'البحث عن كلمة أخرى في الجدول (8 اتجاهات)', mxExtraPh: 'مثلًا: שלום', find: 'بحث', clear: 'مسح',
+  mxTap: 'اضغط على حرف: آيته وقراءة عمودية منه.', mxNotFound: '«{w}» غير موجودة في الجدول الظاهر', mxFound: '«{w}» وُجدت {n} مرات',
+  letterIs: 'الحرف', posN: 'الحرف رقم {n}', readDown: 'اقرأ للأسفل', readUp: 'اقرأ للأعلى', colFrom: 'عمود من {r}',
+  noSaved: 'لم تحفظ نتائج بعد. في كل نتيجة زر ★ حفظ.', editT: 'تعديل النتيجة', note: 'ملاحظة', delete: 'حذف', delConfirm: 'حذف هذه النتيجة؟',
+  everyNshort: 'كل {n}', share: '📤 مشاركة', copy: 'نسخ', copied: 'تم النسخ', summaryN: 'المجموع {n} نتائج',
+  csvType: 'النوع', csvTitle: 'العنوان', csvDetail: 'التفاصيل', csvDate: 'التاريخ',
+  general: 'عام', userName: 'اسم المستخدم', userNamePh: 'الاسم أو اللقب أو العائلة', language: 'اللغة', themeLbl: 'نمط الألوان',
+  th_gold: 'ذهبي', th_sapphire: 'ياقوت أزرق', th_emerald: 'زمرد', th_ruby: 'ياقوت أحمر', th_parchment: 'رق', mode_dark: 'ليل', mode_light: 'نهار',
+  searchSet: 'البحث', finalsLbl: 'التمييز بين الحروف النهائية (ך ם ן ף ץ)', finalsD: 'مُعطَّل (افتراضي): מ و ם تُعدّان حرفًا واحدًا.', defMax: 'أكبر تخطٍّ افتراضي',
+  aiTitle: 'الذكاء الاصطناعي (اختياري)', aiIntro: 'يعمل التطبيق بالكامل دون ذكاء اصطناعي. لشرح نتيجة، اربط مفتاحك الخاص. يبقى المفتاح على الجهاز فقط.',
+  aiPick: 'اختر مزوّدًا للبدء.', aiKey: 'مفتاح API', aiUrl: 'عنوان الخادم', aiModel: 'النموذج', aiRefresh: 'تحديث النماذج', aiTest: 'اختبار الاتصال', aiOff: 'قطع الاتصال', aiCustom: 'عنوان مخصص',
+  aiPriv: 'عند طلب شرح تُرسل النتيجة والآيات مباشرة إلى المزوّد الذي اخترته — وليس عبر AppNest.',
+  aiHelpGemini: '1. <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener">aistudio.google.com/app/apikey</a> 2. «Create API key» 3. الصقه هنا. توجد طبقة مجانية.',
+  aiHelpClaude: '1. <a href="https://console.anthropic.com/" target="_blank" rel="noopener">console.anthropic.com</a> 2. API Keys → Create Key 3. الصقه هنا. الدفع حسب الاستخدام.',
+  aiHelpOpenai: '1. <a href="https://platform.openai.com/api-keys" target="_blank" rel="noopener">platform.openai.com/api-keys</a> 2. Create new secret key 3. الصقه هنا.',
+  aiHelpOllama: 'ذكاء اصطناعي على حاسوبك، مجاني وخاص. ثبّت Ollama أو LM Studio.',
+  aiHelpCustom: 'أي خادم متوافق مع OpenAI: العنوان الأساسي (حتى /v1) ومفتاح عند الحاجة.',
+  aiNeedKey: 'المفتاح أو العنوان مفقود', aiTesting: 'جارٍ الاختبار…', aiOk: 'متصل', aiErr: 'لم يُجب الذكاء الاصطناعي', aiDisc: 'تم قطع الاتصال', aiModelsN: 'وُجد {n} نموذجًا', aiNoModel: 'لا يوجد نموذج متاح',
+  aiExplain: 'شرح بالذكاء الاصطناعي', aiSending: 'جارٍ الإرسال إلى {p}…', aiConnect: 'ربط الذكاء الاصطناعي',
+  aiFreeT: 'شرح بالذكاء الاصطناعي', aiFreeD: 'لا يوجد ذكاء اصطناعي مرتبط. انسخ الطلب الجاهز والصقه في أي تطبيق ذكاء اصطناعي، أو اربط مفتاحًا في الإعدادات.',
+  aiDisclaimer: 'هذا تفسير من الذكاء الاصطناعي — ليس دليلًا. تحقّق بنفسك.',
+  aiPromptHead: 'أستخدم تطبيقًا يبحث عن تسلسلات الحروف متساوية المسافة (ELS) في التناخ والعهد الجديد. أجب بال{lang}، باختصار وصدق.',
+  aiEls: 'وُجدت الكلمة «{w}» بتخطي {d} حرفًا، من {a} إلى {b} (البحث في: {scope}). الآيات التي فيها الحروف:',
+  aiCtrlLine: 'اختبار المقارنة للتخطي {a}–{b}: {real} في النص الحقيقي، {shuf} في نص مخلوط بالحروف نفسها، ونحو {exp} متوقعة بالصدفة.',
+  aiAsk: 'من فضلك: 1) اقترح روابط وتفسيرات ممكنة بين الكلمة والآيات وسياقها. 2) اذكر ما يبينه اختبار المقارنة، وأن هذا تفسير وليس دليلًا.',
+  aiReader: 'استخرجت كل حرف رقم {n} من: {l}. بداية التسلسل:', aiWords: 'كلمات مكتشفة:',
+  aiAskReader: 'هل في هذه الكلمات تراكيب أو أفكار مثيرة؟ اقترح تفسيرات، ونبّه إلى أن الكلمات القصيرة تظهر بالصدفة أيضًا.',
+  aiMatrix: 'مصفوفة حول «{t}»، عرض الصف {w}، من {a} إلى {b}. كل صف يُقرأ من اليمين لليسار:', aiExtras: 'كلمات أخرى وجدتها في الجدول:',
+  dataT: 'البيانات والنسخ الاحتياطي', backupExp: '💾 تصدير نسخة', backupImp: '📂 استعادة نسخة', guideAgain: '📖 الدليل', wipeAll: 'حذف الكل',
+  restoreConfirm: 'الاستعادة تستبدل كل البيانات بـ {n} نتائج من الملف. متابعة؟', restore: 'استعادة', restored: 'اكتملت الاستعادة', badFile: 'الملف لا يبدو نسخة احتياطية لهذا التطبيق',
+  wipe1: 'حذف كل النتائج والإعدادات؟', wipe2: 'هل أنت متأكد؟ لا يمكن التراجع.', wiped: 'تم حذف الكل', continue: 'متابعة',
+  confirmT: 'تأكيد', cancel: 'إلغاء', pressAgainExit: 'اضغط مرة أخرى للخروج', loadingText: 'جارٍ تحميل النص…', loadFail: 'فشل تحميل النص. تحقق من الاتصال.', errGeneric: 'حدث خطأ ما.',
+  srcWlcT: 'التوراة والتناخ — مخطوطة لينينغراد (WLC)',
+  srcWlcD: 'Westminster Leningrad Codex عبر مشروع Open Scriptures وموقع eBible.org. أُزيلت الحركات وعلامات التنغيم والفقرات (פ/ס)؛ عند اختلاف الكتيب والقري أُخذ الكتيب. في التوراة 304,850 حرفًا، وفي التناخ كله نحو 1,197,000.',
+  srcNtT: 'العهد الجديد — ترجمة عبرية',
+  srcNtD: '«The Holy Bible in Modern Hebrew» من eBible.org، ملكية عامة. في الآيات التي فُحصت يطابق ترجمة فرانز ديليتش (1877)؛ لم يُتحقق من الطبعة بدقة. كُتب العهد الجديد باليونانية — فالتخطي هنا يجري على ترجمة. نحو 429,000 حرف.',
+  srcKorenT: 'لماذا قد تبدو النتائج المشهورة مختلفة', srcKorenD: 'استخدمت الدراسات المعروفة طبعة كورين، الأقصر بـ 45 حرفًا في التوراة (304,805). حرف واحد منزاح يغيّر كل تخطٍّ يمر به.',
+  srcRulesT: 'قواعد البحث', srcRulesD: 'تُحتسب الحروف فقط. الحروف النهائية تُعدّ عادية ما لم تفعّل التمييز. التخطي الموجب للأمام والسالب للخلف. كل البحث يجري على جهازك.',
+  license: 'الترخيص', developer: 'تطوير', platform: 'المنصة', storageLbl: 'التخزين', onDevice: 'على الجهاز فقط',
+  disclaimer: 'هذا التطبيق للدراسة والاستكشاف الشخصي والمتعة. نتائج تخطي الحروف ليست دليلًا ولا نبوءة ولا فتوى دينية. كل نص طويل يحتوي تراكيب بالصدفة — لذلك يوجد اختبار المقارنة.',
+  transNote: 'لم تُراجَع ترجمة الواجهة بعد من قبل متحدثين أصليين.',
+  store: 'متجر AppNest', shareApp: 'مشاركة التطبيق', shareAppText: 'شيفرة الكتاب — البحث بتخطي الحروف في التناخ', feedback: 'إرسال ملاحظات', guide: 'الدليل', privacy: 'سياسة الخصوصية',
+  g1t: 'مرحبًا بك', g1d: 'ابحث عن كلمات وأسماء مخفية بتخطٍّ ثابت للحروف — في التوراة والتناخ كله والعهد الجديد.',
+  g2t: 'البحث عن اسم', g2d: 'اكتب اسمًا واختر النص ونطاق التخطي، فيجد التطبيق كل موضع تظهر فيه حروفه على مسافات متساوية.',
+  g3t: 'كل حرف رقم N', g3d: 'مثلًا كل حرف ثالث في سفر الخروج. تُعلَّم الكلمات المتكونة مع آياتها.',
+  g4t: 'المصفوفة', g4d: 'النص كجدول: كلمات من الأعلى للأسفل وبشكل قطري، وكلمات أخرى حول النتيجة.',
+  g5t: 'اختبار مقارنة صادق', g5d: 'كل بحث يجري أيضًا على نص مخلوط بالحروف نفسها لتعرف إن كانت النتيجة غير عادية أم متوقعة بالصدفة.',
+  g6t: 'الحفظ والذكاء الاصطناعي', g6d: 'احفظ النتائج مع ملاحظات وصدّرها وشاركها. ويمكنك ربط ذكاء اصطناعي خاص بك.',
+  skip: 'تخطٍّ', next: 'التالي', start: 'لنبدأ'
+};
+
+</script>
+<script>
+/* הצופן התנכי · CodeNest — AppNest © 2026 Barak Aflalo */
+'use strict';
+var VERSION = '1.0.0', DATA_V = '1';
+var STORE_URL = 'https://appnest-store.pages.dev/';
+var FEEDBACK = 'appnest55@gmail.com';
+function $(id) { return document.getElementById(id); }
+function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
+function fmtN(n) { return Number(n).toLocaleString(S.lang === 'ar' ? 'ar-EG' : (S.lang || 'he')); }
+
+/* ---------- storage shim ---------- */
+var store = (function () {
+  var mem = {}, has = false;
+  try { localStorage.setItem('__t', '1'); localStorage.removeItem('__t'); has = true; } catch (e) { }
+  return {
+    get: function (k, d) { try { var v = has ? localStorage.getItem('cn_' + k) : mem[k]; return v == null ? d : JSON.parse(v); } catch (e) { return d; } },
+    set: function (k, v) { try { var s = JSON.stringify(v); if (has) localStorage.setItem('cn_' + k, s); else mem[k] = s; return true; } catch (e) { toast(T('saveFail'), 4000); return false; } },
+    del: function (k) { try { if (has) localStorage.removeItem('cn_' + k); else delete mem[k]; } catch (e) { } }
+  };
+})();
+var DEF = { lang: 'he', theme: 'gold', mode: 'dark', name: '', finals: false, maxSkip: 1000, guided: false, ai: { prov: '', key: '', model: '', url: '' } };
+var S = Object.assign({}, DEF, store.get('settings', {}));
+S.ai = Object.assign({}, DEF.ai, S.ai || {});
+function saveS() { store.set('settings', S); }
+var SAVED = store.get('saved', []);
+function saveSaved() { store.set('saved', SAVED); updSavedCount(); }
+
+/* ---------- i18n ---------- */
+function T(k, v) {
+  var L = LANG[S.lang] || LANG.en, s = L[k];
+  if (s == null) s = LANG.en[k];
+  if (s == null) s = LANG.he[k];
+  if (s == null) return k;
+  if (v) s = s.replace(/\{(\w+)\}/g, function (m, x) { return v[x] != null ? v[x] : m; });
+  return s;
+}
+function isRTL() { return S.lang === 'he' || S.lang === 'ar'; }
+function applyLang() {
+  document.documentElement.lang = S.lang;
+  document.documentElement.dir = isRTL() ? 'rtl' : 'ltr';
+  document.querySelectorAll('[data-t]').forEach(function (el) { el.textContent = T(el.getAttribute('data-t')); });
+  document.querySelectorAll('[data-tp]').forEach(function (el) { el.placeholder = T(el.getAttribute('data-tp')); });
+  $('verLbl').textContent = T('version') + ' ' + VERSION;
+  updHeader(); updSavedCount(); renderScopes(); hello();
+}
+function hello() { $('homeHello').textContent = S.name ? T('hello', { n: S.name }) : ''; }
+
+/* ---------- theme ---------- */
+var THEMES = ['gold', 'sapphire', 'emerald', 'ruby', 'parchment'];
+var TH_COL = { gold: '#d4af37', sapphire: '#7fb3ff', emerald: '#3ecf8e', ruby: '#e0607e', parchment: '#c8a165' };
+function applyTheme() {
+  document.documentElement.setAttribute('data-theme', S.theme);
+  document.documentElement.setAttribute('data-mode', S.mode);
+  var m = document.querySelector('meta[name=theme-color]'); if (m) m.content = S.mode === 'light' ? '#f6f3ea' : '#0b0b0c';
+}
+
+/* ---------- toast ---------- */
+var toastT = 0;
+function toast(msg, ms) { var t = $('toast'); t.textContent = msg; t.classList.add('on'); clearTimeout(toastT); toastT = setTimeout(function () { t.classList.remove('on'); }, ms || 2200); }
+
+/* ---------- Hebrew numerals & refs ---------- */
+function heNum(n) {
+  var o = ''; while (n >= 400) { o += 'ת'; n -= 400; }
+  var h = Math.floor(n / 100); if (h) o += ' קרש'[h]; n %= 100;
+  if (n === 15) return o + 'טו'; if (n === 16) return o + 'טז';
+  var t = Math.floor(n / 10); if (t) o += ' יכלמנסעפצ'[t]; n %= 10; if (n) o += ' אבגדהוזחט'[n];
+  return o;
+}
+var BOOKS = {
+  tanach: [["GEN", "בראשית", 50, "Genesis"], ["EXO", "שמות", 40, "Exodus"], ["LEV", "ויקרא", 27, "Leviticus"], ["NUM", "במדבר", 36, "Numbers"], ["DEU", "דברים", 34, "Deuteronomy"], ["JOS", "יהושע", 24, "Joshua"], ["JDG", "שופטים", 21, "Judges"], ["1SA", "שמואל א", 31, "1 Samuel"], ["2SA", "שמואל ב", 24, "2 Samuel"], ["1KI", "מלכים א", 22, "1 Kings"], ["2KI", "מלכים ב", 25, "2 Kings"], ["ISA", "ישעיהו", 66, "Isaiah"], ["JER", "ירמיהו", 52, "Jeremiah"], ["EZK", "יחזקאל", 48, "Ezekiel"], ["HOS", "הושע", 14, "Hosea"], ["JOL", "יואל", 4, "Joel"], ["AMO", "עמוס", 9, "Amos"], ["OBA", "עובדיה", 1, "Obadiah"], ["JON", "יונה", 4, "Jonah"], ["MIC", "מיכה", 7, "Micah"], ["NAM", "נחום", 3, "Nahum"], ["HAB", "חבקוק", 3, "Habakkuk"], ["ZEP", "צפניה", 3, "Zephaniah"], ["HAG", "חגי", 2, "Haggai"], ["ZEC", "זכריה", 14, "Zechariah"], ["MAL", "מלאכי", 3, "Malachi"], ["PSA", "תהילים", 150, "Psalms"], ["PRO", "משלי", 31, "Proverbs"], ["JOB", "איוב", 42, "Job"], ["SNG", "שיר השירים", 8, "Song of Songs"], ["RUT", "רות", 4, "Ruth"], ["LAM", "איכה", 5, "Lamentations"], ["ECC", "קהלת", 12, "Ecclesiastes"], ["EST", "אסתר", 10, "Esther"], ["DAN", "דניאל", 12, "Daniel"], ["EZR", "עזרא", 10, "Ezra"], ["NEH", "נחמיה", 13, "Nehemiah"], ["1CH", "דברי הימים א", 29, "1 Chronicles"], ["2CH", "דברי הימים ב", 36, "2 Chronicles"]],
+  nt: [["MAT", "מתי", 28, "Matthew"], ["MRK", "מרקוס", 16, "Mark"], ["LUK", "לוקס", 24, "Luke"], ["JHN", "יוחנן", 21, "John"], ["ACT", "מעשי השליחים", 28, "Acts"], ["ROM", "אל הרומים", 16, "Romans"], ["1CO", "הראשונה אל הקורינתים", 16, "1 Corinthians"], ["2CO", "השנייה אל הקורינתים", 13, "2 Corinthians"], ["GAL", "אל הגלטים", 6, "Galatians"], ["EPH", "אל האפסים", 6, "Ephesians"], ["PHP", "אל הפיליפים", 4, "Philippians"], ["COL", "אל הקולוסים", 4, "Colossians"], ["1TH", "הראשונה אל התסלוניקים", 5, "1 Thessalonians"], ["2TH", "השנייה אל התסלוניקים", 3, "2 Thessalonians"], ["1TI", "הראשונה אל טימותיוס", 6, "1 Timothy"], ["2TI", "השנייה אל טימותיוס", 4, "2 Timothy"], ["TIT", "אל טיטוס", 3, "Titus"], ["PHM", "אל פילימון", 1, "Philemon"], ["HEB", "אל העברים", 13, "Hebrews"], ["JAS", "יעקב", 5, "James"], ["1PE", "הראשונה לפטרוס", 5, "1 Peter"], ["2PE", "השנייה לפטרוס", 3, "2 Peter"], ["1JN", "הראשונה ליוחנן", 5, "1 John"], ["2JN", "השנייה ליוחנן", 1, "2 John"], ["3JN", "השלישית ליוחנן", 1, "3 John"], ["JUD", "יהודה", 1, "Jude"], ["REV", "ההתגלות", 22, "Revelation"]]
+};
+var GROUPS = { torah: ['tanach', 0, 5], neviim: ['tanach', 5, 26], ketuvim: ['tanach', 26, 39], tanach: ['tanach', 0, 39], nt: ['nt', 0, 27] };
+function bookName(src, bi) { var b = BOOKS[src][bi]; return (S.lang === 'he' || S.lang === 'ar') ? b[1] : b[3]; }
+function chv(n) { return S.lang === 'he' ? heNum(n) : String(n); }
+
+/* ---------- corpus ---------- */
+var AB = 'אבגדהוזחטיכלמנסעפצקרשתךםןףץ';
+var CODE = {}; for (var _i = 0; _i < AB.length; _i++) CODE[AB[_i]] = _i;
+var NORMMAP = new Uint8Array(27); for (_i = 0; _i < 22; _i++) NORMMAP[_i] = _i; NORMMAP[22] = 10; NORMMAP[23] = 12; NORMMAP[24] = 13; NORMMAP[25] = 16; NORMMAP[26] = 17;
+var CORP = {}, LOADING = {};
+function loadCorp(src) {
+  if (CORP[src]) return Promise.resolve(CORP[src]);
+  if (LOADING[src]) return LOADING[src];
+  busy(T('loadingText'), 0.1, '', null);
+  LOADING[src] = fetch(src + '.json?v=' + DATA_V).then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
+    .then(function (books) { busy(T('loadingText'), 0.7); var c = buildCorp(src, books); CORP[src] = c; busyOff(); return c; })
+    .catch(function (e) { busyOff(); delete LOADING[src]; toast(T('loadFail'), 4000); throw e; });
+  return LOADING[src];
+}
+function buildCorp(src, books) {
+  var verses = [], vb = [], vc = [], vn = [], st = [], total = 0, bk = [];
+  books.forEach(function (b, bi) {
+    var info = { l0: total, v0: verses.length, chV: [], chL: [] };
+    b.ch.forEach(function (ch, ci) {
+      info.chV.push(verses.length); info.chL.push(total);
+      ch.forEach(function (t, vi) { verses.push(t); vb.push(bi); vc.push(ci + 1); vn.push(vi + 1); st.push(total); total += t.length - (t.split(' ').length - 1) - (t ? 0 : 0); });
+    });
+    info.l1 = total; info.v1 = verses.length; bk.push(info);
+  });
+  var disp = new Uint8Array(total), p = 0;
+  for (var i = 0; i < verses.length; i++) { var t = verses[i]; for (var j = 0; j < t.length; j++) { var c = CODE[t[j]]; if (c != null) disp[p++] = c; } }
+  var norm = new Uint8Array(total); for (i = 0; i < total; i++) norm[i] = NORMMAP[disp[i]];
+  return { src: src, verses: verses, vb: Int16Array.from(vb), vc: Int16Array.from(vc), vn: Int16Array.from(vn), st: Int32Array.from(st), n: total, disp: disp, norm: norm, books: bk };
+}
+function verseOf(C, idx) { var lo = 0, hi = C.st.length - 1; while (lo < hi) { var m = (lo + hi + 1) >> 1; if (C.st[m] <= idx) lo = m; else hi = m - 1; } return lo; }
+function refOf(C, idx) { var v = verseOf(C, idx); return bookName(C.src, C.vb[v]) + ' ' + chv(C.vc[v]) + ':' + chv(C.vn[v]); }
+function letterAt(C, idx) { return AB[C.disp[idx]]; }
+function verseHTML(C, v, hits) {
+  var t = C.verses[v], base = C.st[v], o = '', li = 0;
+  for (var i = 0; i < t.length; i++) { var ch = t[i]; if (ch === ' ') { o += ' '; continue; } var g = base + li; li++; o += hits[g] ? '<span class="hit">' + ch + '</span>' : esc(ch); }
+  return o;
+}
+function wordCodes(str, finals) {
+  var w = [], s = String(str || '').replace(/[֑-ׇ]/g, '');
+  for (var i = 0; i < s.length; i++) { var c = CODE[s[i]]; if (c != null) w.push(finals ? c : NORMMAP[c]); }
+  return w;
+}
+function cleanWord(str) { return String(str || '').replace(/[֑-ׇ]/g, '').replace(/[^א-ת]/g, ''); }
+
+/* ---------- scope selector ---------- */
+var SCOPES = {};
+function scopeHTML(id, withCh) {
+  var sc = SCOPES[id] || (SCOPES[id] = { g: 'torah', b: -1, c1: 1, c2: 0, withCh: withCh });
+  var o = '<div class="fld"><label>' + T('textLbl') + '</label><div class="chips">';
+  ['torah', 'neviim', 'ketuvim', 'tanach', 'nt'].forEach(function (g) { o += '<button class="chip' + (sc.g === g ? ' on' : '') + '" data-sg="' + g + '">' + T('g_' + g) + '</button>'; });
+  o += '</div></div><div class="row"><div class="fld" style="flex:2"><label>' + T('bookLbl') + '</label><select data-sb>';
+  var G = GROUPS[sc.g]; o += '<option value="-1">' + T('allBooks') + '</option>';
+  for (var i = G[1]; i < G[2]; i++) o += '<option value="' + i + '"' + (sc.b === i ? ' selected' : '') + '>' + esc(bookName(G[0], i)) + '</option>';
+  o += '</select></div>';
+  if (withCh && sc.b >= 0) {
+    var nch = BOOKS[G[0]][sc.b][2], c2 = sc.c2 || nch;
+    o += '<div class="fld"><label>' + T('chFrom') + '</label><select data-c1>'; for (i = 1; i <= nch; i++) o += '<option' + (i === sc.c1 ? ' selected' : '') + ' value="' + i + '">' + chv(i) + '</option>'; o += '</select></div>';
+    o += '<div class="fld"><label>' + T('chTo') + '</label><select data-c2>'; for (i = 1; i <= nch; i++) o += '<option' + (i === c2 ? ' selected' : '') + ' value="' + i + '">' + chv(i) + '</option>'; o += '</select></div>';
+  }
+  o += '</div>';
+  return o;
+}
+function renderScope(id) {
+  var el = $(id); if (!el) return; var sc = SCOPES[id]; el.innerHTML = scopeHTML(id, sc ? sc.withCh : el.getAttribute('data-ch') === '1');
+  sc = SCOPES[id];
+  el.querySelectorAll('[data-sg]').forEach(function (b) { b.onclick = function () { sc.g = b.getAttribute('data-sg'); sc.b = -1; sc.c1 = 1; sc.c2 = 0; renderScope(id); }; });
+  var sb = el.querySelector('[data-sb]'); sb.onchange = function () { sc.b = +sb.value; sc.c1 = 1; sc.c2 = 0; renderScope(id); };
+  var c1 = el.querySelector('[data-c1]'), c2 = el.querySelector('[data-c2]');
+  if (c1) c1.onchange = function () { sc.c1 = +c1.value; if (sc.c2 && sc.c2 < sc.c1) sc.c2 = sc.c1; renderScope(id); };
+  if (c2) c2.onchange = function () { sc.c2 = +c2.value; if (sc.c2 < sc.c1) sc.c1 = sc.c2; renderScope(id); };
+}
+function renderScopes() { renderScope('sScope'); renderScope('rScope'); renderScope('mScope'); }
+function scopeLabel(sc) {
+  var G = GROUPS[sc.g];
+  if (sc.b < 0) return T('g_' + sc.g);
+  var s = bookName(G[0], sc.b);
+  if (sc.withCh) { var nch = BOOKS[G[0]][sc.b][2], c2 = sc.c2 || nch; if (!(sc.c1 === 1 && c2 === nch)) s += ' ' + chv(sc.c1) + (c2 !== sc.c1 ? '–' + chv(c2) : ''); }
+  return s;
+}
+function scopeRange(C, sc) {
+  var G = GROUPS[sc.g];
+  if (sc.b < 0) return { from: C.books[G[1]].l0, to: C.books[G[2] - 1].l1 };
+  var B = C.books[sc.b];
+  if (!sc.withCh) return { from: B.l0, to: B.l1 };
+  var nch = B.chL.length, c1 = Math.max(1, sc.c1 || 1), c2 = Math.min(nch, sc.c2 || nch);
+  return { from: B.chL[c1 - 1], to: c2 < nch ? B.chL[c2] : B.l1 };
+}
+
+/* ---------- navigation & back button (AppNest mandatory pattern) ---------- */
+var curSc = 'home', navStack = [], MODALS = [], hist = { guard: false, ignore: 0 }, exitArm = 0;
+var SC_TITLE = { home: 'appName', search: 'mSearch', reader: 'mReader', matrix: 'mMatrix', saved: 'mSaved', sources: 'mSources', settings: 'mSettings', about: 'about' };
+function syncHistory() {
+  var need = !exitArm;
+  if (need && !hist.guard) { history.pushState({ g: 1 }, ''); hist.guard = true; }
+  else if (!need && hist.guard) { hist.guard = false; hist.ignore++; history.back(); }
+}
+function disarmExit() { if (exitArm) { clearTimeout(exitArm); exitArm = 0; } }
+function showSc(id, opt) {
+  disarmExit();
+  if (id !== curSc) {
+    if (!(opt && opt.back)) { if (id === 'home') navStack = []; else navStack.push(curSc); }
+    document.querySelectorAll('.sc').forEach(function (s) { s.classList.toggle('on', s.id === 'sc-' + id); });
+    curSc = id; window.scrollTo(0, 0);
+    if (ON_SHOW[id]) ON_SHOW[id](opt || {});
+  }
+  updHeader(); syncHistory();
+}
+function goBack() { var p = navStack.pop() || 'home'; showSc(p, { back: true }); }
+function updHeader() {
+  var home = curSc === 'home';
+  $('backBtn').style.display = home ? 'none' : '';
+  $('aiDotBtn').style.display = home ? '' : 'none';
+  $('themeBtn').style.display = home ? '' : 'none';
+  $('aboutBtn').style.display = home ? '' : 'none';
+  var prev = navStack.length ? navStack[navStack.length - 1] : 'home';
+  $('backBtn').textContent = (isRTL() ? '→ ' : '← ') + T(prev === 'home' ? 'home' : SC_TITLE[prev]);
+  $('hdrTitle').innerHTML = home ? esc(T('appName')) + ' <small>CodeNest</small>' : esc(T(SC_TITLE[curSc]));
+  var d = $('aiDot'); d.className = 'dot' + (S.ai.prov ? (S.ai.ok ? ' on' : ' off') : '');
+}
+window.addEventListener('popstate', function () {
+  if (hist.ignore > 0) { hist.ignore--; return; }
+  hist.guard = false;
+  if (MODALS.length) closeModal(MODALS[MODALS.length - 1]);
+  else if (guideOpen()) skipGuide();
+  else if (busyCancelable()) cancelBusy();
+  else if (curSc !== 'home') goBack();
+  else { toast(T('pressAgainExit'), 2000); exitArm = setTimeout(function () { exitArm = 0; syncHistory(); }, 2000); return; }
+  syncHistory();
+});
+document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && MODALS.length) closeModal(MODALS[MODALS.length - 1]); });
+
+/* ---------- modals (with phantom-click guard) ---------- */
+function openModal(title, html, onClose) {
+  disarmExit();
+  var bk = document.createElement('div'); bk.className = 'bk';
+  bk.innerHTML = '<div class="md" role="dialog"><h3><span>' + esc(title) + '</span><button class="ib x" data-x aria-label="close">✕</button></h3><div class="mb">' + html + '</div></div>';
+  var t0 = Date.now();
+  bk.addEventListener('click', function (e) { if (Date.now() - t0 < 450) { e.preventDefault(); e.stopPropagation(); } }, true);
+  bk.addEventListener('click', function (e) { if (e.target === bk || e.target.hasAttribute('data-x')) closeModal(bk); });
+  bk._onClose = onClose;
+  $('ovl').appendChild(bk); MODALS.push(bk); syncHistory();
+  return bk;
+}
+function closeModal(bk) {
+  var i = MODALS.indexOf(bk); if (i < 0) return; MODALS.splice(i, 1); bk.remove(); if (bk._onClose) bk._onClose();
+}
+function appConfirm(msg, okTxt, cb, danger) {
+  var m = openModal(T('confirmT'), '<p>' + esc(msg) + '</p><div class="row"><button class="btn" data-x>' + esc(T('cancel')) + '</button><button class="btn ' + (danger ? 'dng' : 'pri') + '" data-ok>' + esc(okTxt) + '</button></div>');
+  m.querySelector('[data-ok]').onclick = function () { closeModal(m); cb(); };
+}
+
+/* ---------- busy overlay ---------- */
+var busyCancelFn = null;
+function busy(txt, frac, sub, cancelFn) {
+  $('busy').classList.add('on'); $('busyTxt').textContent = txt; $('busyBar').style.width = Math.round((frac || 0) * 100) + '%';
+  $('busySub').textContent = sub || '';
+  if (cancelFn !== undefined) busyCancelFn = cancelFn;
+  $('busyCancel').style.display = busyCancelFn ? '' : 'none';
+}
+function busyOff() { $('busy').classList.remove('on'); busyCancelFn = null; }
+function busyCancelable() { return $('busy').classList.contains('on') && !!busyCancelFn; }
+function cancelBusy() { var f = busyCancelFn; busyOff(); if (f) f(); }
+
+/* ---------- worker (ELS engine) ---------- */
+function workerMain() {
+  function rng(seed) { var s = (seed >>> 0) || 1; return function () { s ^= s << 13; s >>>= 0; s ^= s >>> 17; s ^= s << 5; s >>>= 0; return s / 4294967296; }; }
+  function els(T, w, dmin, dmax, both, maxRes, rep, phase) {
+    var n = T.length, k = w.length, res = [], count = 0, d1 = 0, f = w[0], pos = [], i, d, j, p, ok;
+    for (i = 0; i < n; i++) if (T[i] === f) pos.push(i);
+    var P = Int32Array.from(pos), np = P.length, pal = true;
+    for (j = 0; j < k; j++) if (w[j] !== w[k - 1 - j]) { pal = false; break; }
+    var last = Date.now(), tot = dmax - dmin + 1;
+    for (d = dmin; d <= dmax; d++) {
+      var span = (k - 1) * d; if (span >= n) break;
+      for (i = 0; i < np; i++) {
+        p = P[i]; if (p + span >= n) break; ok = true;
+        for (j = 1; j < k; j++) if (T[p + j * d] !== w[j]) { ok = false; break; }
+        if (ok) { count++; if (d === 1) d1++; if (res.length < maxRes * 2) res.push(p, d); }
+      }
+      if (both && !pal) {
+        for (i = np - 1; i >= 0; i--) {
+          p = P[i]; if (p - span < 0) break; ok = true;
+          for (j = 1; j < k; j++) if (T[p - j * d] !== w[j]) { ok = false; break; }
+          if (ok) { count++; if (d === 1) d1++; if (res.length < maxRes * 2) res.push(p, -d); }
+        }
+      }
+      if (Date.now() - last > 150) { last = Date.now(); rep(phase, (d - dmin + 1) / tot); }
+    }
+    return { count: count, d1: d1, res: res };
+  }
+  function expected(T, w, dmin, dmax, both) {
+    var n = T.length, k = w.length, fr = new Float64Array(32), i, j, d, pal = true;
+    for (i = 0; i < n; i++) fr[T[i]]++;
+    var P = 1; for (j = 0; j < k; j++) P *= fr[w[j]] / n;
+    for (j = 0; j < k; j++) if (w[j] !== w[k - 1 - j]) { pal = false; break; }
+    var s = 0; for (d = Math.max(2, dmin); d <= dmax; d++) { var m = n - (k - 1) * d; if (m <= 0) break; s += m; }
+    return s * P * (both && !pal ? 2 : 1);
+  }
+  self.onmessage = function (e) {
+    var m = e.data, rep = function (ph, f) { self.postMessage({ id: m.id, type: 'prog', phase: ph, frac: f }); };
+    var T = m.T, r = els(T, m.w, m.dmin, m.dmax, m.both, m.maxRes, rep, 1), ctrl = null;
+    var exp = expected(T, m.w, m.dmin, m.dmax, m.both);
+    if (m.control) {
+      var R = rng(m.seed), S2 = new Uint8Array(T), i, j, t;
+      for (i = S2.length - 1; i > 0; i--) { j = Math.floor(R() * (i + 1)); t = S2[i]; S2[i] = S2[j]; S2[j] = t; }
+      var c = els(S2, m.w, Math.max(2, m.dmin), m.dmax, m.both, 0, rep, 2); ctrl = c.count;
+    }
+    self.postMessage({ id: m.id, type: 'done', count: r.count, d1: r.d1, res: r.res, ctrl: ctrl, exp: exp, n: T.length });
+  };
+}
+var WK = null, wkId = 0;
+function getWorker() {
+  if (WK) return WK;
+  var url = URL.createObjectURL(new Blob(['(' + workerMain.toString() + ')()'], { type: 'text/javascript' }));
+  WK = new Worker(url); return WK;
+}
+function killWorker() { if (WK) { WK.terminate(); WK = null; } }
+
+/* ---------- SEARCH screen ---------- */
+var LAST = null;
+function initSearch() {
+  $('sMax').value = S.maxSkip;
+  $('sGo').onclick = runSearch;
+  $('sWord').addEventListener('keydown', function (e) { if (e.key === 'Enter') runSearch(); });
+}
+function quickChips() {
+  var q = ['תורה', 'ישראל', 'משיח', 'שלום', 'אמת'];
+  if (S.name && cleanWord(S.name).length >= 2) q.unshift(cleanWord(S.name));
+  $('sQuick').innerHTML = q.map(function (w) { return '<button class="chip heb" data-q="' + esc(w) + '">' + esc(w) + '</button>'; }).join('');
+  $('sQuick').querySelectorAll('[data-q]').forEach(function (b) { b.onclick = function () { $('sWord').value = b.getAttribute('data-q'); }; });
+}
+function runSearch(opts) {
+  opts = opts || {};
+  var word = cleanWord($('sWord').value);
+  if (word.length < 2) { toast(T('wordShort')); return; }
+  if (word.length > 14) { toast(T('wordLong')); return; }
+  var sc = SCOPES.sScope, src = GROUPS[sc.g][0];
+  var dmin = Math.max(1, parseInt($('sMin').value, 10) || 1), dmax = Math.max(dmin, parseInt($('sMax').value, 10) || 1);
+  var both = $('sBoth').checked, ctrl = $('sCtrl').checked;
+  loadCorp(src).then(function (C) {
+    var R = scopeRange(C, sc), A = S.finals ? C.disp : C.norm, Tt = A.slice(R.from, R.to), w = wordCodes(word, S.finals);
+    var lim = Math.floor((Tt.length - 1) / (w.length - 1)); if (dmax > lim) dmax = lim;
+    if (dmin > dmax) { toast(T('rangeBad')); return; }
+    var id = ++wkId, W = getWorker(), t0 = Date.now();
+    busy(T('searching', { w: word }), 0, scopeLabel(sc), function () { killWorker(); toast(T('stopped')); });
+    W.onmessage = function (e) {
+      var m = e.data; if (m.id !== id) return;
+      if (m.type === 'prog') { busy(m.phase === 1 ? T('searching', { w: word }) : T('ctrlRunning'), m.frac, m.phase === 1 ? scopeLabel(sc) : T('ctrlSub')); return; }
+      busyOff();
+      var res = []; for (var i = 0; i < m.res.length; i += 2) res.push({ s: m.res[i] + R.from, d: m.res[i + 1] });
+      res.sort(function (a, b) { return Math.abs(a.d) - Math.abs(b.d) || a.s - b.s; });
+      LAST = { word: word, w: w, src: src, sc: JSON.parse(JSON.stringify(sc)), scLbl: scopeLabel(sc), dmin: dmin, dmax: dmax, both: both, count: m.count, d1: m.d1, ctrl: m.ctrl, exp: m.exp, res: res, ms: Date.now() - t0, shown: 50 };
+      renderSearch();
+    };
+    W.onerror = function () { busyOff(); toast(T('errGeneric')); killWorker(); };
+    W.postMessage({ id: id, T: Tt, w: w, dmin: dmin, dmax: dmax, both: both, maxRes: 500, control: ctrl, seed: 12345 + word.length * 7 });
+  });
+}
+function verdict(L) {
+  var real = L.count - (L.dmin <= 1 ? L.d1 : 0), e = L.exp;
+  if (L.count === 0) return T('vNone');
+  var o = '';
+  if (L.ctrl != null) {
+    var r = real / Math.max(1, L.ctrl);
+    if (real === 0) o = T('vOnlyPlain');
+    else if (r >= 0.67 && r <= 1.5) o = T('vSame');
+    else if (r > 1.5) o = T('vMore');
+    else o = T('vLess');
+  } else {
+    var r2 = real / Math.max(0.5, e);
+    o = (r2 >= 0.67 && r2 <= 1.5) ? T('vSameE') : (r2 > 1.5 ? T('vMore') : T('vLess'));
+  }
+  return o;
+}
+function renderSearch() {
+  var L = LAST; if (!L) return;
+  var C = CORP[L.src];
+  var o = '<div class="card"><h3 class="heb" style="font-size:22px">' + esc(L.word) + ' <span class="mut" style="font-size:14px">· ' + esc(L.scLbl) + ' · ' + T('skipsRange', { a: L.dmin, b: L.dmax }) + '</span></h3>';
+  o += '<div class="stat"><div><b>' + fmtN(L.count) + '</b><span>' + T('stReal') + '</span></div>';
+  o += '<div><b>' + (L.ctrl == null ? '—' : fmtN(L.ctrl)) + '</b><span>' + T('stShuf') + '</span></div>';
+  o += '<div><b>' + fmtN(Math.round(L.exp * 10) / 10) + '</b><span>' + T('stExp') + '</span></div></div>';
+  if (L.dmin <= 1 && L.d1) o += '<div class="mut">' + T('plainNote', { n: fmtN(L.d1) }) + '</div>';
+  o += '<div class="verdict" style="margin-top:8px">' + esc(verdict(L)) + ' <a href="#" id="whyCtrl" style="color:var(--acc)">' + T('whyCtrl') + '</a></div>';
+  o += '</div>';
+  if (L.res.length) {
+    o += '<div class="card" style="padding:4px 8px"><div class="mut" style="padding:8px 6px">' + T('resShown', { n: fmtN(Math.min(L.shown, L.res.length)), t: fmtN(L.count) }) + '</div>';
+    for (var i = 0; i < Math.min(L.shown, L.res.length); i++) {
+      var r = L.res[i], end = r.s + (L.w.length - 1) * r.d;
+      o += '<div class="res" data-i="' + i + '"><div class="sk" dir="ltr">' + (r.d > 0 ? '' : '−') + fmtN(Math.abs(r.d)) + '</div><div class="rf">' + esc(refOf(C, r.s)) + '<small>' + T('until') + ' ' + esc(refOf(C, end)) + '</small></div><button class="btn sm" data-mx="' + i + '">▦</button></div>';
+    }
+    if (L.shown < L.res.length) o += '<div style="padding:8px"><button class="btn wide" id="moreRes">' + T('showMore') + '</button></div>';
+    o += '</div>';
+  }
+  $('sOut').innerHTML = o;
+  $('whyCtrl').onclick = function (e) { e.preventDefault(); openModal(T('whyCtrlT'), '<p>' + esc(T('whyCtrlD')) + '</p>'); };
+  $('sOut').querySelectorAll('.res').forEach(function (el) { el.onclick = function (e) { if (e.target.closest('[data-mx]')) return; openResult(+el.getAttribute('data-i')); }; });
+  $('sOut').querySelectorAll('[data-mx]').forEach(function (b) { b.onclick = function () { var r = L.res[+b.getAttribute('data-mx')]; matrixFromResult(L, r); }; });
+  var mb = $('moreRes'); if (mb) mb.onclick = function () { L.shown += 50; renderSearch(); };
+}
+function hitsOf(L, r) { var h = {}; for (var j = 0; j < L.w.length; j++) h[r.s + j * r.d] = 1; return h; }
+function openResult(i) {
+  var L = LAST, r = L.res[i], C = CORP[L.src], hits = hitsOf(L, r), seen = {}, o = '';
+  o += '<div class="mut">' + T('skipIs') + ' <b style="color:var(--acc)">' + r.d + '</b> · ' + esc(L.scLbl) + '</div>';
+  for (var j = 0; j < L.w.length; j++) {
+    var idx = r.s + j * r.d, v = verseOf(C, idx); if (seen[v]) continue; seen[v] = 1;
+    o += '<div style="margin-top:8px"><span class="tag">' + esc(refOf(C, idx)) + '</span></div><div class="verse heb">' + verseHTML(C, v, hits) + '</div>';
+  }
+  o += '<div class="row"><button class="btn" data-a="mx">▦ ' + T('mMatrix') + '</button><button class="btn" data-a="sv">★ ' + T('save') + '</button><button class="btn" data-a="ai">🤖 ' + T('aiExplain') + '</button></div>';
+  var m = openModal(L.word + ' · ' + refOf(C, r.s), o);
+  m.querySelector('[data-a=mx]').onclick = function () { closeModal(m); matrixFromResult(L, r); };
+  m.querySelector('[data-a=sv]').onclick = function () { saveFinding(elsFinding(L, r)); };
+  m.querySelector('[data-a=ai]').onclick = function () { aiOpen(promptELS(L, r)); };
+}
+function elsFinding(L, r) {
+  return { id: Date.now(), type: 'els', word: L.word, src: L.src, s: r.s, d: r.d, k: L.w.length, scLbl: L.scLbl, count: L.count, ctrl: L.ctrl, exp: L.exp, dmin: L.dmin, dmax: L.dmax, note: '', date: new Date().toISOString() };
+}
+
+/* ---------- READER (every N-th letter) ---------- */
+var DICT = null;
+function getDict() {
+  if (DICT) return Promise.resolve(DICT);
+  return loadCorp('tanach').then(function (C) {
+    var set = new Set(), fin = /[ךםןףץ]/g, mp = { 'ך': 'כ', 'ם': 'מ', 'ן': 'נ', 'ף': 'פ', 'ץ': 'צ' };
+    C.verses.forEach(function (t) { t.split(' ').forEach(function (w) { if (w.length >= 3 && w.length <= 9) set.add(w.replace(fin, function (c) { return mp[c]; })); }); });
+    DICT = set; return set;
+  });
+}
+function normStr(C, idxs) { var s = ''; for (var i = 0; i < idxs.length; i++) s += AB[C.norm[idxs[i]]]; return s; }
+function findWords(str, dict) {
+  var marks = new Uint8Array(str.length), found = {}, i, L;
+  for (i = 0; i < str.length; i++) {
+    for (L = Math.min(9, str.length - i); L >= 3; L--) {
+      var sub = str.substr(i, L);
+      if (dict.has(sub)) { (found[sub] = found[sub] || []).push(i); for (var j = i; j < i + L; j++) marks[j] = Math.max(marks[j], 1); break; }
+    }
+  }
+  return { found: found, marks: marks };
+}
+var RLAST = null;
+function initReader() { $('rGo').onclick = runReader; }
+function runReader() {
+  var sc = SCOPES.rScope, src = GROUPS[sc.g][0];
+  var N = Math.max(1, parseInt($('rN').value, 10) || 1), st = Math.max(1, parseInt($('rStart').value, 10) || 1), mx = Math.min(50000, Math.max(10, parseInt($('rMax').value, 10) || 2000)), back = $('rBack').checked;
+  Promise.all([loadCorp(src), getDict()]).then(function (a) {
+    var C = a[0], R = scopeRange(C, sc), idxs = [];
+    if (!back) { for (var p = R.from + st - 1; p < R.to && idxs.length < mx; p += N) idxs.push(p); }
+    else { for (p = R.to - st; p >= R.from && idxs.length < mx; p -= N) idxs.push(p); }
+    readerShow({ src: src, idxs: idxs, N: back ? -N : N, label: scopeLabel(sc), st: st });
+  });
+}
+function readerFrom(src, start, d, count, label) {
+  loadCorp(src).then(function (C) { return getDict().then(function () { return C; }); }).then(function (C) {
+    var idxs = []; for (var p = start; p >= 0 && p < C.n && idxs.length < count; p += d) idxs.push(p);
+    showSc('reader'); readerShow({ src: src, idxs: idxs, N: d, label: label || refOf(C, start), st: 1 });
+  });
+}
+function readerShow(o) {
+  var C = CORP[o.src], str = normStr(C, o.idxs), fw = findWords(str, DICT);
+  RLAST = { src: o.src, idxs: o.idxs, N: o.N, label: o.label, str: str, fw: fw };
+  var words = Object.keys(fw.found).sort(function (a, b) { return b.length - a.length || fw.found[b].length - fw.found[a].length; });
+  var dispMax = Math.min(str.length, 4000), h = '';
+  for (var i = 0; i < dispMax; i++) {
+    var ch = AB[C.disp[o.idxs[i]]];
+    h += fw.marks[i] ? '<mark data-p="' + i + '">' + ch + '</mark>' : ch;
+  }
+  var out = '<div class="card"><h3>' + T('readerRes', { n: o.N, l: esc(o.label) }) + '</h3><div class="mut">' + T('lettersN', { n: fmtN(str.length) }) + (str.length > dispMax ? ' · ' + T('dispCut', { n: fmtN(dispMax) }) : '') + '</div>';
+  out += '<div class="seq heb" id="rSeq">' + h + '</div>';
+  out += '<div class="mut" style="margin-top:6px">' + T('tapMark') + '</div>';
+  out += '<h3 style="margin-top:12px">' + T('wordsFound', { n: fmtN(words.length) }) + '</h3><div class="wl heb">';
+  words.slice(0, 120).forEach(function (w) { out += '<button class="chip" data-w="' + w + '">' + w + ' <b>' + fw.found[w].length + '</b></button>'; });
+  out += '</div><div class="mut" style="margin-top:8px">' + T('dictNote') + '</div>';
+  out += '<div class="row" style="margin-top:10px"><button class="btn" id="rSave">★ ' + T('save') + '</button><button class="btn" id="rAi">🤖 ' + T('aiExplain') + '</button><button class="btn" id="rCopy">' + T('copy') + '</button></div></div>';
+  $('rOut').innerHTML = out;
+  $('rSeq').onclick = function (e) { var m = e.target.closest('mark'); if (!m) return; seqWordAt(+m.getAttribute('data-p')); };
+  $('rOut').querySelectorAll('[data-w]').forEach(function (b) { b.onclick = function () { var w = b.getAttribute('data-w'); seqWordShow(w, RLAST.fw.found[w][0]); }; });
+  $('rSave').onclick = function () { saveFinding({ id: Date.now(), type: 'reader', src: o.src, label: o.label, N: o.N, start: o.idxs[0], len: o.idxs.length, words: words.slice(0, 30), note: '', date: new Date().toISOString() }); };
+  $('rAi').onclick = function () { aiOpen(promptReader(RLAST, words)); };
+  $('rCopy').onclick = function () { copyText(str); };
+  $('rOut').scrollIntoView({ behavior: 'smooth' });
+}
+function seqWordAt(p) {
+  var R = RLAST, best = null;
+  Object.keys(R.fw.found).forEach(function (w) { R.fw.found[w].forEach(function (i) { if (p >= i && p < i + w.length && (!best || w.length > best.w.length)) best = { w: w, i: i }; }); });
+  if (best) seqWordShow(best.w, best.i);
+}
+function seqWordShow(w, i) {
+  var R = RLAST, C = CORP[R.src], hits = {}, seen = {}, o = '';
+  for (var j = 0; j < w.length; j++) hits[R.idxs[i + j]] = 1;
+  o += '<div class="mut">' + T('wordFromLetters', { n: w.length }) + '</div>';
+  for (j = 0; j < w.length; j++) { var idx = R.idxs[i + j], v = verseOf(C, idx); if (seen[v]) continue; seen[v] = 1; o += '<div style="margin-top:8px"><span class="tag">' + esc(refOf(C, idx)) + '</span></div><div class="verse heb">' + verseHTML(C, v, hits) + '</div>'; }
+  o += '<div class="row"><button class="btn" data-a="mx">▦ ' + T('mMatrix') + '</button></div>';
+  var m = openModal(w, o);
+  m.querySelector('[data-a=mx]').onclick = function () { closeModal(m); var cells = []; for (var j = 0; j < w.length; j++) cells.push(R.idxs[i + j]); matrixOpen({ src: R.src, W: Math.abs(R.N), center: cells[Math.floor(cells.length / 2)], primary: cells, title: w }); };
+}
+
+/* ---------- MATRIX ---------- */
+var MX = null, MAXC = 15, mxOpening = false;
+var HL = ['h2', 'h3', 'h4', 'h5'];
+function initMatrix() {
+  $('mGo').onclick = function () {
+    var sc = SCOPES.mScope, src = GROUPS[sc.g][0];
+    var W = Math.max(2, Math.min(400, parseInt($('mW').value, 10) || 22)), Rn = Math.max(5, Math.min(80, parseInt($('mR').value, 10) || 24));
+    loadCorp(src).then(function (C) { var R = scopeRange(C, sc); matrixOpen({ src: src, W: W, rows: Rn, top: R.from, origin: R.from, primary: [], title: scopeLabel(sc), free: true }); });
+  };
+}
+function matrixFromResult(L, r) {
+  var cells = []; for (var j = 0; j < L.w.length; j++) cells.push(r.s + j * r.d);
+  matrixOpen({ src: L.src, W: Math.abs(r.d), center: cells[Math.floor(cells.length / 2)], primary: cells, title: L.word, fromEls: { L: L, r: r } });
+}
+function matrixOpen(o) {
+  loadCorp(o.src).then(function (C) {
+    MX = { src: o.src, W: o.W, rows: o.rows || Math.max(15, Math.min(41, (o.primary.length || 0) + 14)), primary: o.primary || [], extras: [], title: o.title, free: !!o.free, fromEls: o.fromEls, origin: o.origin != null ? o.origin : 0 };
+    if (o.free) { MX.base = o.top; MX.C = Math.min(MX.W, 60); }
+    else centerMx(o.center);
+    if (curSc !== 'matrix') { mxOpening = true; showSc('matrix'); mxOpening = false; }
+    renderMatrix();
+  });
+}
+function centerMx(center) {
+  var W = MX.W, cMid;
+  if (W <= 40) { MX.C = W; cMid = ((center - MX.origin) % W + W) % W; }
+  else { MX.C = MAXC; cMid = (MAXC - 1) >> 1; }
+  MX.base = center - ((MX.rows >> 1) * W) - cMid;
+}
+function mxCell(r, c) { return MX.base + r * MX.W + c; }
+function renderMatrix() {
+  var C = CORP[MX.src], o = '', prim = {}, ex = {};
+  MX.primary.forEach(function (i) { prim[i] = 1; });
+  MX.extras.forEach(function (e, k) { e.cells.forEach(function (i) { if (!ex[i]) ex[i] = HL[k % 4]; }); });
+  o += '<div class="card"><h3 class="heb">' + esc(MX.title) + '</h3>';
+  o += '<div class="fld"><label>' + T('rowWidth') + '</label><div class="stepper"><button class="btn" id="mxWm">−</button><input type="number" id="mxW" value="' + MX.W + '" inputmode="numeric"><button class="btn" id="mxWp">+</button></div></div>';
+  o += '<div class="navpad"><button class="btn sm" id="mxUp">▲</button><button class="btn sm" id="mxDn">▼</button>' + (MX.W > MX.C ? '<button class="btn sm" id="mxL">' + (isRTL() ? '▶' : '◀') + '</button><button class="btn sm" id="mxR">' + (isRTL() ? '◀' : '▶') + '</button>' : '') + '</div>';
+  o += '<div class="mxwrap" id="mxWrap"><div class="mx heb" id="mxGrid" style="grid-template-columns:repeat(' + MX.C + ',var(--cs,26px));direction:rtl">';
+  for (var r = 0; r < MX.rows; r++) for (var c = 0; c < MX.C; c++) {
+    var idx = mxCell(r, c);
+    if (idx < 0 || idx >= C.n) { o += '<div class="e"></div>'; continue; }
+    var cls = prim[idx] ? 'h1' : (ex[idx] || '');
+    o += '<div data-i="' + idx + '"' + (cls ? ' class="' + cls + '"' : '') + '>' + AB[C.disp[idx]] + '</div>';
+  }
+  o += '</div></div>';
+  o += '<div class="lg">' + (MX.primary.length ? '<span><i style="background:var(--hl1)"></i>' + esc(MX.title) + '</span>' : '');
+  MX.extras.forEach(function (e, k) { o += '<span><i style="background:var(--' + ['hl2', 'hl3', 'hl4', 'hl5'][k % 4] + ')"></i>' + esc(e.word) + ' (' + e.n + ')</span>'; });
+  o += '</div>';
+  o += '<div class="mut">' + T('mxRange', { a: esc(refOf(C, Math.max(0, mxCell(0, 0)))), b: esc(refOf(C, Math.min(C.n - 1, mxCell(MX.rows - 1, MX.C - 1)))) }) + '</div>';
+  o += '<div class="fld" style="margin-top:10px"><label>' + T('mxExtra') + '</label><div class="row"><input type="text" id="mxEx" class="heb" dir="rtl" style="flex:3" placeholder="' + esc(T('mxExtraPh')) + '"><button class="btn sm" id="mxExGo" style="flex:1">' + T('find') + '</button></div></div>';
+  o += '<div class="mut">' + T('mxTap') + '</div>';
+  o += '<div class="row" style="margin-top:10px"><button class="btn" id="mxSave">★ ' + T('save') + '</button><button class="btn" id="mxAi">🤖 ' + T('aiExplain') + '</button>' + (MX.extras.length ? '<button class="btn" id="mxClr">' + T('clear') + '</button>' : '') + '</div></div>';
+  $('mOut').innerHTML = o;
+  $('mSetup').style.display = MX.free ? '' : 'none';
+  var wrap = $('mxWrap'), avail = wrap.clientWidth - 14, cs = Math.max(18, Math.min(30, Math.floor(avail / MX.C) - 1));
+  $('mxGrid').style.setProperty('--cs', cs + 'px');
+  var pc = $('mxGrid').querySelectorAll('.h1'), mid = pc[pc.length >> 1];
+  if (mid && wrap.scrollWidth > wrap.clientWidth) { var wr = wrap.getBoundingClientRect(), cr = mid.getBoundingClientRect(); wrap.scrollLeft += (cr.left + cr.width / 2) - (wr.left + wr.width / 2); }
+  $('mxGrid').onclick = function (e) { var d = e.target.closest('[data-i]'); if (d) mxTapCell(+d.getAttribute('data-i')); };
+  var setW = function (w) { w = Math.max(2, Math.min(5000, w | 0)); var cen = mxCell(MX.rows >> 1, (MX.C - 1) >> 1); MX.W = w; if (MX.free) { MX.C = Math.min(w, 60); } else centerMx(MX.primary.length ? MX.primary[Math.floor(MX.primary.length / 2)] : cen); recompExtras(); renderMatrix(); };
+  $('mxWm').onclick = function () { setW(MX.W - 1); }; $('mxWp').onclick = function () { setW(MX.W + 1); };
+  $('mxW').onchange = function () { setW(+$('mxW').value); };
+  $('mxUp').onclick = function () { MX.base -= MX.W * 5; recompExtras(); renderMatrix(); };
+  $('mxDn').onclick = function () { MX.base += MX.W * 5; recompExtras(); renderMatrix(); };
+  if ($('mxL')) { $('mxL').onclick = function () { MX.base -= 5; recompExtras(); renderMatrix(); }; $('mxR').onclick = function () { MX.base += 5; recompExtras(); renderMatrix(); }; }
+  $('mxExGo').onclick = function () { var w = cleanWord($('mxEx').value); if (w.length < 2) { toast(T('wordShort')); return; } addExtra(w); };
+  $('mxEx').addEventListener('keydown', function (e) { if (e.key === 'Enter') $('mxExGo').click(); });
+  $('mxSave').onclick = function () { saveFinding({ id: Date.now(), type: 'matrix', src: MX.src, title: MX.title, W: MX.W, base: MX.base, rows: MX.rows, C: MX.C, primary: MX.primary, extras: MX.extras.map(function (e) { return e.word; }), free: MX.free, note: '', date: new Date().toISOString() }); };
+  $('mxAi').onclick = function () { aiOpen(promptMatrix()); };
+  if ($('mxClr')) $('mxClr').onclick = function () { MX.extras = []; renderMatrix(); };
+}
+function addExtra(w) {
+  if (MX.extras.some(function (e) { return e.word === w; })) return;
+  var e = { word: w, cells: [], n: 0 }; MX.extras.push(e); recompExtras();
+  if (!e.n) toast(T('mxNotFound', { w: w }), 3000); else toast(T('mxFound', { w: w, n: e.n }));
+  renderMatrix();
+}
+function recompExtras() {
+  if (!MX.extras.length) return;
+  var C = CORP[MX.src], R = MX.rows, Cc = MX.C, A = S.finals ? C.disp : C.norm, G = [];
+  for (var r = 0; r < R; r++) { G.push([]); for (var c = 0; c < Cc; c++) { var i = mxCell(r, c); G[r].push(i >= 0 && i < C.n ? A[i] : 255); } }
+  var DIRS = [[0, 1], [0, -1], [1, 0], [-1, 0], [1, 1], [1, -1], [-1, 1], [-1, -1]];
+  MX.extras.forEach(function (e) {
+    var w = wordCodes(e.word, S.finals), k = w.length; e.cells = []; e.n = 0;
+    for (var r = 0; r < R; r++) for (var c = 0; c < Cc; c++) {
+      if (G[r][c] !== w[0]) continue;
+      DIRS.forEach(function (D) {
+        var er = r + D[0] * (k - 1), ec = c + D[1] * (k - 1); if (er < 0 || er >= R || ec < 0 || ec >= Cc) return;
+        for (var j = 1; j < k; j++) if (G[r + D[0] * j][c + D[1] * j] !== w[j]) return;
+        e.n++; for (j = 0; j < k; j++) e.cells.push(mxCell(r + D[0] * j, c + D[1] * j));
+      });
+    }
+  });
+}
+function mxTapCell(idx) {
+  var C = CORP[MX.src], v = verseOf(C, idx), h = {}; h[idx] = 1;
+  var o = '<div class="mut">' + T('letterIs') + ' <b class="heb" style="font-size:22px;color:var(--acc)">' + letterAt(C, idx) + '</b> · ' + T('posN', { n: fmtN(idx + 1) }) + '</div>';
+  o += '<div style="margin-top:8px"><span class="tag">' + esc(refOf(C, idx)) + '</span></div><div class="verse heb">' + verseHTML(C, v, h) + '</div>';
+  o += '<div class="row"><button class="btn" data-a="down">↓ ' + T('readDown') + '</button><button class="btn" data-a="up">↑ ' + T('readUp') + '</button></div>';
+  var m = openModal(refOf(C, idx), o);
+  m.querySelector('[data-a=down]').onclick = function () { closeModal(m); readerFrom(MX.src, idx, MX.W, 300, T('colFrom', { r: refOf(C, idx) })); };
+  m.querySelector('[data-a=up]').onclick = function () { closeModal(m); readerFrom(MX.src, idx, -MX.W, 300, T('colFrom', { r: refOf(C, idx) })); };
+}
+
+/* ---------- SAVED ---------- */
+function updSavedCount() { var el = $('savedCount'); if (el) el.textContent = SAVED.length ? T('savedN', { n: fmtN(SAVED.length) }) : T('mSavedD'); }
+function saveFinding(f) { SAVED.unshift(f); saveSaved(); toast(T('savedOk')); }
+function fTitle(f) {
+  if (f.type === 'els') return f.word + ' · ' + T('skipIs') + ' \u2066' + f.d + '\u2069';
+  if (f.type === 'reader') return T('everyNshort', { n: Math.abs(f.N) }) + ' · ' + f.label;
+  return '▦ ' + f.title + ' · ' + T('rowWidth') + ' ' + f.W;
+}
+function fSub(f) {
+  var C = CORP[f.src], d = new Date(f.date).toLocaleDateString(S.lang);
+  if (f.type === 'els') return (C ? refOf(C, f.s) + ' · ' : '') + f.scLbl + ' · ' + d;
+  if (f.type === 'reader') return (f.words || []).slice(0, 6).join(' · ') + ' · ' + d;
+  return (f.extras || []).join(' · ') + ' · ' + d;
+}
+function renderSaved() {
+  var need = {}; SAVED.forEach(function (f) { if (!CORP[f.src]) need[f.src] = 1; });
+  var srcs = Object.keys(need);
+  if (srcs.length) { Promise.all(srcs.map(loadCorp)).then(renderSaved).catch(function () { }); }
+  if (!SAVED.length) { $('savedList').innerHTML = '<div class="empty">★<br>' + esc(T('noSaved')) + '</div>'; return; }
+  var o = '<div class="card" style="padding:4px 8px">';
+  SAVED.forEach(function (f, i) {
+    o += '<div class="res" data-i="' + i + '"><div class="rf"><b class="heb">' + esc(fTitle(f)) + '</b><small>' + esc(fSub(f)) + '</small>' + (f.note ? '<small>📝 ' + esc(f.note) + '</small>' : '') + '</div><button class="btn sm" data-e="' + i + '">✏️</button></div>';
+  });
+  $('savedList').innerHTML = o + '</div>';
+  $('savedList').querySelectorAll('.res').forEach(function (el) {
+    var i = +el.getAttribute('data-i'), lp = 0;
+    el.addEventListener('pointerdown', function () { lp = setTimeout(function () { lp = -1; editSaved(i); }, 600); });
+    el.addEventListener('pointerup', function () { if (lp > 0) clearTimeout(lp); });
+    el.addEventListener('pointerleave', function () { if (lp > 0) clearTimeout(lp); });
+    el.onclick = function (e) { if (lp === -1) { lp = 0; return; } if (e.target.closest('[data-e]')) { editSaved(i); return; } openSaved(i); };
+  });
+}
+function openSaved(i) {
+  var f = SAVED[i];
+  loadCorp(f.src).then(function (C) {
+    if (f.type === 'els') {
+      var w = wordCodes(f.word, S.finals), cells = []; for (var j = 0; j < f.k; j++) cells.push(f.s + j * f.d);
+      matrixOpen({ src: f.src, W: Math.abs(f.d), center: cells[Math.floor(cells.length / 2)], primary: cells, title: f.word });
+    } else if (f.type === 'reader') readerFrom(f.src, f.start, f.N, f.len, f.label);
+    else {
+      MX = { src: f.src, W: f.W, rows: f.rows, C: f.C, base: f.base, primary: f.primary || [], extras: [], title: f.title, free: !!f.free, origin: 0 };
+      (f.extras || []).forEach(function (w) { MX.extras.push({ word: w, cells: [], n: 0 }); }); recompExtras();
+      mxOpening = true; showSc('matrix'); mxOpening = false; renderMatrix();
+    }
+  });
+}
+function editSaved(i) {
+  var f = SAVED[i];
+  var m = openModal(T('editT'), '<div class="fld"><label>' + T('note') + '</label><textarea id="edNote" rows="4">' + esc(f.note || '') + '</textarea></div><div class="row"><button class="btn pri" data-s>' + T('saveBtn') + '</button><button class="btn" data-ai>🤖 ' + T('aiExplain') + '</button><button class="btn dng" data-d>' + T('delete') + '</button></div>');
+  m.querySelector('[data-s]').onclick = function () { f.note = m.querySelector('#edNote').value.slice(0, 2000); saveSaved(); closeModal(m); renderSaved(); };
+  m.querySelector('[data-ai]').onclick = function () { closeModal(m); loadCorp(f.src).then(function () { aiOpen(promptSaved(f)); }); };
+  m.querySelector('[data-d]').onclick = function () { appConfirm(T('delConfirm'), T('delete'), function () { SAVED.splice(i, 1); saveSaved(); closeModal(m); renderSaved(); }, true); };
+}
+function savedText() {
+  var o = T('appName') + ' — ' + T('mSaved') + (S.name ? ' · ' + S.name : '') + ' · ' + new Date().toLocaleDateString(S.lang) + '\n\n';
+  SAVED.forEach(function (f) { o += '• ' + fTitle(f) + '\n  ' + fSub(f) + (f.note ? '\n  📝 ' + f.note : '') + '\n'; });
+  return o + '\n' + T('summaryN', { n: SAVED.length });
+}
+function exportCSV() {
+  if (!SAVED.length) { toast(T('noSaved')); return; }
+  var rows = [[T('csvType'), T('csvTitle'), T('csvDetail'), T('note'), T('csvDate')]];
+  SAVED.forEach(function (f) { rows.push([f.type, fTitle(f), fSub(f), f.note || '', f.date]); });
+  rows.push([T('userName'), S.name || '', T('summaryN', { n: SAVED.length }), '', new Date().toISOString()]);
+  var csv = '﻿' + rows.map(function (r) { return r.map(function (c) { return '"' + String(c).replace(/"/g, '""') + '"'; }).join(','); }).join('\r\n');
+  download('codenest-findings.csv', csv, 'text/csv');
+}
+function exportPDF() {
+  if (!SAVED.length) { toast(T('noSaved')); return; }
+  var o = '<h1>' + esc(T('appName')) + ' — ' + esc(T('mSaved')) + '</h1><p>' + esc(S.name || '') + ' · ' + new Date().toLocaleDateString(S.lang) + ' · ' + esc(T('summaryN', { n: SAVED.length })) + '</p>';
+  SAVED.forEach(function (f) { o += '<div class="it"><b>' + esc(fTitle(f)) + '</b><br>' + esc(fSub(f)) + (f.note ? '<br>📝 ' + esc(f.note) : '') + '</div>'; });
+  o += '<p style="font-size:11px">' + esc(T('disclaimer')) + '</p>';
+  $('print').innerHTML = o; $('print').dir = isRTL() ? 'rtl' : 'ltr'; window.print();
+}
+function download(name, data, type) {
+  var a = document.createElement('a'), url = URL.createObjectURL(new Blob([data], { type: type }));
+  a.href = url; a.download = name; document.body.appendChild(a); a.click(); a.remove(); setTimeout(function () { URL.revokeObjectURL(url); }, 4000);
+}
+function copyText(t) {
+  if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(t).then(function () { toast(T('copied')); }, function () { fallbackCopy(t); });
+  else fallbackCopy(t);
+}
+function fallbackCopy(t) { var ta = document.createElement('textarea'); ta.value = t; document.body.appendChild(ta); ta.select(); try { document.execCommand('copy'); toast(T('copied')); } catch (e) { } ta.remove(); }
+function shareText(title, text) {
+  if (navigator.share) navigator.share({ title: title, text: text }).catch(function () { });
+  else copyText(text);
+}
+
+/* ---------- AI (Free/Pro · BYOK) ---------- */
+var AIP = {
+  gemini: { name: 'Gemini', tag: 'FREE', key: true, models: ['gemini-2.5-flash', 'gemini-flash-latest', 'gemini-2.5-flash-lite'], help: 'aiHelpGemini' },
+  claude: { name: 'Claude', tag: 'API', key: true, models: ['claude-haiku-5-5', 'claude-sonnet-5-5', 'claude-haiku-4-5'], help: 'aiHelpClaude' },
+  openai: { name: 'ChatGPT', tag: 'API', key: true, models: ['gpt-4o-mini', 'gpt-4.1-mini', 'gpt-4o'], help: 'aiHelpOpenai' },
+  ollama: { name: 'Ollama / LM Studio', tag: 'LOCAL', key: false, url: 'http://localhost:11434/v1', models: ['llama3.2'], help: 'aiHelpOllama' },
+  custom: { name: 'Custom', tag: 'API', key: true, url: '', models: [], help: 'aiHelpCustom' }
+};
+function aiReady() { var p = AIP[S.ai.prov]; return !!(p && (!p.key || S.ai.key) && (S.ai.prov !== 'custom' || S.ai.url)); }
+function aiBase() { return (S.ai.url || (AIP[S.ai.prov] || {}).url || '').replace(/\/+$/, ''); }
+function aiModels() { var p = AIP[S.ai.prov]; var l = (p ? p.models : []).slice(); if (S.ai.model) { l = l.filter(function (m) { return m !== S.ai.model; }); l.unshift(S.ai.model); } return l; }
+function aiCall(prompt) {
+  var prov = S.ai.prov, models = aiModels();
+  function tryM(i) {
+    var model = models[i]; if (!model) return Promise.reject(new Error(T('aiNoModel')));
+    return aiOnce(prov, model, prompt).catch(function (e) { if (e.status === 404 && i + 1 < models.length) return tryM(i + 1); throw e; });
+  }
+  return tryM(0);
+}
+function aiOnce(prov, model, prompt) {
+  var req;
+  if (prov === 'gemini') req = fetch('https://generativelanguage.googleapis.com/v1beta/models/' + encodeURIComponent(model) + ':generateContent?key=' + encodeURIComponent(S.ai.key), { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] }) });
+  else if (prov === 'claude') req = fetch('https://api.anthropic.com/v1/messages', { method: 'POST', headers: { 'Content-Type': 'application/json', 'x-api-key': S.ai.key, 'anthropic-version': '2023-06-01', 'anthropic-dangerous-direct-browser-access': 'true' }, body: JSON.stringify({ model: model, max_tokens: 1500, messages: [{ role: 'user', content: prompt }] }) });
+  else { var h = { 'Content-Type': 'application/json' }; if (S.ai.key) h.Authorization = 'Bearer ' + S.ai.key; req = fetch((prov === 'openai' ? 'https://api.openai.com/v1' : aiBase()) + '/chat/completions', { method: 'POST', headers: h, body: JSON.stringify({ model: model, messages: [{ role: 'user', content: prompt }] }) }); }
+  return req.then(function (r) {
+    return r.json().catch(function () { return {}; }).then(function (j) {
+      if (!r.ok) { var e = new Error((j.error && (j.error.message || j.error)) || ('HTTP ' + r.status)); e.status = r.status; throw e; }
+      if (prov === 'gemini') return ((((j.candidates || [])[0] || {}).content || {}).parts || []).map(function (p) { return p.text || ''; }).join('');
+      if (prov === 'claude') return (j.content || []).map(function (p) { return p.text || ''; }).join('');
+      return (((j.choices || [])[0] || {}).message || {}).content || '';
+    });
+  });
+}
+function aiListModels() {
+  var prov = S.ai.prov, req;
+  if (prov === 'gemini') req = fetch('https://generativelanguage.googleapis.com/v1beta/models?key=' + encodeURIComponent(S.ai.key)).then(function (r) { return r.json(); }).then(function (j) { return (j.models || []).filter(function (m) { return (m.supportedGenerationMethods || []).indexOf('generateContent') >= 0; }).map(function (m) { return m.name.replace(/^models\//, ''); }); });
+  else if (prov === 'claude') req = fetch('https://api.anthropic.com/v1/models', { headers: { 'x-api-key': S.ai.key, 'anthropic-version': '2023-06-01', 'anthropic-dangerous-direct-browser-access': 'true' } }).then(function (r) { return r.json(); }).then(function (j) { return (j.data || []).map(function (m) { return m.id; }); });
+  else { var h = {}; if (S.ai.key) h.Authorization = 'Bearer ' + S.ai.key; req = fetch((prov === 'openai' ? 'https://api.openai.com/v1' : aiBase()) + '/models', { headers: h }).then(function (r) { return r.json(); }).then(function (j) { return (j.data || []).map(function (m) { return m.id; }).filter(function (id) { return prov !== 'openai' || /^(gpt|o\d|chatgpt)/.test(id); }); }); }
+  return req;
+}
+function langName() { return { he: 'עברית', en: 'English', ru: 'русском', es: 'español', ar: 'العربية' }[S.lang] || 'עברית'; }
+function promptHead() { return T('aiPromptHead', { lang: langName() }) + '\n\n'; }
+function ctrlLine(f) { return T('aiCtrlLine', { real: f.count, shuf: f.ctrl == null ? '—' : f.ctrl, exp: Math.round(f.exp * 10) / 10, a: f.dmin, b: f.dmax }); }
+function promptELS(L, r) {
+  var C = CORP[L.src], seen = {}, vs = '';
+  for (var j = 0; j < L.w.length; j++) { var v = verseOf(C, r.s + j * r.d); if (seen[v]) continue; seen[v] = 1; vs += '- ' + refOf(C, r.s + j * r.d) + ': ' + C.verses[v] + '\n'; }
+  return promptHead() + T('aiEls', { w: L.word, d: r.d, a: refOf(C, r.s), b: refOf(C, r.s + (L.w.length - 1) * r.d), scope: L.scLbl }) + '\n' + vs + '\n' + ctrlLine(L) + '\n\n' + T('aiAsk');
+}
+function promptReader(R, words) {
+  return promptHead() + T('aiReader', { n: R.N, l: R.label }) + '\n' + R.str.slice(0, 600) + '\n' + T('aiWords') + ' ' + words.slice(0, 40).join(', ') + '\n\n' + T('aiAskReader');
+}
+function promptMatrix() {
+  var C = CORP[MX.src], rows = [];
+  for (var r = 0; r < MX.rows; r++) { var s = ''; for (var c = 0; c < MX.C; c++) { var i = mxCell(r, c); s += i >= 0 && i < C.n ? AB[C.disp[i]] : '·'; } rows.push(s); }
+  var o = promptHead() + T('aiMatrix', { t: MX.title, w: MX.W, a: refOf(C, Math.max(0, mxCell(0, 0))), b: refOf(C, Math.min(C.n - 1, mxCell(MX.rows - 1, MX.C - 1))) }) + '\n' + rows.join('\n') + '\n';
+  if (MX.extras.length) o += T('aiExtras') + ' ' + MX.extras.map(function (e) { return e.word + ' (' + e.n + ')'; }).join(', ') + '\n';
+  if (MX.fromEls) o += ctrlLine(MX.fromEls.L) + '\n';
+  return o + '\n' + T('aiAsk');
+}
+function promptSaved(f) {
+  var C = CORP[f.src];
+  if (f.type === 'els') { var L = { word: f.word, w: wordCodes(f.word, false).slice(0, f.k), src: f.src, scLbl: f.scLbl, count: f.count, ctrl: f.ctrl, exp: f.exp, dmin: f.dmin, dmax: f.dmax }; return promptELS(L, { s: f.s, d: f.d }) + (f.note ? '\n' + T('note') + ': ' + f.note : ''); }
+  return promptHead() + fTitle(f) + '\n' + fSub(f) + (f.note ? '\n' + T('note') + ': ' + f.note : '') + '\n\n' + T('aiAsk');
+}
+function aiOpen(prompt) {
+  if (!aiReady()) {
+    var m = openModal(T('aiFreeT'), '<p class="mut">' + esc(T('aiFreeD')) + '</p><div class="ans" id="aiPr">' + esc(prompt) + '</div><div class="row" style="margin-top:10px"><button class="btn pri" data-c>' + T('copy') + '</button><button class="btn" data-sh>' + T('share') + '</button><button class="btn" data-st>⚙️ ' + T('aiConnect') + '</button></div>');
+    m.querySelector('[data-c]').onclick = function () { copyText(prompt); };
+    m.querySelector('[data-sh]').onclick = function () { shareText(T('appName'), prompt); };
+    m.querySelector('[data-st]').onclick = function () { closeModal(m); showSc('settings'); setTimeout(function () { $('aiCard').scrollIntoView({ behavior: 'smooth' }); }, 100); };
+    return;
+  }
+  var mm = openModal('🤖 ' + T('aiExplain'), '<div class="mut">' + esc(T('aiSending', { p: AIP[S.ai.prov].name })) + '</div><div class="pbar"><i style="width:60%"></i></div>');
+  aiCall(prompt).then(function (txt) {
+    S.ai.ok = true; saveS(); updHeader();
+    if (MODALS.indexOf(mm) < 0) return;
+    mm.querySelector('.mb').innerHTML = '<div class="ans heb">' + esc(txt || '—') + '</div><div class="mut" style="margin-top:8px">' + esc(T('aiDisclaimer')) + '</div><div class="row" style="margin-top:10px"><button class="btn" data-c>' + T('copy') + '</button><button class="btn" data-sh>' + T('share') + '</button></div>';
+    mm.querySelector('[data-c]').onclick = function () { copyText(txt); };
+    mm.querySelector('[data-sh]').onclick = function () { shareText(T('appName'), txt + '\n\n— ' + T('appName') + (S.name ? ' · ' + S.name : '')); };
+  }).catch(function (e) {
+    S.ai.ok = false; saveS(); updHeader();
+    if (MODALS.indexOf(mm) < 0) return;
+    mm.querySelector('.mb').innerHTML = '<p style="color:var(--danger)">' + esc(T('aiErr')) + '</p><div class="ans">' + esc(e.message || e) + '</div>';
+  });
+}
+function renderAI() {
+  var o = '';
+  Object.keys(AIP).forEach(function (k) { o += '<button class="chip' + (S.ai.prov === k ? ' on' : '') + '" data-p="' + k + '">' + esc(k === 'custom' ? T('aiCustom') : AIP[k].name) + ' <span class="tag">' + AIP[k].tag + '</span></button>'; });
+  $('aiProv').innerHTML = o;
+  $('aiProv').querySelectorAll('[data-p]').forEach(function (b) { b.onclick = function () { S.ai.prov = b.getAttribute('data-p'); S.ai.model = ''; S.ai.ok = undefined; S.ai.url = AIP[S.ai.prov].url || ''; saveS(); renderAI(); updHeader(); }; });
+  var p = AIP[S.ai.prov];
+  $('aiHelp').innerHTML = p ? T(p.help) : esc(T('aiPick'));
+  $('aiKeyF').style.display = p && (p.key || S.ai.prov === 'custom') ? '' : 'none';
+  $('aiUrlF').style.display = p && (S.ai.prov === 'ollama' || S.ai.prov === 'custom') ? '' : 'none';
+  $('aiKey').value = S.ai.key || ''; $('aiUrl').value = S.ai.url || '';
+  var ms = p ? aiModels() : [], extra = S.ai.list || [];
+  extra.forEach(function (m) { if (ms.indexOf(m) < 0) ms.push(m); });
+  $('aiModel').innerHTML = ms.map(function (m) { return '<option' + (m === S.ai.model ? ' selected' : '') + '>' + esc(m) + '</option>'; }).join('');
+  ['aiModel', 'aiRefresh', 'aiTest', 'aiOff'].forEach(function (id) { $(id).disabled = !p; });
+}
+function initAI() {
+  $('aiKey').onchange = function () { S.ai.key = $('aiKey').value.trim(); S.ai.ok = undefined; saveS(); updHeader(); };
+  $('aiUrl').onchange = function () { S.ai.url = $('aiUrl').value.trim(); saveS(); };
+  $('aiModel').onchange = function () { S.ai.model = $('aiModel').value; saveS(); };
+  $('aiRefresh').onclick = function () {
+    if (!aiReady()) { toast(T('aiNeedKey')); return; }
+    aiListModels().then(function (l) { if (!l || !l.length) throw new Error('empty'); S.ai.list = l.slice(0, 80); saveS(); renderAI(); toast(T('aiModelsN', { n: l.length })); }).catch(function () { toast(T('aiErr'), 3000); });
+  };
+  $('aiTest').onclick = function () {
+    if (!aiReady()) { toast(T('aiNeedKey')); return; }
+    toast(T('aiTesting'));
+    aiCall('Reply with the single word: OK').then(function () { S.ai.ok = true; saveS(); updHeader(); toast('✅ ' + T('aiOk')); }).catch(function (e) { S.ai.ok = false; saveS(); updHeader(); toast('❌ ' + (e.message || T('aiErr')), 4000); });
+  };
+  $('aiOff').onclick = function () { S.ai = { prov: '', key: '', model: '', url: '' }; saveS(); renderAI(); updHeader(); toast(T('aiDisc')); };
+}
+
+/* ---------- SETTINGS ---------- */
+var LANGS = [['he', 'עברית'], ['en', 'English'], ['ru', 'Русский'], ['es', 'Español'], ['ar', 'العربية']];
+function renderSettings() {
+  $('stName').value = S.name || '';
+  $('stLang').innerHTML = LANGS.map(function (l) { return '<button class="chip' + (S.lang === l[0] ? ' on' : '') + '" data-l="' + l[0] + '">' + l[1] + '</button>'; }).join('');
+  $('stLang').querySelectorAll('[data-l]').forEach(function (b) { b.onclick = function () { S.lang = b.getAttribute('data-l'); saveS(); applyLang(); renderSettings(); }; });
+  $('stTheme').innerHTML = THEMES.map(function (t) { return '<button data-th="' + t + '" class="' + (S.theme === t ? 'on' : '') + '" style="background:' + TH_COL[t] + ';color:#111">' + esc(T('th_' + t)) + '</button>'; }).join('');
+  $('stTheme').querySelectorAll('[data-th]').forEach(function (b) { b.onclick = function () { S.theme = b.getAttribute('data-th'); saveS(); applyTheme(); renderSettings(); }; });
+  $('stMode').innerHTML = ['dark', 'light'].map(function (m) { return '<button class="chip' + (S.mode === m ? ' on' : '') + '" data-m="' + m + '">' + (m === 'dark' ? '🌙 ' : '☀️ ') + esc(T('mode_' + m)) + '</button>'; }).join('');
+  $('stMode').querySelectorAll('[data-m]').forEach(function (b) { b.onclick = function () { S.mode = b.getAttribute('data-m'); saveS(); applyTheme(); renderSettings(); }; });
+  $('stFinals').checked = !!S.finals; $('stMax').value = S.maxSkip;
+  renderAI();
+}
+function initSettings() {
+  $('stName').onchange = function () { S.name = $('stName').value.trim().slice(0, 40); saveS(); hello(); quickChips(); toast(T('savedOk')); };
+  $('stFinals').onchange = function () { S.finals = $('stFinals').checked; saveS(); };
+  $('stMax').onchange = function () { S.maxSkip = Math.max(10, Math.min(50000, parseInt($('stMax').value, 10) || 1000)); saveS(); $('sMax').value = S.maxSkip; };
+  $('bkExp').onclick = function () {
+    var ai = Object.assign({}, S.ai, { key: '' });
+    var data = { app: 'codenest', version: VERSION, date: new Date().toISOString(), user: S.name || '', settings: Object.assign({}, S, { ai: ai }), saved: SAVED, summary: T('summaryN', { n: SAVED.length }) };
+    download('codenest-backup-' + new Date().toISOString().slice(0, 10) + '.json', JSON.stringify(data, null, 1), 'application/json');
+  };
+  $('bkImp').onclick = function () { $('bkFile').value = ''; $('bkFile').click(); };
+  $('bkFile').onchange = function () {
+    var f = $('bkFile').files[0]; if (!f) return;
+    f.text().then(function (t) {
+      var d = JSON.parse(t); if (!d || d.app !== 'codenest' || !Array.isArray(d.saved)) throw new Error('bad');
+      appConfirm(T('restoreConfirm', { n: d.saved.length }), T('restore'), function () {
+        var key = S.ai.key; S = Object.assign({}, DEF, d.settings || {}); S.ai = Object.assign({}, DEF.ai, (d.settings || {}).ai || {}); if (!S.ai.key) S.ai.key = key;
+        SAVED = d.saved; saveS(); saveSaved(); applyTheme(); applyLang(); renderSettings(); toast(T('restored'));
+      });
+    }).catch(function () { toast(T('badFile'), 3000); });
+  };
+  $('guideAgain').onclick = function () { openGuide(); };
+  $('wipeAll').onclick = function () {
+    appConfirm(T('wipe1'), T('continue'), function () {
+      appConfirm(T('wipe2'), T('wipeAll'), function () { SAVED = []; S = Object.assign({}, DEF, { ai: Object.assign({}, DEF.ai) }); store.del('saved'); saveS(); applyTheme(); applyLang(); renderSettings(); toast(T('wiped')); }, true);
+    }, true);
+  };
+}
+
+/* ---------- SOURCES & ABOUT ---------- */
+function renderSources() {
+  var o = '<div class="card"><h3>' + T('srcWlcT') + ' <span class="tag ok">verified</span></h3><p class="mut">' + T('srcWlcD') + '</p><div class="mut">' + T('license') + ': Public Domain · <a style="color:var(--acc)" href="https://github.com/openscriptures/morphhb" target="_blank" rel="noopener">Open Scriptures Hebrew Bible</a> · <a style="color:var(--acc)" href="https://ebible.org/" target="_blank" rel="noopener">eBible.org</a></div></div>';
+  o += '<div class="card"><h3>' + T('srcNtT') + ' <span class="tag rv">review</span></h3><p class="mut">' + T('srcNtD') + '</p><div class="mut">' + T('license') + ': Public Domain · <a style="color:var(--acc)" href="https://ebible.org/" target="_blank" rel="noopener">eBible.org</a> · <a style="color:var(--acc)" href="https://github.com/BibleNLP/ebible" target="_blank" rel="noopener">BibleNLP/ebible</a></div></div>';
+  o += '<div class="card"><h3>' + T('srcKorenT') + '</h3><p class="mut">' + T('srcKorenD') + '</p></div>';
+  o += '<div class="card"><h3>' + T('srcRulesT') + '</h3><p class="mut">' + T('srcRulesD') + '</p></div>';
+  $('srcBody').innerHTML = o;
+}
+function renderAbout() {
+  var o = '<div class="card" style="text-align:center"><img src="icon-192.png" alt="" width="84" height="84" style="border-radius:20px;border:1px solid var(--line)"><h2 style="margin:8px 0 0">' + esc(T('appName')) + '</h2><div class="mut">CodeNest · ' + T('version') + ' ' + VERSION + '</div></div>';
+  o += '<div class="card"><div class="mut">' + T('version') + ': <b>' + VERSION + '</b> (' + T('dataV') + ' ' + DATA_V + ')<br>' + T('developer') + ': <b>Barak Aflalo</b><br>' + T('platform') + ': PWA · HTML5<br>' + T('storageLbl') + ': ' + T('onDevice') + '<br>' + T('license') + ': © AppNest 2026</div></div>';
+  o += '<div class="card"><p class="mut">' + esc(T('disclaimer')) + '</p><p class="mut">' + esc(T('transNote')) + '</p></div>';
+  o += '<div class="row"><a class="btn" href="' + STORE_URL + '" target="_blank" rel="noopener">🏪 ' + T('store') + '</a><button class="btn" id="abShare">📤 ' + T('shareApp') + '</button></div>';
+  o += '<div class="row" style="margin-top:8px"><a class="btn" href="mailto:' + FEEDBACK + '?subject=' + encodeURIComponent('CodeNest ' + VERSION) + '">✉️ ' + T('feedback') + '</a><button class="btn" id="abGuide">📖 ' + T('guide') + '</button><a class="btn" href="privacy_policy.html" target="_blank" rel="noopener">🔒 ' + T('privacy') + '</a></div>';
+  o += '<div class="row" style="margin-top:8px"><button class="btn" data-go2="sources">📚 ' + T('mSources') + '</button></div>';
+  o += '<div class="foot"><span class="badge">AppNest</span></div>';
+  $('aboutBody').innerHTML = o;
+  $('abShare').onclick = function () { var u = location.origin + location.pathname; if (navigator.share) navigator.share({ title: T('appName'), text: T('shareAppText') + (S.name ? ' — ' + S.name : ''), url: u }).catch(function () { }); else copyText(u); };
+  $('abGuide').onclick = openGuide;
+  $('aboutBody').querySelector('[data-go2]').onclick = function () { showSc('sources'); };
+}
+
+/* ---------- GUIDE ---------- */
+var GSTEPS = [['📜', 'g1t', 'g1d'], ['🔍', 'g2t', 'g2d'], ['🔢', 'g3t', 'g3d'], ['▦', 'g4t', 'g4d'], ['⚖️', 'g5t', 'g5d'], ['★', 'g6t', 'g6d']], gi = 0;
+function guideOpen() { return $('guide').classList.contains('on'); }
+function openGuide() { gi = 0; $('guide').classList.add('on'); renderGuide(); disarmExit(); syncHistory(); }
+function renderGuide() {
+  var s = GSTEPS[gi]; $('gIc').textContent = s[0]; $('gT').textContent = T(s[1]); $('gD').textContent = T(s[2]);
+  $('gDots').innerHTML = GSTEPS.map(function (x, i) { return '<i class="' + (i === gi ? 'on' : '') + '"></i>'; }).join('');
+  $('gNext').textContent = gi === GSTEPS.length - 1 ? T('start') : T('next');
+}
+function skipGuide() { $('guide').classList.remove('on'); S.guided = true; saveS(); }
+
+/* ---------- boot ---------- */
+var ON_SHOW = {
+  search: function () { quickChips(); },
+  saved: renderSaved, settings: renderSettings, sources: renderSources, about: renderAbout,
+  matrix: function (o) { if (!o.back && !mxOpening) { MX = null; $('mSetup').style.display = ''; $('mOut').innerHTML = ''; } }
+};
+function boot() {
+  applyTheme(); applyLang();
+  document.querySelectorAll('[data-go]').forEach(function (b) { b.onclick = function () { showSc(b.getAttribute('data-go')); }; });
+  $('backBtn').onclick = goBack;
+  $('themeBtn').onclick = function () { S.theme = THEMES[(THEMES.indexOf(S.theme) + 1) % THEMES.length]; saveS(); applyTheme(); toast('🎨 ' + T('th_' + S.theme)); };
+  $('aboutBtn').onclick = function () { showSc('about'); };
+  $('aiDotBtn').onclick = function () { showSc('settings'); setTimeout(function () { $('aiCard').scrollIntoView({ behavior: 'smooth' }); }, 120); };
+  $('busyCancel').onclick = cancelBusy;
+  $('gNext').onclick = function () { if (gi < GSTEPS.length - 1) { gi++; renderGuide(); } else skipGuide(); };
+  $('gSkip').onclick = skipGuide;
+  $('demoBtn').onclick = function () {
+    showSc('search'); $('sWord').value = 'תורה';
+    SCOPES.sScope.g = 'torah'; SCOPES.sScope.b = 0; renderScope('sScope');
+    $('sMin').value = 2; $('sMax').value = 100; runSearch();
+  };
+  $('expCsv').onclick = exportCSV; $('expPdf').onclick = exportPDF;
+  $('shareSaved').onclick = function () { if (!SAVED.length) { toast(T('noSaved')); return; } shareText(T('mSaved'), savedText()); };
+  initSearch(); initReader(); initMatrix(); initSettings(); initAI();
+  updSavedCount(); syncHistory();
+  if (!S.guided && !/[?&]noguide/.test(location.search)) openGuide();
+  var bf = $('bootfail'); if (bf) bf.remove();
+  if ('serviceWorker' in navigator && !/[?&]nosw/.test(location.search)) navigator.serviceWorker.register('sw.js').catch(function () { });
+  window.__APP_READY = true;
+}
+boot();
+
+</script>
+</body>
+</html>
